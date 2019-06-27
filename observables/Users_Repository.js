@@ -85,6 +85,10 @@ class Users_Repository {
         return bcrypt.hashSync(plainText, 10);
     }
 
+    authenticate(password,hash){
+        return bcrypt.compareSync(password,hash);
+    }
+
     subscribe(observer) {
         this.observers.push(observer)
     }
