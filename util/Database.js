@@ -37,9 +37,9 @@ class Database{
             return JSON.parse(JSON.stringify(err));
         })
     }
-    updateDocuments(collection,querys,updates){
+    updateDocuments(collection,query,update){
 
-        return this.db.collection(collection).updateMany(querys,updates).
+        return this.db.collection(collection).updateMany(query,update).
         then((res)=>{
             return JSON.parse(JSON.stringify(res));
         }).
@@ -57,6 +57,42 @@ class Database{
         catch((err)=>{
             return JSON.parse(JSON.stringify(err));
         });
+    }
+
+    notify(collection,action,value) {
+
+        if(action === 'CREATE') {
+            return this.createDocuments(collection,[value]).then((res) => {
+                return res;
+            }).catch((err) => {
+                return err;
+            });
+        }
+
+        else if(action === 'UPDATE'){
+            return this.updateDocuments(collection,value[0],value[1]).then((res)=>{
+                return res;
+            }).catch((err)=>{
+                return err;
+            });
+        }
+
+        else if( action === 'DELETE'){
+            return this.deleteDocuments(collection,value).
+            then((res)=>{
+                return res;
+            }).
+            catch((err)=>{
+                return err;
+            });
+        }
+
+        else{
+
+            return false;
+        }
+
+
     }
 }
 

@@ -14,6 +14,86 @@
             font-size: 30px;
         }
     </style>
+    <script>
+        function validate(){
+
+            let valid = true;
+
+            const password = document.getElementById('password');
+            password.style.backgroundColor = "transparent";
+
+            const retype = document.getElementById('retype');
+            retype.style.backgroundColor = "transparent";
+
+            const length = RegExp('^.{6,}$');
+            const lengthTag = document.getElementById('length');
+            lengthTag.style.color = "black";
+
+            const uppercase = RegExp('/*[A-Z]');
+            const uppercaseTag = document.getElementById('uppercase');
+            uppercaseTag.style.color = "black";
+
+            const lowercase = RegExp('/*[a-z]');
+            const lowercaseTag = document.getElementById('lowercase');
+            lowercaseTag.style.color = "black";
+
+            const number = RegExp('/*[0-9]');
+            const numberTag = document.getElementById('number');
+            numberTag.style.color = "black";
+
+            const special = RegExp('[#$@!%&*?]');
+            const specialTag = document.getElementById('special');
+            specialTag.style.color = "black";
+
+
+            if(!password.value){
+                password.style.backgroundColor = "pink";
+                valid = false;
+            }
+            if(!retype.value){
+                retype.style.backgroundColor = "pink";
+                valid = false;
+            }
+            if(!length.test(password.value)){
+                lengthTag.style.color = "red";
+                valid = false;
+            }
+            if(!uppercase.test(password.value)){
+                uppercaseTag.style.color = "red";
+                valid = false;
+            }
+            if(!lowercase.test(password.value)){
+                lowercaseTag.style.color = "red";
+                valid = false;
+            }
+            if(!number.test(password.value)){
+                numberTag.style.color = "red";
+                valid = false;
+            }
+            if(!special.test(password.value)){
+                specialTag.style.color = "red";
+                valid = false;
+            }
+            if(password.value !== retype.value){
+                let error = document.getElementById('passError');
+                clearChildren(error);
+                password.style.backgroundColor = "pink";
+                retype.style.backgroundColor = "pink";
+                error.appendChild(document.createTextNode('*Passwords Do Not Match'));
+                error.style.color = "red";
+                error.style.display = "block";
+                valid = false;
+            }
+            return valid;
+        }
+        function clearChildren(element){
+
+            while (element.firstChild) {
+                element.removeChild(element.firstChild);
+            }
+
+        }
+    </script>
 </head>
 <body>
 
@@ -26,29 +106,28 @@
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header" style="padding:35px 50px;">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4><span class="glyphicon glyphicon-lock"></span> Create User</h4>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Account Creation for <%= firstname%> </h4>
                 </div>
                 <div class="modal-body" style="padding:40px 50px;">
-                    <form role="form" method="post">
+                    <form role="form" onsubmit="return validate()" method="post">
+                        <div style="font-size:12px" class="form-group">
+                            <p><b>Password Must Contain:</b></p>
+                            <p id="length">At least 6 Characters </p>
+                            <p id="uppercase">One Upper Case Alphabetic(e.g., A-Z)</p>
+                            <p id="lowercase">One Lower Case Alphabetic(e.g., a-z)</p>
+                            <p id="number">One Numeric (i.e. 0-9)</p>
+                            <p id="special">One Special Character (e.g., # $ @ ! % & * ?)</p>
+                        </div>
+                        <p id="passError" style="display:none; font-size:12px;"></p>
                         <div class="form-group">
-                            <label for="firstname"><span class="glyphicon glyphicon-user"></span> First Name</label>
-                            <input type="text" class="form-control" name="firstname" id="firstname" placeholder="First Name">
+                            <label for="password"><span class="glyphicon glyphicon-user"></span> Password</label>
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Password">
                         </div>
                         <div class="form-group">
-                            <label for="lastname"><span class="glyphicon glyphicon-user"></span> Last Name</label>
-                            <input type="text" class="form-control" name="lastname" id="lastname" placeholder="Last Name">
+                            <label for="retype"><span class="glyphicon glyphicon-user"></span> Retype Password</label>
+                            <input type="password" class="form-control" name="retype" id="retype" placeholder="Retype Password">
                         </div>
-                        <div class="form-group">
-                            <label for="email"><span class="glyphicon glyphicon-user"></span> Email</label>
-                            <input type="text" class="form-control" name="email" id="email" placeholder="User Name">
-                        </div>
-                        <div class="form-group">
-                            <label for="folder"><span class="glyphicon glyphicon-user"></span> Folder Name</label>
-                            <input type="text" class="form-control" name="folder" id="folder" placeholder="Folder Name">
-                        </div>
-                        <input type="hidden" name="admin" id="admin" value="false"/>
-                        <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span> Create</button>
+                        <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span> Submit</button>
                     </form>
                 </div>
             </div>

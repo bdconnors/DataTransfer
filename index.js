@@ -1,6 +1,3 @@
-/** Dependencies **/
-const User = require('./models/User').User;
-
 /** App Framework **/
 const express = require('express');
 const session = require('express-session');
@@ -9,69 +6,100 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const cors  = require('cors');
 
-/** ID and Password Tools **/
+/** UniqueID Generator**/
 const uuid = require('uuid');
+
+
+/** User Authentication **/
+const Authentication = require('./util/Authentication').Authentication;
+const auth = new Authentication();
 
 /** Database **/
 const url = 'mongodb://localhost:27017';
 const dbName = 'novvdr';
-const Database = require('./util/Database').Database;
-const db = new Database(url,dbName);
 
-const Users_Repository = require('./observables/Users_Repository').Users_Repository;
-let userRepo;
-const Users_DB = require('./observers/Users_DB').Users_DB;
-let userDB;
+    /** Database CRUD Functions**/
+    const Database = require('./util/Database').Database;
+    const db = new Database(url,dbName);
 
 
-db.connect().then((res)=>{
+/** Internal Data Structures **/
 
-    userRepo = new Users_Repository();
-    userDB = new Users_DB(db);
-    userRepo.subscribe(userDB);
-    userDB.getAllUsers().then((res)=>{
-        for(let i = 0; i < res.length; i++){
-            userRepo.users[i] = new User(
-                res[i].id,
-                res[i].admin,
-                res[i].firstname,
-                res[i].lastname,
-                res[i].email,
-                res[i].password,
-                res[i].folder
-            );
-        }
-    }).catch((err)=>{throw err});
+    /** User Model **/
+    const User = require('./models/User').User;
 
-}).catch((err)=>{
-    throw err
-});
+    /** User Repository **/
+    const Users_Repo = require('./Users_Repo').Users_Repo;
+    let userRepo;
+
+    /** Folder Model **/
+    const Folder = require('./models/Folder').Folder;
+
+    /** Folder Repository **/
+    const Folders_Repo = require('./Folders_Repo').Folders_Repo;
+    let folderRepo;
+
+/** App Start Up **/
+
+    /** Connect to Database and load Internal Data Structures **/
+    db.connect().then((res)=>{
+
+        userRepo = new Users_Repo();
+        userRepo.subscribe(db);
+
+        folderRepo = new Folders_Repo();
+        folderRepo.subscribe(db);
+
+        db.retrieveDocuments('users',{}).then((res)=>{
+
+                userRepo.load(res);
+                console.log(userRepo.users);
+
+                db.retrieveDocuments('folders',{}).then((res)=>{
+
+                    folderRepo.load(res);
+
+                }).catch((err)=>{throw err;});
+
+        }).catch((err)=>{throw err});
+
+    }).catch((err)=>{
+        throw err
+    });
 
 
 
-/** Initialize App **/
-const app = express();
-const port = 3000;
-app.set('view engine','ejs');
-app.use(bodyParser.urlencoded({ extended: true,limit: '50mb'}));
-app.use(bodyParser.json());
-app.use(cors());
-app.listen(port, () => console.log(`listening on port 3000!`));
+    /** Initialize App and App Components **/
+
+        /** Use Express for App Engine and listen on port 3000 **/
+        const app = express();
+        app.listen(3000, () => console.log(`listening on port 3000!`));
+
+        /** Use ejs for View Engine **/
+        app.set('view engine','ejs');
+        app.set("views", "./views");
+
+        /** Use Body Parser to parse HTML post data **/
+        app.use(bodyParser.urlencoded({ extended: true,limit: '50mb'}));
+        app.use(bodyParser.json());
+
+        /** Use CORS for Cross Origin Requests **/
+        app.use(cors());
 
 
-/** User Sessions **/
-app.use(session({
-    genid: (req)=>{
-        return uuid()
-    },
-    secret: 'ProjectSapphire',
-    resave: true,
-    saveUninitialized: true,
-    name: 'session',
-    secure: false,
-    rolling: true,
-    cookie: { maxAge: 3600000 }
-}));
+        /** Use Express Session to Create User Sessions **/
+        app.use(session({
+            genid: (req)=>{
+                return uuid()
+            },
+            secret: 'ProjectSapphire',
+            resave: true,
+            saveUninitialized: true,
+            name: 'session',
+            secure: false,
+            rolling: true,
+            cookie: { maxAge: 3600000 }
+        }));
 
 
 
@@ -92,11 +120,11 @@ app.post('/login',(req,res)=> {
    const email =  req.body.email;
    const password = req.body.password;
 
-   if(userRepo.getUserByEmail(email)){
+   if(userRepo.getUser('email',email)){
 
-       const user = userRepo.getUserByEmail(email);
+       const user = userRepo.getUser('email',email);
 
-       if(userRepo.authenticate(password,user.password)){
+       if(auth.checkPassword(password,user.password)){
 
            req.session.user = user;
 
@@ -121,18 +149,149 @@ app.post('/login',(req,res)=> {
    }
 
 });
+app.get('/logout',(req,res)=>{
 
+    if(req.session && req.user){
+        req.session.destroy();
+        res.redirect('/login');
+    }else{
+        res.redirect('/login');
+    }
+});
 app.get('/dashboard',(req,res)=>{
 
     if(req.session && req.session.user) {
 
-        res.send(req.session.user);
+        let user = req.session.user;
+        if(req.session.user.admin){
+            res.render('dashboard',{title:'Dashboard',firstname:user.firstname,menu:'adminMenu.ejs',folders:folderRepo.folders,users:userRepo.users});
+        }else{
+
+        }
 
     }else{
 
         req.session.origin = '/dashboard';
         res.redirect('/login');
 
+    }
+
+});
+
+app.get('/add/user',(req,res)=>{
+
+    if(auth.checkSession(req)){
+
+        if(auth.checkAdmin(req)){
+
+            res.render('addUser');
+
+        }else{
+            res.send('User Unauthorized');
+        }
+
+    }else{
+        req.session.origin = '/add/user';
+        res.redirect('/login');
+    }
+
+
+});
+app.post('/add/user',(req,res)=>{
+
+    if(auth.checkSession(req)){
+
+        if(auth.checkAdmin(req)){
+
+            let firstname = req.body.firstname;
+            let lastname = req.body.lastname;
+            let email = req.body.email;
+
+            userRepo.createUser(false,firstname,lastname,email).then((result)=>{
+                res.send(result);
+            }).catch((err)=>{
+                console.log(err);
+                res.send('Server Error');
+            });
+
+
+
+        }else{
+            res.send('User Unauthorized');
+        }
+
+    }else{
+        req.session.origin = '/add/user';
+        res.redirect('/login');
+    }
+
+});
+
+app.get('/newuser',(req,res)=>{
+
+    let authcode = req.query.authcode;
+    console.log(userRepo);
+    if(userRepo.getUser('authCode',authcode)){
+        let user = userRepo.getUser('authCode',authcode);
+        res.render('createUser',{firstname:user.firstname});
+    }
+
+
+});
+app.post('/newuser',(req,res)=>{
+
+    const user = userRepo.getUser('authCode',req.query.authcode);
+    console.log(req.query.authcode);
+    const password = req.body.password;
+    const hashPassword = auth.createHashPassword(password);
+
+    if(userRepo.updateUser({id:user.id,admin:user.admin,firstname:user.firstname,lastname:user.lastname,email:user.email,password:hashPassword,authCode:''})){
+        res.redirect('/newuser/success?name='+user.firstname+' '+user.lastname+'&email='+user.email);
+    }else{
+        res.send('Fail');
+    }
+
+
+});
+app.get('/newuser/success',(req,res)=>{
+
+    if(req.query.name && req.query.email) {
+        res.render('userAddSuccess', {
+            name: req.query.name,
+            email: req.query.email
+        });
+    }
+
+});
+app.get('/add/folder',(req,res)=>{
+    if(auth.checkSession(req)) {
+        console.log(req.session.user);
+        console.log(userRepo.users);
+        res.render('addFolder', {sessUser:req.session.user,users: userRepo.users})
+    }else{
+        req.session.origin = '/add/folder';
+        res.redirect('/login');
+    }
+});
+app.post('/add/folder',(req,res)=>{
+
+    const folderName = req.body.name;
+    let users;
+    if(req.body.users) {
+        if (req.body.users === []) {
+            users = userRepo.getManyUsers(req.body.users);
+        } else {
+            users = [userRepo.getUser(req.body.users)];
+        }
+
+    }else {
+        users = [];
+    }
+
+    if(folderRepo.createFolder(folderName,req.session.user,users)){
+        res.send('Success')
+    }else{
+        res.send('fail');
     }
 
 });

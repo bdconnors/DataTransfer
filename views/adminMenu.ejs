@@ -1,0 +1,28 @@
+<div id='cssmenu'>
+    <ul>
+        <li>
+            <a href='#'>Profile</a>
+        </li>
+        <li><a href='#'>Folders</a>
+            <ul>
+                <li><a href="/add/folder">Add New Folder</a></li>
+                <% for(var i=0; i<folders.length; i++) {%>
+                    <li><%= folders[i].name %></li>
+                <% } %>
+            </ul>
+        </li>
+        <li>
+            <a href='#'>Users</a>
+            <ul>
+                <li>
+                    <a href='/add/user'>Add New User</a>
+                </li>
+                <% for(var i=0; i<users.length; i++) {%>
+                    <li><a><%= users[i].firstname +' '+users[i].lastname %></a></li>
+                <% } %>
+            </ul>
+        <li>
+            <a href="/logout">Log Out</a>
+        </li>
+    </ul>
+</div>
