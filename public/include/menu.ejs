@@ -1,0 +1,50 @@
+
+<div id='cssmenu'>
+    <ul>
+        <li>
+            <a href='/dashboard'>Home</a>
+        </li>
+        <li>
+            <a href='#'>Folders</a>
+            <ul>
+                <li><a id="addFolderButton" >Add New Folder</a></li>
+                <% if(user.admin === true){%>
+                    <% for(var i = 0; i < folders.length; i++) {%>
+                        <li><a href="/folder/<%= folders[i].name%>"><%= folders[i].name %></a></li>
+
+                    <% } %>
+                <%}else{%>
+                    <% for(var  i = 0; i < folders.length; i++){%>
+
+                        <%if(folders[i].admin.id === user.id){%>
+                            <li><a href="/folder/<%= folders[i].name%>"><%= folders[i].name %></a></li>
+                        <%}else{%>
+                           <%for(var j = 0; j < folders[i].users.length; j++){%>
+                                <%if(folders[i].users[j].id === user.id){%>
+                                    <li><a href="/folder/<%= folders[i].name%>"><%= folders[i].name %></a></li>
+                                <%}%>
+                            <%}%>
+                        <%}%>
+                    <%}%>
+                <%}%>
+            </ul>
+        </li>
+            <%if(user.admin === true){%>
+                <li>
+                    <a href='#'>Users</a>
+                    <ul>
+                        <li>
+                            <a id="addUserButton">Add New User</a>
+                        </li>
+                        <% for(var i=0; i < users.length; i++) {%>
+                            <li><a ><%= users[i].firstname +' '+users[i].lastname %></a></li>
+                        <%}%>
+                    </ul>
+            <%}%>
+        <li>
+            <a href="/logout">Log Out</a>
+        </li>
+    </ul>
+</div>
+<%- include('../include/modal.ejs',{modalId:'addUserModal',button:'#addUserButton',modalTitle:'Add User',modalContent:'add_user.ejs'});%>
+<%- include('../include/modal.ejs',{modalId:'addFolderModal',button:'#addFolderButton',modalTitle:'Add Folder',modalContent:'add_folder.ejs'});%>

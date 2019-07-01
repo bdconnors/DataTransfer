@@ -1,0 +1,17 @@
+<%- include header.ejs%>
+<body>
+<%- include('../include/menu.ejs')%>
+<div>
+    <%if(user.admin === true){%>
+        <% for(var i = 0; i< files.length; i++){%>
+            <figure>
+                <a href="/">
+                    <img src="images/file.png"><figcaption><%= files[i].name %></figcaption>
+                </a>
+            </figure>
+        <%}%>
+    <%}else{%>
+
+    <%}%>
+</div>
+<%- include footer.ejs%>

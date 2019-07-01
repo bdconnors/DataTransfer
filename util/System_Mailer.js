@@ -19,6 +19,7 @@ class System_Mailer{
     }
 
     addUserEmail(firstname,email,authcode){
+        console.log('mail: ' + authcode);
         const mailOptions = {
             from: this.from,
             to: email,

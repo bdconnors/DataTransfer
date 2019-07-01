@@ -1,0 +1,28 @@
+<div class="container">
+
+    <!-- Modal -->
+    <div class="modal fade" id="<%= modalId%>" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span><%= modalTitle%></h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <%- include(modalContent)%>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        $("<%= button %>").click(function(){
+            $("#<%= modalId%>").modal();
+        });
+    });
+</script>

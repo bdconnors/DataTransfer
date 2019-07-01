@@ -60,7 +60,7 @@ class Database{
     }
 
     notify(collection,action,value) {
-
+        console.log(value);
         if(action === 'CREATE') {
             return this.createDocuments(collection,[value]).then((res) => {
                 return res;

@@ -19,14 +19,32 @@ class Authentication{
         return bcrypt.compareSync(password, hash);
 
     }
+    checkFolderPermission(folder,user){
 
+        let permitted = false;
+        const admin = folder.admin;
+        const users = folder.users;
 
+        if(user.id === folder.admin.id || user.admin === true){
+
+            permitted = true;
+
+        }else{
+
+            for(let i = 0; i < users.length; i++){
+
+                if(users[i].id === user.id){
+                    permitted = true;
+                }
+            }
+
+        }
+
+        return permitted;
+    }
     createHashPassword(plainText) {
         return bcrypt.hashSync(plainText, 10);
     }
 
-    authenticate(password,hash){
-        return bcrypt.compareSync(password,hash);
-    }
 }
 module.exports = {Authentication:Authentication};

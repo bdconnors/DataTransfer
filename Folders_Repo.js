@@ -1,4 +1,3 @@
-const User = require('./models/User').User;
 const Folder = require('./models/Folder').Folder;
 const Date_Util = require('./util/Date_Util').Date_Util;
 const uuid = require('uuid');
@@ -6,7 +5,8 @@ const uuid = require('uuid');
 
 class Folders_Repo {
 
-    constructor(){
+    constructor(filesRepo){
+        this.filesRepo = filesRepo;
         this.folders = [];
         this.dateUtil = new Date_Util();
         this.observers=[];
@@ -17,7 +17,7 @@ class Folders_Repo {
         let success = false;
 
         const folderId = uuid();
-        const folder = new Folder(uuid,name,this.dateUtil.getCurrentDate(),'','',[],admin,users,[]);
+        const folder = new Folder(folderId,name,this.dateUtil.getCurrentDate(),'','',[],admin,users,[]);
         this.folders.push(folder);
 
         if(this.getFolder('id',folderId)){
@@ -51,8 +51,21 @@ class Folders_Repo {
 
         if(this.getFolder('id',updateValue.id)){
 
+            let folder = this.getFolder('id',updateValue.id);
+
+            folder.id = updateValue.id;
+            folder.name = updateValue.name;
+            folder.created = updateValue.created;
+            folder.modified = updateValue.modified;
+            folder.accessed = updateValue.accessed;
+            folder.files = updateValue.files;
+            folder.admin = updateValue.admin;
+            folder.users = updateValue.users;
+            folder.activity = updateValue.activity;
+
             success = true;
-            this.notifyAll('UPDATE',updateValue);
+
+            this.notifyAll('folders','UPDATE',updateValue);
         }
 
         return success;
@@ -70,8 +83,8 @@ class Folders_Repo {
 
             if(curFolder[searchField] === searchValue){
                 success = curFolder;
-                this.notifyAll('DELETE',curFolder);
                 this.folders.splice(i,1);
+                this.notifyAll('DELETE',curFolder);
             }
         }
 
@@ -83,10 +96,17 @@ class Folders_Repo {
 
             this.folders[i] = new Folder(
 
-                folders[i].id,folders[i].name,folders[i].created,folders[i].accessed,
-                folders[i].modified,folders[i].files,folders[i].admin,folders[i].activity
+                folders[i].id,
+                folders[i].name,
+                folders[i].created,
+                folders[i].modified,
+                folders[i].accessed,
+                folders[i].files,
+                folders[i].admin,
+                folders[i].activity
 
             );
+            console.log(this.folders);
         }
     }
     subscribe(observer) {

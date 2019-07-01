@@ -14,7 +14,8 @@ class Users_Repo {
 
         let userid = uuid();
         let authCode = uuid();
-        let user = new User(userid,admin,firstname,lastname,email,'',[],authCode);
+        console.log('create: ' + authCode);
+        let user = new User(userid,admin,firstname,lastname,email,'',authCode);
         this.users.push(user);
         return this.mailer.addUserEmail(firstname,email,authCode).then((res)=>{
             this.notifyAll('users','CREATE',user);
@@ -62,9 +63,16 @@ class Users_Repo {
         let success = false;
 
         if(this.getUser('id',updateValue.id)){
-
+            let user = this.getUser('id',updateValue.id);
+            user.id = updateValue.id;
+            user.admin = updateValue.admin;
+            user.firstname = updateValue.firstname;
+            user.lastname = updateValue.lastname;
+            user.email = updateValue.email;
+            user.password = updateValue.password;
+            user.authCode = updateValue.authCode;
             success = true;
-            this.notifyAll('users','UPDATE',[{id:updateValue.id},updateValue]);
+            this.notifyAll('users','UPDATE',[{id:updateValue.id},{$set:updateValue}]);
         }
 
         return success;

@@ -1,0 +1,24 @@
+<%- include form_scripts.ejs%>
+<script>
+    function validate(){
+
+        let valid = true;
+        if(!document.getElementById('name').value){
+
+            valid = false;
+            document.getElementById('name').style.backgroundColor = 'pink';
+            clearChildren(document.getElementById('nameError'));
+            document.getElementById('nameError').style.color = 'red';
+            document.getElementById('nameError').appendChild(document.createTextNode('*Please Enter a Folder Name'));
+            document.getElementById('nameError').style.display = 'block';
+        }
+        return valid;
+    }
+    function clearChildren(element){
+
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+
+    }
+</script>

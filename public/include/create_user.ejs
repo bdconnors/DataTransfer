@@ -1,0 +1,31 @@
+<%- include ../dashboard/header.ejs%>
+
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <h4><span class="glyphicon glyphicon-lock"></span> Account Creation for <%= firstname%> </h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <form role="form" onsubmit="return validate()" method="post">
+                        <div style="font-size:12px" class="form-group">
+                            <p><b>Password Must Contain:</b></p>
+                            <p id="length">At least 6 Characters </p>
+                            <p id="uppercase">One Upper Case Alphabetic(e.g., A-Z)</p>
+                            <p id="lowercase">One Lower Case Alphabetic(e.g., a-z)</p>
+                            <p id="number">One Numeric (i.e. 0-9)</p>
+                            <p id="special">One Special Character (e.g., # $ @ ! % & * ?)</p>
+                        </div>
+                        <p id="passError" style="display:none; font-size:12px;"></p>
+                        <div class="form-group">
+                            <label for="password"><span class="glyphicon glyphicon-user"></span> Password</label>
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+                        </div>
+                        <div class="form-group">
+                            <label for="retype"><span class="glyphicon glyphicon-user"></span> Retype Password</label>
+                            <input type="password" class="form-control" name="retype" id="retype" placeholder="Retype Password">
+                        </div>
+                        <button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Submit</button>
+                    </form>
+                </div>
+            </div>
+
+<%- include ../dashboard/footer.ejs%>

@@ -5,6 +5,7 @@ const session = require('express-session');
 /** App Components **/
 const bodyParser = require('body-parser');
 const cors  = require('cors');
+const path = require('path');
 
 /** UniqueID Generator**/
 const uuid = require('uuid');
@@ -25,19 +26,18 @@ const dbName = 'novvdr';
 
 /** Internal Data Structures **/
 
-    /** User Model **/
-    const User = require('./models/User').User;
-
     /** User Repository **/
     const Users_Repo = require('./Users_Repo').Users_Repo;
     let userRepo;
 
-    /** Folder Model **/
-    const Folder = require('./models/Folder').Folder;
+    /** File Repository**/
+    const Files_repo = require('./Files_Repo').Files_Repo;
+    let fileRepo;
 
     /** Folder Repository **/
     const Folders_Repo = require('./Folders_Repo').Folders_Repo;
     let folderRepo;
+
 
 /** App Start Up **/
 
@@ -47,21 +47,37 @@ const dbName = 'novvdr';
         userRepo = new Users_Repo();
         userRepo.subscribe(db);
 
-        folderRepo = new Folders_Repo();
+        fileRepo = new Files_repo();
+
+        folderRepo = new Folders_Repo(fileRepo);
         folderRepo.subscribe(db);
 
         db.retrieveDocuments('users',{}).then((res)=>{
 
-                userRepo.load(res);
-                console.log(userRepo.users);
+            userRepo.load(res);
 
-                db.retrieveDocuments('folders',{}).then((res)=>{
 
-                    folderRepo.load(res);
+            db.retrieveDocuments('files',{}).then((res)=> {
 
-                }).catch((err)=>{throw err;});
+                fileRepo.load(res);
 
-        }).catch((err)=>{throw err});
+
+                    db.retrieveDocuments('folders', {}).then((res) => {
+
+                        folderRepo.load(res);
+
+
+                    }).catch((err) => {
+                        throw err;
+                    });
+
+                }).catch((err)=>{
+                    throw err;
+                });
+
+        }).catch((err)=>{
+            throw err
+        });
 
     }).catch((err)=>{
         throw err
@@ -77,7 +93,8 @@ const dbName = 'novvdr';
 
         /** Use ejs for View Engine **/
         app.set('view engine','ejs');
-        app.set("views", "./views");
+        app.use( express.static( "public" ));
+        app.set("views", "public");
 
         /** Use Body Parser to parse HTML post data **/
         app.use(bodyParser.urlencoded({ extended: true,limit: '50mb'}));
@@ -111,7 +128,7 @@ app.get('/',(req,res)=>{
 
 app.get('/login',(req,res)=>{
 
-    res.render('login');
+    res.render('./login/login');
 
 });
 
@@ -161,13 +178,8 @@ app.get('/logout',(req,res)=>{
 app.get('/dashboard',(req,res)=>{
 
     if(req.session && req.session.user) {
-
         let user = req.session.user;
-        if(req.session.user.admin){
-            res.render('dashboard',{title:'Dashboard',firstname:user.firstname,menu:'adminMenu.ejs',folders:folderRepo.folders,users:userRepo.users});
-        }else{
-
-        }
+        res.render('./dashboard/dashboard',{user:user,folders:folderRepo.folders,users:userRepo.users})
 
     }else{
 
@@ -210,7 +222,7 @@ app.post('/add/user',(req,res)=>{
             userRepo.createUser(false,firstname,lastname,email).then((result)=>{
                 res.send(result);
             }).catch((err)=>{
-                console.log(err);
+
                 res.send('Server Error');
             });
 
@@ -229,19 +241,22 @@ app.post('/add/user',(req,res)=>{
 
 app.get('/newuser',(req,res)=>{
 
-    let authcode = req.query.authcode;
-    console.log(userRepo);
-    if(userRepo.getUser('authCode',authcode)){
-        let user = userRepo.getUser('authCode',authcode);
-        res.render('createUser',{firstname:user.firstname});
-    }
+    if(auth.checkSession(req)) {
+        let authcode = req.query.authcode;
 
+        if (userRepo.getUser('authCode', authcode)) {
+            let user = userRepo.getUser('authCode', authcode);
+            res.render('createUser', {firstname: user.firstname});
+        }
+    }else{
+        res.send('Please Log Out First');
+    }
 
 });
 app.post('/newuser',(req,res)=>{
 
     const user = userRepo.getUser('authCode',req.query.authcode);
-    console.log(req.query.authcode);
+
     const password = req.body.password;
     const hashPassword = auth.createHashPassword(password);
 
@@ -265,9 +280,8 @@ app.get('/newuser/success',(req,res)=>{
 });
 app.get('/add/folder',(req,res)=>{
     if(auth.checkSession(req)) {
-        console.log(req.session.user);
-        console.log(userRepo.users);
-        res.render('addFolder', {sessUser:req.session.user,users: userRepo.users})
+
+        res.render('addFolder', { user:req.session.user,users: userRepo.users})
     }else{
         req.session.origin = '/add/folder';
         res.redirect('/login');
@@ -292,6 +306,32 @@ app.post('/add/folder',(req,res)=>{
         res.send('Success')
     }else{
         res.send('fail');
+    }
+
+});
+
+
+app.get('/folder/:folder',(req,res)=>{
+
+    const folderReq = req.params.folder;
+    if(auth.checkSession(req)) {
+        if (folderRepo.getFolder('name', folderReq)) {
+
+            const folder = folderRepo.getFolder('name', folderReq);
+
+            if (auth.checkFolderPermission(folder, req.session.user)) {
+                console.log(folder.files);
+                res.render('./folder/folder', {folderName: folderReq,users:userRepo.users,folders:folderRepo.folders,files:folder.files,user:req.session.user});
+
+            } else {
+                res.end('UnAuthorized');
+            }
+        } else {
+            res.send('Folder Does Not Exist');
+        }
+    }else{
+        req.session.origin = '/folder/'+folderReq;
+        res.redirect('/login');
     }
 
 });
