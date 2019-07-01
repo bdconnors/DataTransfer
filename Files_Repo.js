@@ -7,27 +7,24 @@ const mimeTypes = require('mime-types');
 
 class Files_Repo {
 
-    constructor(){
-        this.files = [];
+    constructor(files){
+        this.files = files;
         this.dateUtil = new Date_Util();
-        this.observers=[];
     }
 
-    createFolder(name,size,directory,users){
+    createFile(name,size,directory,admin,users){
 
         let success = false;
 
         const fileId = uuid();
         const ext = path.extname(name);
         const mime = mimeTypes.lookup(ext);
-        const file = new File(fileId,name,this.dateUtil.getCurrentDate(),'','',ext,mime,size,directory,users,[]);
+        const file = new File(fileId,name,this.dateUtil.getCurrentDate(),'','',ext,mime,size,directory,admin,users,[]);
         this.files.push(file);
 
         if(this.getFile('id',fileId)){
             success = true;
         }
-
-        this.notifyAll('files','CREATE',file);
         return success;
 
     }
@@ -63,10 +60,10 @@ class Files_Repo {
             file.mime = updateValue.mime;
             file.size = updateValue.size;
             file.directory = updateValue.directory;
+            file.admin = updateValue.admin;
             file.users = updateValue.users;
             file.activity = updateValue.activity;
             success = true;
-            this.notifyAll('files','UPDATE',updateValue);
         }
 
         return success;
@@ -84,41 +81,11 @@ class Files_Repo {
 
             if(curFile[searchField] === searchValue){
                 success = curFile;
-                this.folders.splice(i,1);
-                this.notifyAll('DELETE',curFile);
+                this.files.splice(i,1);
             }
         }
 
         return success;
-    }
-    load(files){
-
-        for(let i = 0; i < files.length; i++){
-
-            this.files[i] = new File(
-
-                files[i].id,
-                files[i].name,
-                files[i].created,
-                files[i].modified,
-                files[i].accessed,
-                files[i].ext,
-                files[i].mime,
-                files[i].size,
-                files[i].directory,
-                files[i].users,
-                files[i].activity
-
-            );
-        }
-    }
-    subscribe(observer) {
-
-        this.observers.push(observer)
-    }
-
-    notifyAll(collection,action,folder) {
-        this.observers.map(observer => observer.notify(collection,action,folder));
     }
 
 }

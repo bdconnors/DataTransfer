@@ -66,6 +66,7 @@ class Users_Repo {
             let user = this.getUser('id',updateValue.id);
             user.id = updateValue.id;
             user.admin = updateValue.admin;
+            user.write = updateValue.write;
             user.firstname = updateValue.firstname;
             user.lastname = updateValue.lastname;
             user.email = updateValue.email;
@@ -97,18 +98,7 @@ class Users_Repo {
 
         return success;
     }
-    load(users){
 
-        for(let i = 0; i < users.length; i++){
-
-            this.users[i] = new User(
-
-                users[i].id,users[i].admin,users[i].firstname,users[i].lastname,
-                users[i].email,users[i].password,users[i].authCode
-
-            );
-        }
-    }
 
     subscribe(observer) {
         this.observers.push(observer)

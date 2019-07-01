@@ -1,12 +1,16 @@
 const Folder = require('./models/Folder').Folder;
+const Files_Repo = require('./Files_Repo').Files_Repo;
+
+
 const Date_Util = require('./util/Date_Util').Date_Util;
 const uuid = require('uuid');
+const path = require('path');
+const mimeTypes = require('mime-types');
 
 
 class Folders_Repo {
 
-    constructor(filesRepo){
-        this.filesRepo = filesRepo;
+    constructor(){
         this.folders = [];
         this.dateUtil = new Date_Util();
         this.observers=[];
@@ -21,10 +25,10 @@ class Folders_Repo {
         this.folders.push(folder);
 
         if(this.getFolder('id',folderId)){
-            success = true;
+            success = this.getFolder('id',folderId);
+            this.notifyAll('folders','CREATE',folder);
         }
 
-        this.notifyAll('folders','CREATE',folder);
         return success;
 
     }
@@ -63,9 +67,12 @@ class Folders_Repo {
             folder.users = updateValue.users;
             folder.activity = updateValue.activity;
 
-            success = true;
+             if(this.getFolder('id',updateValue.id)){
+                 success = this.getFolder('id',updateValue.id);
+                 this.notifyAll('folders','UPDATE',[{id:updateValue.id},{$set:updateValue}]);
+             }
 
-            this.notifyAll('folders','UPDATE',updateValue);
+
         }
 
         return success;
@@ -90,25 +97,79 @@ class Folders_Repo {
 
         return success;
     }
-    load(folders){
+    addFile(folderid,name,size,directory,admin,users){
 
-        for(let i = 0; i < folders.length; i++){
+        let success = false;
 
-            this.folders[i] = new Folder(
+        if(this.getFolder('id',folderid)){
 
-                folders[i].id,
-                folders[i].name,
-                folders[i].created,
-                folders[i].modified,
-                folders[i].accessed,
-                folders[i].files,
-                folders[i].admin,
-                folders[i].activity
+            const folder = this.getFolder('id',folderid);
+            const fileRepo = new Files_Repo(folder.files);
 
-            );
-            console.log(this.folders);
+            if(fileRepo.create(name,size,directory,users)){
+                success = fileRepo.getFile('name',name);
+                this.notifyAll('folders','UPDATE',[{id:folder.id},{$set:folder}]);
+            }
         }
+
+        return success;
     }
+
+    getFile(folderid,searchField,searchValue) {
+
+        let success = false;
+
+        if(this.getFolder('id',folderid)){
+
+            const folder = this.getFolder('id',folderid);
+            const fileRepo = new Files_Repo(folder.files);
+
+            if(fileRepo.getFile(searchField,searchValue)){
+                success = fileRepo.getFile(searchField,searchValue);
+            }
+        }
+        return success;
+    }
+
+
+    updateFile(folderid,searchField,searchValue,newFileValue) {
+
+        let success = false;
+
+        if(this.getFile(folderid,searchField,searchValue)){
+
+            let folder = this.getFolder('id',folderid);
+            const fileRepo = new Files_Repo(folder.files);
+
+            if(fileRepo.updateFile(newFileValue)){
+
+                success = newFileValue;
+                this.notifyAll('folders','UPDATE',[{id:folder.id},{$set:folder}]);
+
+            }
+        }
+
+        return success;
+    }
+
+    deleteFile(folderid,searchField,searchValue) {
+
+       let success = false;
+
+       if(this.getFile(folderid,searchField,searchValue)) {
+
+           const folder = this.getFolder('id',folderid);
+           const fileRepo = new Files_Repo(folder.files);
+           const file = this.getFile(folderid,searchField,searchValue);
+
+           if(fileRepo.deleteFile(searchField,searchValue)){
+               success = file;
+               this.notifyAll('folders','UPDATE',[{id:folder.id},{$set:folder}])
+           }
+       }
+       return success;
+    }
+
     subscribe(observer) {
 
         this.observers.push(observer)

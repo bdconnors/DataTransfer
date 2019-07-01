@@ -26,13 +26,13 @@ const dbName = 'novvdr';
 
 /** Internal Data Structures **/
 
+    /** User Action Center **/
+    let User_Action = require('./User_Action').User_Action;
+    let userAction;
+
     /** User Repository **/
     const Users_Repo = require('./Users_Repo').Users_Repo;
     let userRepo;
-
-    /** File Repository**/
-    const Files_repo = require('./Files_Repo').Files_Repo;
-    let fileRepo;
 
     /** Folder Repository **/
     const Folders_Repo = require('./Folders_Repo').Folders_Repo;
@@ -47,33 +47,24 @@ const dbName = 'novvdr';
         userRepo = new Users_Repo();
         userRepo.subscribe(db);
 
-        fileRepo = new Files_repo();
-
-        folderRepo = new Folders_Repo(fileRepo);
+        folderRepo = new Folders_Repo();
         folderRepo.subscribe(db);
 
         db.retrieveDocuments('users',{}).then((res)=>{
 
-            userRepo.load(res);
+            userRepo.users = res;
+            console.log(userRepo.users);
+
+            db.retrieveDocuments('folders', {}).then((res) => {
+
+                folderRepo.folders=res;
+                console.log(folderRepo.folders);
 
 
-            db.retrieveDocuments('files',{}).then((res)=> {
+            }).catch((err) => {
+                throw err;
+            });
 
-                fileRepo.load(res);
-
-
-                    db.retrieveDocuments('folders', {}).then((res) => {
-
-                        folderRepo.load(res);
-
-
-                    }).catch((err) => {
-                        throw err;
-                    });
-
-                }).catch((err)=>{
-                    throw err;
-                });
 
         }).catch((err)=>{
             throw err
@@ -144,6 +135,7 @@ app.post('/login',(req,res)=> {
        if(auth.checkPassword(password,user.password)){
 
            req.session.user = user;
+           userAction = new User_Action(user,folderRepo);
 
            if(req.session.origin) {
 
@@ -166,6 +158,7 @@ app.post('/login',(req,res)=> {
    }
 
 });
+
 app.get('/logout',(req,res)=>{
 
     if(req.session && req.user){
@@ -175,6 +168,7 @@ app.get('/logout',(req,res)=>{
         res.redirect('/login');
     }
 });
+
 app.get('/dashboard',(req,res)=>{
 
     if(req.session && req.session.user) {
@@ -190,30 +184,12 @@ app.get('/dashboard',(req,res)=>{
 
 });
 
-app.get('/add/user',(req,res)=>{
 
-    if(auth.checkSession(req)){
-
-        if(auth.checkAdmin(req)){
-
-            res.render('addUser');
-
-        }else{
-            res.send('User Unauthorized');
-        }
-
-    }else{
-        req.session.origin = '/add/user';
-        res.redirect('/login');
-    }
-
-
-});
 app.post('/add/user',(req,res)=>{
 
     if(auth.checkSession(req)){
 
-        if(auth.checkAdmin(req)){
+        if(auth.checkAdmin(req.session.user)){
 
             let firstname = req.body.firstname;
             let lastname = req.body.lastname;
@@ -225,8 +201,6 @@ app.post('/add/user',(req,res)=>{
 
                 res.send('Server Error');
             });
-
-
 
         }else{
             res.send('User Unauthorized');
@@ -253,6 +227,7 @@ app.get('/newuser',(req,res)=>{
     }
 
 });
+
 app.post('/newuser',(req,res)=>{
 
     const user = userRepo.getUser('authCode',req.query.authcode);
@@ -268,6 +243,7 @@ app.post('/newuser',(req,res)=>{
 
 
 });
+
 app.get('/newuser/success',(req,res)=>{
 
     if(req.query.name && req.query.email) {
@@ -278,19 +254,12 @@ app.get('/newuser/success',(req,res)=>{
     }
 
 });
-app.get('/add/folder',(req,res)=>{
-    if(auth.checkSession(req)) {
 
-        res.render('addFolder', { user:req.session.user,users: userRepo.users})
-    }else{
-        req.session.origin = '/add/folder';
-        res.redirect('/login');
-    }
-});
 app.post('/add/folder',(req,res)=>{
 
     const folderName = req.body.name;
     let users;
+
     if(req.body.users) {
         if (req.body.users === []) {
             users = userRepo.getManyUsers(req.body.users);
@@ -302,7 +271,7 @@ app.post('/add/folder',(req,res)=>{
         users = [];
     }
 
-    if(folderRepo.createFolder(folderName,req.session.user,users)){
+    if(userAction.addFolder(folderName,req.session.user,users)){
         res.send('Success')
     }else{
         res.send('fail');
@@ -315,23 +284,32 @@ app.get('/folder/:folder',(req,res)=>{
 
     const folderReq = req.params.folder;
     if(auth.checkSession(req)) {
-        if (folderRepo.getFolder('name', folderReq)) {
 
-            const folder = folderRepo.getFolder('name', folderReq);
+        if(userAction.getFolder('name',folderReq)) {
 
-            if (auth.checkFolderPermission(folder, req.session.user)) {
-                console.log(folder.files);
-                res.render('./folder/folder', {folderName: folderReq,users:userRepo.users,folders:folderRepo.folders,files:folder.files,user:req.session.user});
+            const folder = userAction.getFolder('name',folderReq);
 
-            } else {
-                res.end('UnAuthorized');
-            }
-        } else {
-            res.send('Folder Does Not Exist');
+            res.render('./folder/folder', {
+                folder: folder,
+                users: userRepo.users,
+                folders: folderRepo.folders,
+                user: req.session.user
+            });
+        }else{
+            res.send("You're either an Un-Authorized user or the requested folder no longer exits");
         }
+
+
     }else{
         req.session.origin = '/folder/'+folderReq;
         res.redirect('/login');
     }
+
+});
+
+app.post('/file/upload',(req,res)=>{
+
+
+    res.send(req.body);
 
 });

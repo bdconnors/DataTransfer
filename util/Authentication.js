@@ -11,8 +11,11 @@ class Authentication{
         }
         return valid;
     }
-    checkAdmin(req){
-        return req.session.user.admin;
+    checkAdmin(user){
+        return user.admin;
+    }
+    checkWritePriv(user){
+        return user.write;
     }
     checkPassword(password, hash) {
 
@@ -22,10 +25,9 @@ class Authentication{
     checkFolderPermission(folder,user){
 
         let permitted = false;
-        const admin = folder.admin;
         const users = folder.users;
 
-        if(user.id === folder.admin.id || user.admin === true){
+        if(this.checkFolderAdmin(folder,user)|| this.checkAdmin(user)){
 
             permitted = true;
 
@@ -41,6 +43,53 @@ class Authentication{
         }
 
         return permitted;
+    }
+    checkFolderAdmin(folder,user){
+
+        let permitted = false;
+
+        if(folder.admin.id === user.id){
+            permitted = true;
+        }
+
+        return permitted;
+
+    }
+    checkFileAdmin(file,user){
+
+        let permitted = false;
+
+        if(file.admin.id === user.id){
+            permitted = true;
+        }
+
+        return permitted;
+    }
+    checkFilePriv(file,user){
+
+        let permitted = false;
+
+        const users = file.users;
+
+        if(this.checkAdmin(user)){
+
+            permitted = true;
+
+        }else{
+
+            for(let i = 0; i < users.length; i++){
+
+                if(users[i].id === user.id){
+
+                    permitted = true;
+
+                }
+            }
+
+        }
+
+        return permitted;
+
     }
     createHashPassword(plainText) {
         return bcrypt.hashSync(plainText, 10);

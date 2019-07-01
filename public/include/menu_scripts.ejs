@@ -1,7 +1,6 @@
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
-<%- include add_folder_scripts.ejs%>
-<%- include add_user_scripts.ejs%>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 <script>
     (($) =>{
 
@@ -70,4 +69,40 @@
             });
         });
     })(jQuery);
+</script>
+<script>
+    function validate(){
+
+        let valid = true;
+        if(!document.getElementById('name').value){
+
+            valid = false;
+            document.getElementById('name').style.backgroundColor = 'pink';
+            clearChildren(document.getElementById('nameError'));
+            document.getElementById('nameError').style.color = 'red';
+            document.getElementById('nameError').appendChild(document.createTextNode('*Please Enter a Folder Name'));
+            document.getElementById('nameError').style.display = 'block';
+        }
+        return valid;
+    }
+    function clearChildren(element){
+
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+
+    }
+</script>
+<script>
+    $(document).ready(function(){
+        $("#input").change(function(){
+            let input = document.getElementById('input');
+            let reader = new FileReader();
+            reader.onload = function(){
+                let data = reader.readAsDataURL(input.files[0]);
+                document.getElementById('data').value = data;
+            };
+        });
+    });
+
 </script>
