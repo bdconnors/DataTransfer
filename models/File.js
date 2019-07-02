@@ -1,5 +1,5 @@
 class File{
-    constructor(id,name,created,modified,accessed,ext,mime,size,directory,admin,users,activity){
+    constructor(id,name,created,modified,accessed,ext,mime,size,directory,admin,users){
         this.id = id;
         this.name = name;
         this.created = created;
@@ -11,7 +11,6 @@ class File{
         this.directory = directory;
         this.admin = admin;
         this.users = users;
-        this.activity = activity;
     }
 }
 module.exports = {File:File};

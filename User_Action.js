@@ -4,21 +4,21 @@ class User_Action{
 
     constructor(user,folderRepo){
         this.user = user;
+        this.userFolders= [];
         this.folderRepo = folderRepo;
         this.auth = new Authentication();
     }
 
     addFolder(name,admin,users){
 
-        let success = false;
-
         if(this.auth.checkAdmin(this.user)|| this.auth.checkWritePriv(this.user)) {
-
-            success = this.folderRepo.createFolder(name, admin, users);
-
+            return this.folderRepo.createFolder(name, admin, users).then((res)=>{
+                return res;
+            }).catch((err)=>{
+                return err;
+            });
         }
 
-        return success;
     }
     getFolder(searchField,searchValue){
 
@@ -69,19 +69,30 @@ class User_Action{
         return success;
 
     }
-    addFile(folderid,name,size,admin,users){
+    addFile(foldername,name,data,admin,users){
 
-        let success = false;
+        if(this.getFolder('name',foldername) && this.auth.checkWritePriv(this.user)){
 
-        if(this.getFolder('id',folderid) && this.auth.checkWritePriv(this.user)){
+            const folder = this.getFolder('name',foldername);
+            const directory = './files/'+folder.name+'/';
 
-            const folder = this.getFolder('id',folderid);
-            const directory = '/files/'+folder.name+'/';
-            success = this.folderRepo.addFile(name,size,directory,admin,users);
+            return this.folderRepo.addFile(foldername,name,data,directory,admin,users).
+            then((result)=>{
 
+                return result;
+
+            }).
+            catch((err)=>{
+
+                return err;
+
+            });
+
+        }else{
+            return false;
         }
 
-        return success;
+
 
     }
     getFile(folderid,searchField,searchValue,){
@@ -141,6 +152,18 @@ class User_Action{
             }
         }
         return success;
+    }
+    load(){
+
+        for(let i = 0; i < this.folderRepo.folders.length; i++){
+
+            let folder= this.folderRepo.folders[i];
+
+            if(this.auth.checkFolderPermission(folder,this.user)){
+                this.userFolders[i] = folder
+            }
+
+        }
     }
 }
 

@@ -31,6 +31,7 @@ class Database{
 
         return this.db.collection(collection).find(query).toArray().
         then((res)=>{
+
             return JSON.parse(JSON.stringify(res));
         }).
         catch((err)=>{
@@ -41,6 +42,7 @@ class Database{
 
         return this.db.collection(collection).updateMany(query,update).
         then((res)=>{
+
             return JSON.parse(JSON.stringify(res));
         }).
         catch((err)=>{

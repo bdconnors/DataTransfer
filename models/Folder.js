@@ -1,6 +1,6 @@
 class Folder {
 
-    constructor(id,name,created,modified,accessed,files,admin,users,activity){
+    constructor(id,name,created,modified,accessed,files,admin,users){
         this.id = id;
         this.name = name;
         this.created = created;
@@ -9,7 +9,6 @@ class Folder {
         this.files = files;
         this.admin = admin;
         this.users = users;
-        this.activity = activity;
     }
 }
 

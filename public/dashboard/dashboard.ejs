@@ -6,36 +6,14 @@
     </div>
     <div>
         <% for(var i=0; i< folders.length; i++){%>
-
-            <%if(folders[i].admin.id === user.id || user.admin === true){%>
-                <div>
-                    <figure>
-                        <a style = "text-decoration: none;" href="/folder/<%= folders[i].name%>">
-                            <img src="../images/folder.png">
-                            <figcaption><%= folders[i].name %></figcaption>
-                        </a>
-                    </figure>
-                </div>
-
-            <%}else{%>
-
-                <% for(var i = 0; i<folders[i].users.length; i++){%>
-
-                    <%if(folders[i].users[i].id === user.id){%>
-
-                    <div>
-                        <figure>
-                            <a style = "text-decoration: none;" href="/folder/<%= folders[i].name%>">
-                                <img src="../images/folder.png">
-                                <figcaption><%= folders[i].name %></figcaption>
-                            </a>
-                        </figure>
-                    </div>
-                    <%}%>
-
-                <%}%>
-            <%}%>
-
+            <div>
+                <figure>
+                    <a style = "text-decoration: none;" href="/folder/<%= folders[i].name%>">
+                        <img src="../images/folder.png">
+                        <figcaption><%= folders[i].name %></figcaption>
+                    </a>
+                </figure>
+            </div>
         <%}%>
     </div>
 <%- include footer.ejs %>

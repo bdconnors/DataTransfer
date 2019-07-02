@@ -10,12 +10,12 @@ class Users_Repo {
         this.observers=[];
     }
 
-    createUser(admin,firstname,lastname,email){
+    createUser(admin,write,firstname,lastname,email){
 
         let userid = uuid();
         let authCode = uuid();
         console.log('create: ' + authCode);
-        let user = new User(userid,admin,firstname,lastname,email,'',authCode);
+        let user = new User(userid,admin,write,firstname,lastname,email,'',authCode);
         this.users.push(user);
         return this.mailer.addUserEmail(firstname,email,authCode).then((res)=>{
             this.notifyAll('users','CREATE',user);
@@ -42,19 +42,26 @@ class Users_Repo {
 
     }
 
-    getManyUsers(users){
+    getManyUsers(userIds){
 
         let manyUsers = [];
 
-        for(let i = 0; i < users.length; i++){
+        for(let i = 0; i < userIds.length; i++){
 
-            let curUser;
+            console.log('in ID for loop ');
+            let curId = userIds[i];
+            console.log(curId);
 
-            if(this.getUser('id',users[i].id)){
-                curUser = users[i];
-                manyUsers[i] = curUser;
+            if(this.getUser('id',curId) !== false){
+                console.log('user exists');
+                console.log(this.getUser('id',curId));
+                manyUsers[i] = this.getUser('id',curId);
             }
+
         }
+        console.log('many users');
+        console.log(manyUsers);
+
 
         return manyUsers;
     }
@@ -62,7 +69,7 @@ class Users_Repo {
 
         let success = false;
 
-        if(this.getUser('id',updateValue.id)){
+        if(this.getUser('id',updateValue.id)!== false){
             let user = this.getUser('id',updateValue.id);
             user.id = updateValue.id;
             user.admin = updateValue.admin;
@@ -99,7 +106,22 @@ class Users_Repo {
         return success;
     }
 
+    load(users){
 
+        for(let i = 0; i < users.length; i++){
+            this.users.push(
+                new User(users[i].id,
+                    users[i].admin,
+                    users[i].write,
+                    users[i].firstname,
+                    users[i].lastname,
+                    users[i].email,
+                    users[i].password,
+                    users[i].authCode)
+            )
+        }
+
+    }
     subscribe(observer) {
         this.observers.push(observer)
     }

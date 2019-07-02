@@ -10,6 +10,8 @@ const path = require('path');
 /** UniqueID Generator**/
 const uuid = require('uuid');
 
+/** File System **/
+const fs = require('fs');
 
 /** User Authentication **/
 const Authentication = require('./util/Authentication').Authentication;
@@ -52,14 +54,13 @@ const dbName = 'novvdr';
 
         db.retrieveDocuments('users',{}).then((res)=>{
 
-            userRepo.users = res;
+            userRepo.load(res);
             console.log(userRepo.users);
 
             db.retrieveDocuments('folders', {}).then((res) => {
 
-                folderRepo.folders=res;
+                folderRepo.load(res);
                 console.log(folderRepo.folders);
-
 
             }).catch((err) => {
                 throw err;
@@ -135,7 +136,9 @@ app.post('/login',(req,res)=> {
        if(auth.checkPassword(password,user.password)){
 
            req.session.user = user;
+           console.log(req.session.user);
            userAction = new User_Action(user,folderRepo);
+           userAction.load();
 
            if(req.session.origin) {
 
@@ -173,7 +176,7 @@ app.get('/dashboard',(req,res)=>{
 
     if(req.session && req.session.user) {
         let user = req.session.user;
-        res.render('./dashboard/dashboard',{user:user,folders:folderRepo.folders,users:userRepo.users})
+        res.render('./dashboard/dashboard',{user:user,folders:userAction.userFolders,users:userRepo.users})
 
     }else{
 
@@ -194,8 +197,22 @@ app.post('/add/user',(req,res)=>{
             let firstname = req.body.firstname;
             let lastname = req.body.lastname;
             let email = req.body.email;
+            let write;
+            let admin;
 
-            userRepo.createUser(false,firstname,lastname,email).then((result)=>{
+            if(req.body.permissions === 'admin'){
+                admin = true;
+                write = true;
+            }else if(req.body.permissions === 'write'){
+                admin = false;
+                write = true;
+            }else{
+                admin = false;
+                write = false;
+            }
+
+
+            userRepo.createUser(admin,write,firstname,lastname,email).then((result)=>{
                 res.send(result);
             }).catch((err)=>{
 
@@ -215,16 +232,14 @@ app.post('/add/user',(req,res)=>{
 
 app.get('/newuser',(req,res)=>{
 
-    if(auth.checkSession(req)) {
+
         let authcode = req.query.authcode;
 
         if (userRepo.getUser('authCode', authcode)) {
             let user = userRepo.getUser('authCode', authcode);
-            res.render('createUser', {firstname: user.firstname});
+            res.render('./create_user/create_user', {firstname: user.firstname});
         }
-    }else{
-        res.send('Please Log Out First');
-    }
+
 
 });
 
@@ -247,7 +262,7 @@ app.post('/newuser',(req,res)=>{
 app.get('/newuser/success',(req,res)=>{
 
     if(req.query.name && req.query.email) {
-        res.render('userAddSuccess', {
+        res.render('./create_user/create_user_success', {
             name: req.query.name,
             email: req.query.email
         });
@@ -261,21 +276,25 @@ app.post('/add/folder',(req,res)=>{
     let users;
 
     if(req.body.users) {
-        if (req.body.users === []) {
+        if (typeof req.body.users === 'object')  {
+            console.log('is array');
             users = userRepo.getManyUsers(req.body.users);
-        } else {
-            users = [userRepo.getUser(req.body.users)];
+        }else{
+
+            console.log('is not array');
+            users = [userRepo.getUser('id',req.body.users)];
         }
 
     }else {
         users = [];
     }
 
-    if(userAction.addFolder(folderName,req.session.user,users)){
-        res.send('Success')
-    }else{
-        res.send('fail');
-    }
+    userAction.addFolder(folderName,req.session.user,users).then((result)=>{
+        console.log(result.users);
+        res.render('./add_folder/add_folder_success',{folder:result,permissions:result.users});
+    }).catch((err)=>{
+        res.send(err);
+    });
 
 });
 
@@ -288,11 +307,10 @@ app.get('/folder/:folder',(req,res)=>{
         if(userAction.getFolder('name',folderReq)) {
 
             const folder = userAction.getFolder('name',folderReq);
-
             res.render('./folder/folder', {
                 folder: folder,
                 users: userRepo.users,
-                folders: folderRepo.folders,
+                folders: userAction.userFolders,
                 user: req.session.user
             });
         }else{
@@ -307,9 +325,64 @@ app.get('/folder/:folder',(req,res)=>{
 
 });
 
-app.post('/file/upload',(req,res)=>{
+
+app.get('/folder/:folder/:file',(req,res)=>{
+
+    if(folderRepo.getFolder('name',req.params.folder)){
+
+        let folder = folderRepo.getFolder('name', req.params.folder);
+
+        if (folderRepo.getFile(folder.id,'name', req.params.file)) {
+
+            let file = folderRepo.getFile(folder.id,'name', req.params.file);
+
+            if (auth.checkFilePriv(file, req.session.user)) {
+
+                res.setHeader('Content-Type',file.mime);
+                res.setHeader('Content-Disposition', 'inline; filename=' + file.name);
+                let stream = fs.createReadStream('./files/' + req.params.folder + '/' + req.params.file);
+                stream.pipe(res);
 
 
-    res.send(req.body);
+            } else {
+                res.send('Unauthorized');
+            }
+
+        } else {
+            res.send('file not found');
+        }
+    }else{
+        res.send('folder not found');
+    }
+
+
+});
+
+app.post('/folder/:folder/upload/file',(req,res)=>{
+
+    const folder = req.params.folder;
+    const fileName = req.body.input;
+    const data = req.body.data;
+    const admin = req.session.user;
+    let users;
+
+    if(req.body.users) {
+        if (req.body.users === []) {
+            users = userRepo.getManyUsers(req.body.users);
+        } else {
+            users = [userRepo.getUser(req.body.users)];
+        }
+
+    }else {
+        users = [];
+    }
+
+    userAction.addFile(folder,fileName,data,admin,users).then((result)=>{
+        res.send(result);
+    }).catch((err)=>{
+        res.send(err);
+    })
+
+
 
 });

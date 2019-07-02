@@ -3,6 +3,7 @@ const Date_Util = require('./util/Date_Util').Date_Util;
 const uuid = require('uuid');
 const path = require('path');
 const mimeTypes = require('mime-types');
+const fs = require('fs.promises');
 
 
 class Files_Repo {
@@ -12,21 +13,26 @@ class Files_Repo {
         this.dateUtil = new Date_Util();
     }
 
-    createFile(name,size,directory,admin,users){
-
-        let success = false;
+    createFile(name,data,directory,admin,users) {
 
         const fileId = uuid();
+        const size = Buffer.byteLength(data);
         const ext = path.extname(name);
         const mime = mimeTypes.lookup(ext);
-        const file = new File(fileId,name,this.dateUtil.getCurrentDate(),'','',ext,mime,size,directory,admin,users,[]);
-        this.files.push(file);
+        const file = new File(fileId, name, this.dateUtil.getCurrentDate(), '', '', ext, mime, size, directory, admin, users);
+        return fs.appendFile(directory+name, data, 'base64').then((result) => {
 
-        if(this.getFile('id',fileId)){
-            success = true;
-        }
-        return success;
+            this.files.push(file);
 
+            if (this.getFile('id', fileId)!== false) {
+                return this.getFile('id',fileId);
+            }else{
+                return false;
+            }
+
+        }).catch((err)=>{
+            return err;
+        });
     }
 
     getFile(searchField,searchValue) {
@@ -49,7 +55,7 @@ class Files_Repo {
 
         let success = false;
 
-        if(this.getFile('id',updateValue.id)){
+        if(this.getFile('id',updateValue.id)!== false){
             let file = this.getFile('id',updateValue.id);
             file.id = updateValue.id;
             file.name = updateValue.name;
@@ -62,7 +68,6 @@ class Files_Repo {
             file.directory = updateValue.directory;
             file.admin = updateValue.admin;
             file.users = updateValue.users;
-            file.activity = updateValue.activity;
             success = true;
         }
 
@@ -79,7 +84,7 @@ class Files_Repo {
 
             let curFile = this.files[i];
 
-            if(curFile[searchField] === searchValue){
+            if(curFile[searchField] === searchValue !== false){
                 success = curFile;
                 this.files.splice(i,1);
             }

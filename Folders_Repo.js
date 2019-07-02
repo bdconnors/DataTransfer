@@ -6,7 +6,7 @@ const Date_Util = require('./util/Date_Util').Date_Util;
 const uuid = require('uuid');
 const path = require('path');
 const mimeTypes = require('mime-types');
-
+const fsPromises = require('fs.promises');
 
 class Folders_Repo {
 
@@ -18,18 +18,33 @@ class Folders_Repo {
 
     createFolder(name,admin,users){
 
-        let success = false;
-
-        const folderId = uuid();
-        const folder = new Folder(folderId,name,this.dateUtil.getCurrentDate(),'','',[],admin,users,[]);
-        this.folders.push(folder);
-
-        if(this.getFolder('id',folderId)){
-            success = this.getFolder('id',folderId);
-            this.notifyAll('folders','CREATE',folder);
+        if(this.countDuplicateName(name) > 0){
+            let duplicateCount = this.countDuplicateName(name);
+            name = name +"("+duplicateCount+")";
         }
+        return fsPromises.mkdir('./files/'+name).then((res)=>{
 
-        return success;
+            const folderId = uuid();
+            const folder = new Folder(folderId, name, this.dateUtil.getCurrentDate(), '', '', [], admin, users);
+            this.folders.push(folder);
+
+            if (this.getFolder('id', folderId)!== false) {
+
+                this.notifyAll('folders', 'CREATE', folder);
+                return this.getFolder('id', folderId);
+
+            }else{
+
+                return false;
+            }
+
+        }).catch((err)=>{
+
+            return err;
+
+
+        });
+
 
     }
 
@@ -53,7 +68,7 @@ class Folders_Repo {
 
         let success = false;
 
-        if(this.getFolder('id',updateValue.id)){
+        if(this.getFolder('id',updateValue.id)!== false){
 
             let folder = this.getFolder('id',updateValue.id);
 
@@ -65,9 +80,8 @@ class Folders_Repo {
             folder.files = updateValue.files;
             folder.admin = updateValue.admin;
             folder.users = updateValue.users;
-            folder.activity = updateValue.activity;
 
-             if(this.getFolder('id',updateValue.id)){
+             if(this.getFolder('id',updateValue.id)!== false){
                  success = this.getFolder('id',updateValue.id);
                  this.notifyAll('folders','UPDATE',[{id:updateValue.id},{$set:updateValue}]);
              }
@@ -97,34 +111,33 @@ class Folders_Repo {
 
         return success;
     }
-    addFile(folderid,name,size,directory,admin,users){
+    addFile(foldername,name,data,directory,admin,users){
 
-        let success = false;
+        const folder = this.getFolder('name',foldername);
+        const fileRepo = new Files_Repo(folder.files);
 
-        if(this.getFolder('id',folderid)){
+        return fileRepo.createFile(name,data,directory,admin,users).then((result)=>{
 
-            const folder = this.getFolder('id',folderid);
-            const fileRepo = new Files_Repo(folder.files);
+            this.notifyAll('folders','UPDATE',[{name:foldername},{$set:folder}]);
 
-            if(fileRepo.create(name,size,directory,users)){
-                success = fileRepo.getFile('name',name);
-                this.notifyAll('folders','UPDATE',[{id:folder.id},{$set:folder}]);
-            }
-        }
+            return result;
 
-        return success;
+        }).catch((err)=>{
+                return err;
+        });
+
     }
 
     getFile(folderid,searchField,searchValue) {
 
         let success = false;
 
-        if(this.getFolder('id',folderid)){
+        if(this.getFolder('id',folderid)!== false){
 
             const folder = this.getFolder('id',folderid);
             const fileRepo = new Files_Repo(folder.files);
 
-            if(fileRepo.getFile(searchField,searchValue)){
+            if(fileRepo.getFile(searchField,searchValue)!== false){
                 success = fileRepo.getFile(searchField,searchValue);
             }
         }
@@ -136,12 +149,12 @@ class Folders_Repo {
 
         let success = false;
 
-        if(this.getFile(folderid,searchField,searchValue)){
+        if(this.getFile(folderid,searchField,searchValue)!== false){
 
             let folder = this.getFolder('id',folderid);
             const fileRepo = new Files_Repo(folder.files);
 
-            if(fileRepo.updateFile(newFileValue)){
+            if(fileRepo.updateFile(newFileValue)!== false){
 
                 success = newFileValue;
                 this.notifyAll('folders','UPDATE',[{id:folder.id},{$set:folder}]);
@@ -156,20 +169,49 @@ class Folders_Repo {
 
        let success = false;
 
-       if(this.getFile(folderid,searchField,searchValue)) {
+       if(this.getFile(folderid,searchField,searchValue)!== false) {
 
            const folder = this.getFolder('id',folderid);
            const fileRepo = new Files_Repo(folder.files);
            const file = this.getFile(folderid,searchField,searchValue);
 
-           if(fileRepo.deleteFile(searchField,searchValue)){
+           if(fileRepo.deleteFile(searchField,searchValue)!== false){
                success = file;
                this.notifyAll('folders','UPDATE',[{id:folder.id},{$set:folder}])
            }
        }
        return success;
     }
+    countDuplicateName(name){
 
+        let duplicates = 0;
+
+        for(let i = 0; i < this.folders.length; i++) {
+
+            let curFolder = this.folders[i];
+
+            if (curFolder.name.includes(name)) {
+                duplicates++;
+            }
+        }
+
+        return duplicates;
+    }
+    load(folders){
+        for(let i = 0; i < folders.length; i++){
+            this.folders.push(
+                new Folder(folders[i].id,
+                    folders[i].name,
+                    folders[i].created,
+                    folders[i].modified,
+                    folders[i].accessed,
+                    folders[i].files,
+                    folders[i].admin,
+                    folders[i].users
+                )
+            )
+        }
+    }
     subscribe(observer) {
 
         this.observers.push(observer)

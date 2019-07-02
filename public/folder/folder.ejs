@@ -1,6 +1,6 @@
 <%- include header.ejs%>
 <body>
-<%- include('../include/menu.ejs')%>
+<%- include('../include/menu.ejs'); %>
 <div>
     <%if(user.admin === true||folder.admin.id === user.id){%>
         <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
@@ -8,7 +8,7 @@
                 <div class="navbar-header">
                     <a class="navbar-brand"><%= folder.name%></a>
                 </div>
-                <form class="navbar-form navbar-left">
+                <form class="navbar-form navbar-right">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search" name="search">
                         <div class="input-group-btn">
@@ -28,8 +28,8 @@
         </div>
         <% for(var i = 0; i< folder.files.length; i++){%>
             <figure>
-                <a href="/">
-                    <img src="images/file.png"><figcaption><%= folder.files[i].name %></figcaption>
+                <a href="./<%= folder.name%>/<%= folder.files[i].name%>">
+                    <img src="../images/file.png"><figcaption><%= folder.files[i].name %></figcaption>
                 </a>
             </figure>
         <%}%>

@@ -6,25 +6,11 @@
         <li>
             <a href='#'>Folders</a>
             <ul>
-                <li><a id="addFolderButton" >Add New Folder</a></li>
-                <% if(user.admin === true){%>
-                    <% for(var i = 0; i < folders.length; i++) {%>
-                        <li><a href="/folder/<%= folders[i].name%>"><%= folders[i].name %></a></li>
-
-                    <% } %>
-                <%}else{%>
-                    <% for(var  i = 0; i < folders.length; i++){%>
-
-                        <%if(folders[i].admin.id === user.id){%>
-                            <li><a href="/folder/<%= folders[i].name%>"><%= folders[i].name %></a></li>
-                        <%}else{%>
-                           <%for(var j = 0; j < folders[i].users.length; j++){%>
-                                <%if(folders[i].users[j].id === user.id){%>
-                                    <li><a href="/folder/<%= folders[i].name%>"><%= folders[i].name %></a></li>
-                                <%}%>
-                            <%}%>
-                        <%}%>
-                    <%}%>
+                <%if(user.write === true){%>
+                    <li><a id="addFolderButton" >Add New Folder</a></li>
+                <%}%>
+                <%for(var i = 0; i < folders.length; i++){%>
+                    <li><a href="/folder/<%= folders[i].name%>"><%= folders[i].name %></a></li>
                 <%}%>
             </ul>
         </li>
@@ -71,14 +57,7 @@
             $(document.createTextNode("Add User")).appendTo($("#modalTitle"));
             $("#myModal").modal();
         });
-        $("#input").change(function(){
-            let input = document.getElementById('input');
-            let reader = new FileReader();
-            reader.onload = function(){
-                let data = reader.readAsDataURL(input.files[0]);
-                document.getElementById('data').value = data;
-            };
-        });
+
         $("#uploadFileButton").click(function(){
             $("#content").empty();
             $(`<%- include upload_file.ejs%>`).appendTo($("#content"));

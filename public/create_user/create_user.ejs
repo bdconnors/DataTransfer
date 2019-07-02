@@ -1,10 +1,10 @@
-<%- include ../dashboard/header.ejs%>
+<%- include header.ejs%>
 
-            <div class="modal-content">
-                <div class="modal-header" style="padding:35px 50px;">
+            <div class="content">
+                <div id = "header"  style="padding:35px 50px;">
                     <h4><span class="glyphicon glyphicon-lock"></span> Account Creation for <%= firstname%> </h4>
                 </div>
-                <div class="modal-body" style="padding:40px 50px;">
+                <div class="body" style="padding:40px 50px;">
                     <form role="form" onsubmit="return validate()" method="post">
                         <div style="font-size:12px" class="form-group">
                             <p><b>Password Must Contain:</b></p>
@@ -28,4 +28,4 @@
                 </div>
             </div>
 
-<%- include ../dashboard/footer.ejs%>
+<%- include footer.ejs%>

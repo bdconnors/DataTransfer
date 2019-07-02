@@ -11,5 +11,11 @@
         <label for="email"><span class="glyphicon glyphicon-user"></span> Email</label>
         <input type="text" class="form-control" name="email" id="email" placeholder="User Name">
     </div>
+    <div class="form-group">
+        <label for="retype"><span class="glyphicon glyphicon-user"></span> Account Type</label><br>
+        <input type="radio" name="permissions" id="admin" value="admin">Administrator<br>
+        <input type="radio" name="permissions" id="write" value="write">Write/Read<br>
+        <input type="radio" name="permissions" id="read" value="write">Read Only<br>
+    </div>
     <button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Add User</button>
 </form>
