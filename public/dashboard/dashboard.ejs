@@ -1,19 +1,38 @@
 <%- include header.ejs%>
 <body>
 <%- include ../include/menu.ejs %>
-    <div id="header">
+    <div style="display:table; margin-left:auto;margin-right:auto;" id="header">
         <h1>Welcome <%= user.firstname %></h1>
     </div>
-    <div>
-        <% for(var i=0; i< folders.length; i++){%>
-            <div>
-                <figure>
-                    <a style = "text-decoration: none;" href="/folder/<%= folders[i].name%>">
-                        <img src="../images/folder.png">
-                        <figcaption><%= folders[i].name %></figcaption>
-                    </a>
-                </figure>
-            </div>
-        <%}%>
+    <div style="display:table; margin-left:auto;margin-right:auto; text-align:center;">
+        <h3>My Folders</h3>
+        <table>
+
+            <%var rowNumber = 4 % folders.length;%>
+            <%var cellPerRow = folders.length % 4; %>
+            <%var rowCount= 1;%>
+            <%var cellCount = 1; %>
+            <% for(rowCount; rowCount <= rowNumber; rowCount++){
+                console.log('row loop');
+                console.log('row count: '+rowNumber);
+            %>
+                <tr>
+                    <% for(cellCount; cellCount <= cellPerRow; cellCount++){
+                        console.log('cell loop');
+                        console.log('cell count: '+cellCount); %>
+                        <td style="padding: 0 10px 0 10px;">
+                            <div>
+                                <figure>
+                                    <a style = "text-decoration: none;" href="/folder/<%= folders[cellCount-1].name%>">
+                                        <img src="../images/folder.png">
+                                        <figcaption><%= folders[cellCount-1].name %></figcaption>
+                                    </a>
+                                </figure>
+                             </div>
+                        </td>
+                    <%}%>
+                </tr>
+            <%}%>
+        </table>
     </div>
 <%- include footer.ejs %>
