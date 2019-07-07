@@ -51,9 +51,10 @@ class Database{
 
     }
     deleteDocuments(collection,deleteQuery){
-
-        return this.conn.collection(collection).deleteMany(deleteQuery).
+        console.log(deleteQuery);
+        return this.db.collection(collection).removeMany(deleteQuery).
         then((res)=>{
+            console.log(res);
             return JSON.parse(JSON.stringify(res));
         }).
         catch((err)=>{
@@ -82,6 +83,7 @@ class Database{
         else if( action === 'DELETE'){
             return this.deleteDocuments(collection,value).
             then((res)=>{
+                console.log('db delete');
                 return res;
             }).
             catch((err)=>{

@@ -1,0 +1,38 @@
+<div id='cssmenu'>
+    <ul style="z-index:100" style="display: block;">
+        <li>
+            <a style="z-index:100" href='/dashboard'>Home</a>
+        </li>
+        <li>
+            <li class="has-sub">
+			<span class="submenu-button"></span>
+			 <a style="z-index:100"  href='#'>Folders</a>
+			<ul>
+                <%if(user.folderwrite === true){%>
+                    <li><a style="z-index:100"  href="/add/folder">Add New Folder</a></li>
+                <%}%>
+                <%for(var i = 0; i < folders.length; i++){%>
+                    <li><a style="z-index:100" href="/folder/<%= folders[i].name%>"><%= folders[i].name %></a></li>
+                <%}%>
+            </ul>
+        </li>
+		<li>
+			<li style="z-index:100" class="has-sub">
+			<span class="submenu-button"></span>
+			<a style="z-index:100"  href="#">
+				Users
+			</a>
+			<ul>
+				<%if(user.admin === true){%>
+					<li><a style="z-index:100" >Add New User</a></li>
+					<% for(var i=0; i < users.length; i++) {%>
+						<li><a style="z-index:100"  ><%= users[i].firstname +' '+users[i].lastname %></a></li>
+					<%}%>
+				<%}%>
+			</ul>
+		</li>
+        <li>
+            <a href="/logout">Log Out</a>
+        </li>
+    </ul>
+</div>

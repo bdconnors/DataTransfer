@@ -15,12 +15,27 @@ class Authentication{
         return user.admin;
     }
     checkWritePriv(user){
-        return user.write;
+        return user.folderwrite;
     }
     checkPassword(password, hash) {
 
         return bcrypt.compareSync(password, hash);
 
+    }
+    checkFilePermission(folder,file,user){
+
+        let permitted = false;
+
+        if(this.checkAdmin(user)|| this.checkFolderAdmin(folder,user)){
+            permitted = true;
+        }else{
+           for(let i = 0; i < file.users.length; i++){
+               if(file.users[i] === user.id){
+                   permitted = true;
+               }
+           }
+        }
+        return permitted;
     }
     checkFolderPermission(folder,user){
 
@@ -35,7 +50,7 @@ class Authentication{
 
             for(let i = 0; i < users.length; i++){
 
-                if(users[i].id === user.id){
+                if(users[i] === user.id){
                     permitted = true;
                 }
             }
@@ -48,44 +63,8 @@ class Authentication{
 
         let permitted = false;
 
-        if(folder.admin.id === user.id){
+        if(folder.admin === user.id){
             permitted = true;
-        }
-
-        return permitted;
-
-    }
-    checkFileAdmin(file,user){
-
-        let permitted = false;
-
-        if(file.admin.id === user.id){
-            permitted = true;
-        }
-
-        return permitted;
-    }
-    checkFilePriv(file,user){
-
-        let permitted = false;
-
-        const users = file.users;
-
-        if(this.checkAdmin(user)){
-
-            permitted = true;
-
-        }else{
-
-            for(let i = 0; i < users.length; i++){
-
-                if(users[i].id === user.id){
-
-                    permitted = true;
-
-                }
-            }
-
         }
 
         return permitted;
