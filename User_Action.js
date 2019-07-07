@@ -13,6 +13,8 @@ class User_Action{
 
         if(this.auth.checkAdmin(this.user)|| this.auth.checkWritePriv(this.user)) {
             return this.folderRepo.createFolder(name, admin, users).then((res)=>{
+				this.userFolders.push(res);
+				console.log(this.userFolders);
                 return res;
             }).catch((err)=>{
                 return err;
@@ -79,7 +81,7 @@ class User_Action{
             return this.folderRepo.addFile(foldername,name,data,directory,admin,users).
             then((result)=>{
 
-                return result;
+                return 'success';
 
             }).
             catch((err)=>{

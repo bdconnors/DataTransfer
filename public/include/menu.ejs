@@ -1,70 +1,40 @@
 <div id='cssmenu'>
-    <ul>
+    <ul style="display: block;">
         <li>
             <a href='/dashboard'>Home</a>
         </li>
         <li>
-            <a href='#'>Folders</a>
-            <ul>
+            <li class="has-sub">
+			<span class="submenu-button"></span>
+			 <a href='#'>
+				Folders
+			 </a>
+			<ul>
                 <%if(user.write === true){%>
-                    <li><a id="addFolderButton" >Add New Folder</a></li>
+                    <li><a>Add New Folder</a></li>
                 <%}%>
                 <%for(var i = 0; i < folders.length; i++){%>
                     <li><a href="/folder/<%= folders[i].name%>"><%= folders[i].name %></a></li>
                 <%}%>
             </ul>
         </li>
-            <%if(user.admin === true){%>
-                <li>
-                    <a href='#'>Users</a>
-                    <ul>
-                        <li>
-                            <a id="addUserButton">Add New User</a>
-                        </li>
-                        <% for(var i=0; i < users.length; i++) {%>
-                            <li><a ><%= users[i].firstname +' '+users[i].lastname %></a></li>
-                        <%}%>
-                    </ul>
-            <%}%>
+		<li>
+			<li class="has-sub">
+			<span class="submenu-button"></span>
+			<a href="#">
+				Users
+			</a>
+			<ul>
+				<%if(user.admin === true){%>
+					<li><a>Add New User</a></li>
+					<% for(var i=0; i < users.length; i++) {%>
+						<li><a ><%= users[i].firstname +' '+users[i].lastname %></a></li>
+					<%}%>
+				<%}%>
+			</ul>
+		</li>
         <li>
             <a href="/logout">Log Out</a>
         </li>
     </ul>
 </div>
-<div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header" style="padding:35px 50px;">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 id="modalTitle"><span class="glyphicon glyphicon-lock"></span></h4>
-            </div>
-            <div id="content" class="modal-body" style="padding:40px 50px;">
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-    $(document).ready(function(){
-        $("#addUserButton").click(function(){
-            $("#content").empty();
-            $(`<%- include add_user.ejs%>`).appendTo($("#content"));
-            $(document.createTextNode("Add User")).appendTo($("#modalTitle"));
-            $("#myModal").modal();
-        });
-        $("#addFolderButton").click(function(){
-            $("#content").empty();
-            $(`<%- include add_folder.ejs%>`).appendTo($("#content"));
-            $(document.createTextNode("Add User")).appendTo($("#modalTitle"));
-            $("#myModal").modal();
-        });
-
-        $("#uploadFileButton").click(function(){
-            $("#content").empty();
-            $(`<%- include upload_file.ejs%>`).appendTo($("#content"));
-            $(document.createTextNode("Upload File")).appendTo($("#modalTitle"));
-            $("#myModal").modal();
-        });
-
-
-    });
-</script>

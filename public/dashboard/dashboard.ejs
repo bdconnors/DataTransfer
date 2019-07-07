@@ -8,10 +8,22 @@
         <h3>My Folders</h3>
         <table>
 
-            <%var rowNumber = 4 % folders.length;%>
+            <%var rowNumber = 4 % folders.length;
+				if(folders.length < 4 && folders.length !== 0){
+					rowNumber = 1;
+				}
+			
+			%>
             <%var cellPerRow = folders.length % 4; %>
             <%var rowCount= 1;%>
-            <%var cellCount = 1; %>
+            <%var cellCount = 1; 
+				console.log('inside ejs');
+				console.log('rowNumber: '+rowNumber);
+				console.log('cellPerRow: '+cellPerRow);
+				console.log('rowCount: '+rowCount);
+				console.log('cellCount: '+cellCount);
+			
+			%>
             <% for(rowCount; rowCount <= rowNumber; rowCount++){
                 console.log('row loop');
                 console.log('row count: '+rowNumber);

@@ -27,7 +27,7 @@ class System_Mailer{
             text: 'That was easy!',
             html: `<p>Dear ${firstname},</p>
                    <p><b>Please Follow The Link Below To Create Your Novitious Account:</b></p>
-                   <p>Account Creation Link: <a href='http://localhost:3000/newuser?authcode=${authcode}'>http://localhost:3000/newuser?authcode=${authcode}</a></p>
+                   <p>Account Creation Link: <a href='http://74.70.197.249/newuser?authcode=${authcode}'>http://74.70.197.249/newuser?authcode=${authcode}</a></p>
                    <p>Thanks, </p>
                    <p>Novitious Team</p>
                    <br>

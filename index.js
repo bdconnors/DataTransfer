@@ -18,7 +18,7 @@ const Authentication = require('./util/Authentication').Authentication;
 const auth = new Authentication();
 
 /** Database **/
-const url = 'mongodb://localhost:27017';
+const url = 'mongodb://127.0.0.1:27017';
 const dbName = 'novvdr';
 
     /** Database CRUD Functions**/
@@ -81,7 +81,7 @@ const dbName = 'novvdr';
 
         /** Use Express for App Engine and listen on port 3000 **/
         const app = express();
-        app.listen(3000, () => console.log(`listening on port 3000!`));
+        app.listen(80, () => console.log(`listening on port 3000!`));
 
         /** Use ejs for View Engine **/
         app.set('view engine','ejs');
@@ -136,7 +136,7 @@ app.post('/login',(req,res)=> {
        if(auth.checkPassword(password,user.password)){
 
            req.session.user = user;
-           console.log(req.session.user);
+		   console.log(req.session.user);
            userAction = new User_Action(user,folderRepo);
            userAction.load();
 
@@ -176,6 +176,9 @@ app.get('/dashboard',(req,res)=>{
 
     if(req.session && req.session.user) {
         let user = req.session.user;
+		console.log('inside dashboard');
+		console.log('folders');
+		console.log(userAction.userFolders);
         res.render('./dashboard/dashboard',{user:user,folders:userAction.userFolders,users:userRepo.users})
 
     }else{
@@ -187,10 +190,9 @@ app.get('/dashboard',(req,res)=>{
 
 });
 
-
 app.post('/add/user',(req,res)=>{
 
-    if(auth.checkSession(req)){
+   if(auth.checkSession(req)){
 
         if(auth.checkAdmin(req.session.user)){
 
@@ -219,7 +221,7 @@ app.post('/add/user',(req,res)=>{
                 res.send('Server Error');
             });
 
-        }else{
+          }else{
             res.send('User Unauthorized');
         }
 
@@ -357,7 +359,24 @@ app.get('/folder/:folder/:file',(req,res)=>{
 
 
 });
-
+app.get('/folder/:folder/upload/file',(req,res)=>{
+	
+	const user = req.session.user;
+	const folder = folderRepo.getFolder('name',req.params.folder);
+	
+	if(auth.checkSession(req)){
+		if(auth.checkFolderPermission(folder,user)){
+			
+			res.render('./upload_file/upload_file.ejs',{user:user,folder:folder,users:userRepo.users,folders:folderRepo.folders})
+			
+		}else{
+			res.send('unauthorized user');
+		}
+	}else{
+		res.redirect('/login')
+	}
+	
+});
 app.post('/folder/:folder/upload/file',(req,res)=>{
 
     const folder = req.params.folder;
