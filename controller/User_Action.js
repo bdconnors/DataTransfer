@@ -75,7 +75,7 @@ class User_Action{
     }
     addFile(foldername,name,data,users){
 
-        if(this.getFolder('name',foldername) && this.auth.checkWritePriv(this.user)){
+       
 
             const folder = this.getFolder('name',foldername);
             const directory = './storage/'+folder.name+'/';
@@ -89,13 +89,10 @@ class User_Action{
             }).
             catch((err)=>{
 
-                return false;
+                return err;
 
             });
 
-        }else{
-            return false;
-        }
 
 
 
