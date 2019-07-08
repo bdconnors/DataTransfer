@@ -2,11 +2,9 @@
     <ul>
         <li>
             <a href='/dashboard'>Home</a>
-        </li>
-        
-            <li class="has-sub">
+		    <li class="has-sub">
 			<span class="submenu-button"></span>
-			 <a href='#'>Folders</a>
+			<a href='#'>Folders</a>
 			<ul>
                 <%if(user.admin === true || user.folderwrite === true){%>
                     <li><a href="/add/folder">Add New Folder</a></li>
@@ -15,13 +13,9 @@
                     <li><a href="/folder/<%= folders[i].name%>"><%= folders[i].name %></a></li>
                 <%}%>
             </ul>
-</li>       
-	
 			<li class="has-sub">
 			<span class="submenu-button"></span>
-			<a href="#">
-				Users
-			</a>
+			<a href="#">Users</a>
 			<ul>
 				<%if(user.admin === true){%>
 					<li><a >Add New User</a></li>
@@ -30,7 +24,6 @@
 					<%}%>
 				<%}%>
 			</ul>
-		</li>
         <li>
             <a href="/logout">Log Out</a>
         </li>
