@@ -1,0 +1,33 @@
+<%- include header.ejs%>
+<%- include('../include/menu.ejs',{user:user})%>
+<div class="content">
+    <div id = "header"  style="padding:35px 50px;">
+        <h4><span class="glyphicon glyphicon-lock"></span> Invite User</h4>
+    </div>
+    <div class="body" style="padding:40px 50px;">
+        <form role="form" method="post">
+            <div  class="form-group">
+                <label for="firstname"><span class="glyphicon glyphicon-user"></span> First Name</label><br>
+                <input type="text" name="firstname" id="firstname" class="form-control" placeholder="First Name">
+            </div>
+            <div class="form-group">
+                <label for="lastname"><span class="glyphicon glyphicon-user"></span> Last Name</label><br>
+                <input type="text" name="lastname" id="lastname" class="form-control" placeholder="Last Name">
+            </div>
+            <div class="form-group">
+                <label for="email"><span class="glyphicon glyphicon-user"></span> E-mail</label><br>
+                <input type="text" name="email" id="email" class="form-control" placeholder="E-mail">
+            </div>
+            <label for="email"><span class="glyphicon glyphicon-user"></span> Account Type</label><br>
+            <div class="form-group">
+                <select name="account" class="form-control">
+                    <option>Read Only</option>
+                    <option>Read/Folder Creation</option>
+                    <option>Administrator</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Invite User</button>
+        </form>
+    </div>
+</div>
+<%- include footer.ejs%>

@@ -1,20 +1,20 @@
 <%- include header.ejs%>
 <body>
-<%- include ../include/menu.ejs %>
+<%- include('../include/menu.ejs',{user:user}) %>
     <div style="display:table; margin-left:auto;margin-right:auto;" id="header">
-        <h1>Welcome <%= user.firstname %></h1>
+        <h1>Welcome <%= user.user.firstname %></h1>
     </div>
     <div style="display:table; margin-left:auto;margin-right:auto; text-align:center;">
         <h3>My Folders</h3>
         <table>
 
-            <%var rowNumber = 4 % folders.length;
-				if(folders.length < 4 && folders.length !== 0){
+            <%var rowNumber = 4 % user.user.folders.length;
+				if(user.user.folders.length < 4 && user.user.folders.length !== 0){
 					rowNumber = 1;
 				}
 			
 			%>
-            <%var cellPerRow = folders.length % 4; %>
+            <%var cellPerRow = user.user.folders.length % 4; %>
             <%var rowCount= 1;%>
             <%var cellCount = 1; 
 				console.log('inside ejs');
@@ -35,9 +35,9 @@
                         <td style="padding: 0 10px 0 10px;">
                             <div>
                                 <figure>
-                                    <a style = "text-decoration: none;" href="/folder/<%= folders[cellCount-1].name%>">
+                                    <a style = "text-decoration: none;" href="/folder/<%= user.user.folders[cellCount-1].name%>">
                                         <img src="../images/folder.png">
-                                        <figcaption><%= folders[cellCount-1].name %></figcaption>
+                                        <figcaption><%= user.user.folders[cellCount-1].name %></figcaption>
                                     </a>
                                 </figure>
                              </div>

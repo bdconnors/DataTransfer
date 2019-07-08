@@ -28,6 +28,20 @@ const dbName = 'novvdr';
 
 /** Internal Data Structures **/
 
+    /** Factories **/
+    const File_Permission_Factory = require('./model/user/files/File_Permission_Factory').File_Permission_Factory;
+    const fileFactory = new File_Permission_Factory();
+
+    const Folder_Permission_Factory = require('./model/user/folders/Folder_Permission_Factory').Folder_Permission_Factory;
+    const folderFactory = new Folder_Permission_Factory(fileFactory);
+
+    const User_Factory = require('./model/user/User_Factory').User_Factory;
+    const userFactory = new User_Factory(folderFactory);
+
+    /** Local Storage Access **/
+    const File_System = require('./File_System').File_System;
+    const storage = new File_System();
+
     /** User Action Center **/
     let User_Action = require('./controller/User_Action').User_Action;
     let userAction;
@@ -36,36 +50,17 @@ const dbName = 'novvdr';
     const Users_Repo = require('./model/user/Users_Repo').Users_Repo;
     let userRepo;
 
-    /** Folder Repository **/
-    const Folders_Repo = require('./model/folder/Folders_Repo').Folders_Repo;
-    let folderRepo;
-
-
 /** App Start Up **/
 
     /** Connect to Database and load Internal Data Structures **/
     db.connect().then((res)=>{
 
-        userRepo = new Users_Repo();
+        userRepo = new Users_Repo(userFactory);
         userRepo.subscribe(db);
-
-        folderRepo = new Folders_Repo();
-        folderRepo.subscribe(db);
 
         db.retrieveDocuments('users',{}).then((res)=>{
 
             userRepo.load(res);
-            console.log(userRepo.users);
-
-            db.retrieveDocuments('folders', {}).then((res) => {
-
-                folderRepo.load(res);
-                console.log(folderRepo.folders);
-
-            }).catch((err) => {
-                throw err;
-            });
-
 
         }).catch((err)=>{
             throw err
@@ -125,18 +120,16 @@ app.post('/',(req,res)=> {
    const email =  req.body.email;
    const password = req.body.password;
 
-   if(userRepo.getUser('email',email)){
+   if(userRepo.retrieve(email)){
 
-       const user = userRepo.getUser('email',email);
+       const user = userRepo.retrieve(email);
 
        if(auth.checkPassword(password,user.password)){
 
            req.session.user = user;
-		   console.log(req.session.user);
-           userAction = new User_Action(user,folderRepo);
-           userAction.load();
+           userAction = new User_Action(user,userRepo,storage);
 
-           if(req.session.origin) {
+           if(req.session.origin){
 
                res.redirect(req.session.origin);
 
@@ -171,54 +164,64 @@ app.get('/logout',(req,res)=>{
 app.get('/dashboard',(req,res)=>{
 
     if(req.session && req.session.user) {
-        let user = req.session.user;
-		console.log('inside dashboard');
-		console.log('folders');
-		console.log(userAction.userFolders);
-        res.render('./dashboard/dashboard',{user:user,folders:userAction.userFolders,users:userRepo.users})
-
+        res.render('./dashboard/dashboard',{user:userAction})
     }else{
-
         req.session.origin = '/dashboard';
         res.redirect('/');
-
     }
 
 });
 
-app.post('/add/user',(req,res)=>{
+app.get('/add/user',(req,res)=>{
 
    if(auth.checkSession(req)){
 
         if(auth.checkAdmin(req.session.user)){
 
-            let firstname = req.body.firstname;
-            let lastname = req.body.lastname;
-            let email = req.body.email;
-            let write;
-            let admin;
-
-            if(req.body.permissions === 'admin'){
-                admin = true;
-                write = true;
-            }else if(req.body.permissions === 'write'){
-                admin = false;
-                write = true;
-            }else{
-                admin = false;
-                write = false;
-            }
-
-
-            userRepo.createUser(admin,write,firstname,lastname,email).then((result)=>{
-                res.send(result);
-            }).catch((err)=>{
-
-                res.send('Server Error');
-            });
+            res.render('./invite_user/invite_user',{user:userAction});
 
           }else{
+
             res.send('User Unauthorized');
+
+        }
+
+    }else{
+        req.session.origin = '/add/user';
+        res.redirect('/');
+    }
+
+});
+app.post('/add/user',(req,res)=>{
+
+    if(auth.checkSession(req)){
+
+        if(auth.checkAdmin(req.session.user)) {
+
+            const firstname = req.body.firstname;
+            const lastname = req.body.lastname;
+            const fullname = firstname +' '+lastname;
+            const email = req.body.email;
+            const account = req.body.account;
+            const permissions = auth.accountType(account);
+
+            if(userAction.inviteUser(firstname,lastname,email,permissions)) {
+
+                res.render('./invite_user/invite_user_success', {
+                    user:userAction,
+                    name: fullname,
+                    email: email,
+                    account: account
+                });
+
+            }else{
+
+                res.send("error");
+
+            }
+
+        }else{
+            res.send('Un-Authorized User');
         }
 
     }else{
@@ -228,14 +231,17 @@ app.post('/add/user',(req,res)=>{
 
 });
 
+
 app.get('/newuser',(req,res)=>{
 
 
         let authcode = req.query.authcode;
 
-        if (userRepo.getUser('authCode', authcode)) {
-            let user = userRepo.getUser('authCode', authcode);
+        if (userRepo.retrieveBy('authCode', authcode)) {
+            let user = userRepo.retrieveBy('authCode', authcode);
             res.render('./create_user/create_user', {firstname: user.firstname});
+        }else{
+            res.send('Link Expired or Account Already Created');
         }
 
 
@@ -243,12 +249,13 @@ app.get('/newuser',(req,res)=>{
 
 app.post('/newuser',(req,res)=>{
 
-    const user = userRepo.getUser('authCode',req.query.authcode);
+    const user = userRepo.retrieveBy('authCode',req.query.authcode);
 
     const password = req.body.password;
-    const hashPassword = auth.createHashPassword(password);
+    user['password'] = auth.createHashPassword(password);
+    user['authCode'] = '';
 
-    if(userRepo.updateUser({id:user.id,admin:user.admin,firstname:user.firstname,lastname:user.lastname,email:user.email,password:hashPassword,authCode:''})){
+    if(userRepo.updateMultipleFields(user.email,user)){
         res.redirect('/newuser/success?name='+user.firstname+' '+user.lastname+'&email='+user.email);
     }else{
         res.send('Fail');
@@ -264,6 +271,8 @@ app.get('/newuser/success',(req,res)=>{
             name: req.query.name,
             email: req.query.email
         });
+    }else{
+        res.send('Something Went Wrong Contact System Administator');
     }
 
 });
@@ -271,13 +280,13 @@ app.get('/add/folder',(req,res)=>{
 
     if(auth.checkSession(req)){
         if(auth.checkWritePriv(req.session.user)||auth.checkAdmin(req.session.user)){
-            res.render('./add_folder/add_folder',{user:req.session.user,folders:folderRepo.folders,users:userRepo.users});
-        }
+            res.render('./add_folder/add_folder',{user:userAction});
+       }
     }
 });
 app.post('/add/folder',(req,res)=>{
-
-    const folderName = req.body.name;
+    res.send(req.body);
+    /**const folderName = req.body.name;
     let users;
 
     if(req.body.users) {
@@ -300,14 +309,14 @@ app.post('/add/folder',(req,res)=>{
         res.render('./add_folder_success/add_folder_success',{user:req.session.user,folders:folderRepo.folders,users:userRepo.users,folder:result,permissions:result.users});
     }).catch((err)=>{
         res.send(err);
-    });
+    });**/
 
 });
 
 
 app.get('/folder/:folder',(req,res)=>{
 
-    const folderReq = req.params.folder;
+    /**const folderReq = req.params.folder;
     if(auth.checkSession(req)) {
 
         if(userAction.getFolder('name',folderReq)) {
@@ -327,14 +336,14 @@ app.get('/folder/:folder',(req,res)=>{
     }else{
         req.session.origin = '/folder/'+folderReq;
         res.redirect('/');
-    }
+    }**/
 
 });
 
 
 app.get('/folder/:folder/:file',(req,res)=>{
 
-    if(folderRepo.getFolder('name',req.params.folder)){
+    /**if(folderRepo.getFolder('name',req.params.folder)){
 
         let folder = folderRepo.getFolder('name', req.params.folder);
 
@@ -357,34 +366,34 @@ app.get('/folder/:folder/:file',(req,res)=>{
         }
     }else{
         res.send('folder not found');
-    }
+    }**/
 
 
 });
 app.get('/folder/:folder/upload/file',(req,res)=>{
 	
-	const user = req.session.user;
+	/**const user = req.session.user;
 	const folder = folderRepo.getFolder('name',req.params.folder);
     console.log(folder);
 
-	
+
 	if(auth.checkSession(req)){
 		if(auth.checkFolderPermission(folder,user)){
-			
+
 			res.render('./upload_file/upload_file.ejs',{user:user,folder:folder,users:userRepo.users,folders:folderRepo.folders})
-			
+
 		}else{
 			res.send('unauthorized user');
 		}
 	}else{
 	    req.session.origin = '/folder/'+req.params.folder+'/upload/file';
 		res.redirect('/')
-	}
+	}**/
 	
 });
 app.post('/folder/:folder/upload/file',(req,res)=>{
 
-    const folder = req.params.folder;
+    /**const folder = req.params.folder;
     const fileName = req.body.input;
     const data = req.body.data;
     let users;
@@ -400,31 +409,31 @@ app.post('/folder/:folder/upload/file',(req,res)=>{
     }else {
         users = [];
     }
-    res.send(userAction.addFile(folder,fileName,data,users));
+    res.send(userAction.addFile(folder,fileName,data,users));**/
 
 
 });
 
 app.post('/folder/:folder/delete/file/:file',(req,res)=>{
 
-    const folder = req.params.folder;
+    /**const folder = req.params.folder;
     const file = req.params.file;
     userAction.deleteFile(folder,file).then((result)=>{
         res.send(result);
     }).catch((err)=>{
         res.send(err);
-    });
+    });**/
 
 
 });
 app.post('/delete/folder/:folder',(req,res)=>{
 
-    const folder = req.params.folder;
+    /**const folder = req.params.folder;
     userAction.deleteFolder('name',folder).then((result)=>{
         res.send(result);
     }).catch((err)=>{
         res.send(err);
-    });
+    });**/
 
 
 });

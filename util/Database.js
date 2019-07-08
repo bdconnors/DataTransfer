@@ -73,7 +73,7 @@ class Database{
         }
 
         else if(action === 'UPDATE'){
-            return this.updateDocuments(collection,value[0],value[1]).then((res)=>{
+            return this.updateDocuments(collection,{email:value.email},{$set:value}).then((res)=>{
                 return res;
             }).catch((err)=>{
                 return err;
@@ -81,21 +81,14 @@ class Database{
         }
 
         else if( action === 'DELETE'){
-            return this.deleteDocuments(collection,value).
+            return this.deleteDocuments(collection,{email:value.email}).
             then((res)=>{
-                console.log('db delete');
                 return res;
             }).
             catch((err)=>{
                 return err;
             });
         }
-
-        else{
-
-            return false;
-        }
-
 
     }
 }

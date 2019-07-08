@@ -1,6 +1,6 @@
 class User{
 
-    constructor(id,admin,folderwrite,firstname,lastname,email,password,authCode){
+    constructor(id,admin,folderwrite,firstname,lastname,email,password,folders,authCode){
         this.id = id;
         this.admin = admin;
         this.folderwrite = folderwrite;
@@ -8,6 +8,7 @@ class User{
         this.lastname = lastname;
         this.email = email;
         this.password = password;
+        this.folders = folders;
         this.authCode = authCode;
     }
 

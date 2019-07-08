@@ -6,23 +6,23 @@
 			<span class="submenu-button"></span>
 			<a href='#'>Folders</a>
 			<ul>
-                <%if(user.admin === true || user.folderwrite === true){%>
+                <%if(user.user.admin === true || user.user.folderwrite === true){%>
                     <li><a href="/add/folder">Add New Folder</a></li>
                 <%}%>
-                <%for(var i = 0; i < folders.length; i++){%>
-                    <li><a href="/folder/<%= folders[i].name%>"><%= folders[i].name %></a></li>
+                <%for(var i = 0; i < user.user.folders.length; i++){%>
+                    <li><a href="/folder/<%= user.user.folders[i].name%>"><%= user.user.folders[i].name %></a></li>
                 <%}%>
             </ul>
 			<li class="has-sub">
 			<span class="submenu-button"></span>
 			<a href="#">Users</a>
 			<ul>
-				<%if(user.admin === true){%>
-					<li><a >Add New User</a></li>
-					<% for(var i=0; i < users.length; i++) {%>
-						<li><a ><%= users[i].firstname +' '+users[i].lastname %></a></li>
-					<%}%>
+				<%if(user.user.admin === true){%>
+					<li><a href="/add/user">Add New User</a></li>
 				<%}%>
+					<%for(var i=0; i < user.userRepo.users.length; i++) {%>
+						<li><a ><%= user.userRepo.users[i].firstname +' '+user.userRepo.users[i].lastname %></a></li>
+					<%}%>
 			</ul>
         <li>
             <a href="/logout">Log Out</a>

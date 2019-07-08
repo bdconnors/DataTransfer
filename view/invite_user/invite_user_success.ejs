@@ -1,0 +1,21 @@
+<%- include header.ejs%>
+<%- include('../include/menu.ejs',{user:user})%>
+<div class="content">
+    <div id = "header"  style="padding:35px 50px;">
+        <h4><span class="glyphicon glyphicon-lock"></span> User Successfully Invited </h4>
+    </div>
+    <div class="body" style="padding:40px 50px;">
+        <form action="/dashboard" method="get">
+            <div style="display:table; margin-left:auto; margin-right:auto;"class="form-group">
+                <h3>An Invitation E-mail has been sent to: </h3>
+                <br>
+                <p><b>Name:</b> <%= name%></p>
+                <p><b>E-mail:</b> <%= email%></p>
+                <p><b>Account Type:</b> <%= account%></p>
+                <button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Ok</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include footer.ejs%>

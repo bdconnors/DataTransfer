@@ -18,16 +18,18 @@ class System_Mailer{
         });
     }
 
-    addUserEmail(firstname,email,authcode){
-        console.log('mail: ' + authcode);
+    invite(firstname,email,authcode){
+
+        let success = true;
+
         const mailOptions = {
             from: this.from,
             to: email,
             subject: 'Novitious Account Creation',
-            text: 'That was easy!',
+            text: 'Novitious Account Creation',
             html: `<p>Dear ${firstname},</p>
                    <p><b>Please Follow The Link Below To Create Your Novitious Account:</b></p>
-                   <p>Account Creation Link: <a href='http://74.70.197.249/newuser?authcode=${authcode}'>http://74.70.197.249/newuser?authcode=${authcode}</a></p>
+                   <p>Account Creation Link: <a href='http://localhost/newuser?authcode=${authcode}'>http://localhost/newuser?authcode=${authcode}</a></p>
                    <p>Thanks, </p>
                    <p>Novitious Team</p>
                    <br>
@@ -36,13 +38,13 @@ class System_Mailer{
                    <p>** If you believe this E-mail is a mistake please ignore it **</p>`
 
         };
-        return this.transporter.sendMail(mailOptions).
-        then((info)=>{
-            return info;
-        }).catch((err)=>{
-            console.log(err);
-            return err;
+
+        this.transporter.sendMail(mailOptions,(info,err)=>{
+            if(err){success = false}
+            success = true;
         });
+        return success;
+
 
 }
 

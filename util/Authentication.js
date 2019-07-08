@@ -22,53 +22,28 @@ class Authentication{
         return bcrypt.compareSync(password, hash);
 
     }
-    checkFilePermission(folder,file,user){
+    accountType(account){
 
-        let permitted = false;
+        let permissions ={};
 
-        if(this.checkAdmin(user)|| this.checkFolderAdmin(folder,user)){
-            permitted = true;
-        }else{
-           for(let i = 0; i < file.users.length; i++){
-               if(file.users[i] === user.id){
-                   permitted = true;
-               }
-           }
-        }
-        return permitted;
-    }
-    checkFolderPermission(folder,user){
+        if(account === 'Read Only') {
 
-        let permitted = false;
-        const users = folder.users;
+            permissions['admin'] = false;
+            permissions['folderwrite'] = false;
 
-        if(this.checkFolderAdmin(folder,user)|| this.checkAdmin(user)){
+        }else if(account === 'Read/Folder Creation'){
 
-            permitted = true;
+            permissions['admin'] = false;
+            permissions['folderwrite'] = true;
 
-        }else{
+        }else if(account === 'Administrator'){
 
-            for(let i = 0; i < users.length; i++){
-
-                if(users[i] === user.id){
-                    permitted = true;
-                }
-            }
+            permissions['admin'] = true;
+            permissions['folderwrite'] = true;
 
         }
 
-        return permitted;
-    }
-    checkFolderAdmin(folder,user){
-
-        let permitted = false;
-
-        if(folder.admin === user.id){
-            permitted = true;
-        }
-
-        return permitted;
-
+        return permissions;
     }
     createHashPassword(plainText) {
         return bcrypt.hashSync(plainText, 10);
