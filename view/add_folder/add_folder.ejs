@@ -5,26 +5,30 @@
         <h4><span class="glyphicon glyphicon-lock"></span> Create Folder</h4>
     </div>
     <div class="body" style="padding:40px 50px;">
+        <div class="center-div form-width">
         <form id="fileForm" role="form" method="post">
-            <div class="form-group">
-                <label for="name"><span class="glyphicon glyphicon-user" placeholder="Folder Name"></span> Create Folder</label>
-                <input type="text" class="form-control" name="name" id="name">
+            <div class="form-group center-div">
+                <label for="name" class="align-left"><span class="glyphicon glyphicon-user"></span> Folder Name</label>
+                <input type="text" class="form-control" name="name" id="name" placeholder="Folder Name">
             </div>
-            <div class="form-group">
-                <label for="retype"><span class="glyphicon glyphicon-user"></span> User Permissions</label>
+            <div class="form-group center-div">
+                <label for="retype" class="align-left"><span class="glyphicon glyphicon-user"></span> User Permissions</label>
                 <br>
-                <% for(var i=0; i < user.userRepo.users.length; i++) {%>
+                <% for(var i = 0; i < user.userRepo.users.length; i++) {
+                    console.log(user.userRepo.users);
+                %>
                     <% if(user.userRepo.users[i].admin !== true && user.userRepo.users[i].id !== user.user.id){%>
-                        <input type="checkbox" name="users" id="users" value="<%= user.userRepo.users[i].id%>"><%= user.user.users[i].firstname+' '+ user.userRepo.users[i].lastname %><br>
-                        <select name ="user<%= i%>">
-                            <option value=1 selected>Read</option>
-                            <option value=2>Read/Write</option>
-                        </select>
+                            <div id="<%= user.userRepo.users[i].id %>">
+                                <input type="checkbox" name="users" onclick="showPermissions('<%= user.userRepo.users[i].id %>')" value="<%= user.userRepo.users[i].id %>"><%= user.userRepo.users[i].firstname+' '+user.userRepo.users[i].lastname%>
+                            </div>
                     <%}%>
                 <% } %>
             </div>
+            <div class="button-width center-div">
             <button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Create Folder</button>
+            </div>
         </form>
+        </div>
     </div>
 </div>
 <%- include footer.ejs%>

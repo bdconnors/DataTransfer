@@ -4,20 +4,22 @@
                     <h4>File System</h4>
                 </div>
                 <div class="body" style="padding:40px 50px;">
-                    <form role="form" method="post">
-                        <div class="form-group">
-                            <label for="user"><span class="glyphicon glyphicon-user"></span> Email</label>
-                            <input type="text" class="form-control" name="email" id="email" placeholder="User Name">
-                        </div>
-                        <div class="form-group">
-                            <label for="pass"><span class="glyphicon glyphicon-eye-open"></span> Password</label>
-                            <input type="password" class="form-control" name="password" id="password" placeholder="Enter password">
-                        </div>
-                        <div class="checkbox">
-                            <label><input type="checkbox" value="" checked>Remember me</label>
-                        </div>
-                        <button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Login</button>
-                    </form>
+                    <div class = "center-div form-width">
+                        <form role="form" method="post">
+                            <div class="form-group align-left">
+                                <label for="user"><span class="glyphicon glyphicon-user"></span> E-mail</label>
+                                <input type="text" class="form-control" name="email" id="email" placeholder="username@email.com">
+                            </div>
+                            <div class="form-group align-left">
+                                <label for="pass"><span class="glyphicon glyphicon-eye-open"></span> Password</label>
+                                <input type="password" class="form-control" name="password" id="password" placeholder="password">
+                            </div>
+                            <div class="center-div button-width">
+                                <button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Login</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
+
 <%- include footer.ejs%>

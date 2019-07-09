@@ -6,6 +6,7 @@
 			<span class="submenu-button"></span>
 			<a href='#'>Folders</a>
 			<ul>
+				<% console.log(user.user);%>
                 <%if(user.user.admin === true || user.user.folderwrite === true){%>
                     <li><a href="/add/folder">Add New Folder</a></li>
                 <%}%>

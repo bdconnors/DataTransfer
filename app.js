@@ -42,6 +42,10 @@ const dbName = 'novvdr';
     const File_System = require('./File_System').File_System;
     const storage = new File_System();
 
+    /** System Mailer **/
+    const System_Mailer = require('./util/System_Mailer').System_Mailer;
+    const systemMailer = new System_Mailer('gmail','system.novitious@gmail.com','Rubix123');
+
     /** User Action Center **/
     let User_Action = require('./controller/User_Action').User_Action;
     let userAction;
@@ -55,7 +59,8 @@ const dbName = 'novvdr';
     /** Connect to Database and load Internal Data Structures **/
     db.connect().then((res)=>{
 
-        userRepo = new Users_Repo(userFactory);
+        userRepo = new Users_Repo(userFactory,folderFactory,storage,systemMailer);
+        userAction  = new User_Action(userRepo,auth);
         userRepo.subscribe(db);
 
         db.retrieveDocuments('users',{}).then((res)=>{
@@ -74,9 +79,9 @@ const dbName = 'novvdr';
 
     /** Initialize App and App Components **/
 
-        /** Use Express for App Engine and listen on port 3000 **/
+        /** Use Express for App Engine and listen on port 80**/
         const app = express();
-        app.listen(80, () => console.log(`listening on port 3000!`));
+        app.listen(80, () => console.log(`listening on port 80`));
 
         /** Use ejs for View Engine **/
         app.set('view engine','ejs');
@@ -107,11 +112,21 @@ const dbName = 'novvdr';
 
 app.get('/',(req,res)=>{
 
-    if(auth.checkSession(req)){
-        res.redirect('/dashboard');
-    }else {
-        res.render('./login/login');
+    if(auth.checkSession(req)) {
+
+        if (userAction.verifyUser(req.session.user)) {
+
+            if (req.session.origin) {
+
+                res.redirect(req.session.origin)
+            }
+
+            res.redirect('/dashboard')
+        }
     }
+
+    res.render('./login/login');
+
 
 });
 
@@ -119,52 +134,44 @@ app.post('/',(req,res)=> {
 
    const email =  req.body.email;
    const password = req.body.password;
+   if(userAction.signIn(email,password)){
 
-   if(userRepo.retrieve(email)){
+       req.session.user = userAction.user;
 
-       const user = userRepo.retrieve(email);
-
-       if(auth.checkPassword(password,user.password)){
-
-           req.session.user = user;
-           userAction = new User_Action(user,userRepo,storage);
-
-           if(req.session.origin){
-
-               res.redirect(req.session.origin);
-
-           }else{
-
-               res.redirect('/dashboard');
-           }
-
-       }else{
-
-           res.send('Bad Password');
-       }
-
+       res.redirect('/dashboard');
    }else{
-
-       res.send('User Not Found');
-
+       res.send('Bad Password or User Not Found');
    }
+
 
 });
 
 app.get('/logout',(req,res)=>{
 
     if(auth.checkSession(req)){
+
         req.session.destroy();
         res.redirect('/');
+
     }else{
+
         res.redirect('/');
+
     }
 });
 
 app.get('/dashboard',(req,res)=>{
 
-    if(req.session && req.session.user) {
-        res.render('./dashboard/dashboard',{user:userAction})
+    if(auth.checkSession(req)) {
+
+        if(userAction.verifyUser(req.session.user)) {
+
+            res.render('./dashboard/dashboard', {user: userAction});
+
+        }else{
+            res.redirect('/logout');
+        }
+
     }else{
         req.session.origin = '/dashboard';
         res.redirect('/');
@@ -237,11 +244,16 @@ app.get('/newuser',(req,res)=>{
 
         let authcode = req.query.authcode;
 
-        if (userRepo.retrieveBy('authCode', authcode)) {
-            let user = userRepo.retrieveBy('authCode', authcode);
-            res.render('./create_user/create_user', {firstname: user.firstname});
+        if(!auth.checkSession(req)) {
+
+            if (userRepo.retrieveBy('authCode', authcode)) {
+                let user = userRepo.retrieveBy('authCode', authcode);
+                res.render('./create_user/create_user', {firstname: user.firstname});
+            } else {
+                res.send('Link Expired or Account Already Created');
+            }
         }else{
-            res.send('Link Expired or Account Already Created');
+            res.redirect('/logout');
         }
 
 
@@ -282,34 +294,32 @@ app.get('/add/folder',(req,res)=>{
         if(auth.checkWritePriv(req.session.user)||auth.checkAdmin(req.session.user)){
             res.render('./add_folder/add_folder',{user:userAction});
        }
+    }else{
+        req.session.origin = '/add/folder';
+        res.redirect('/');
     }
 });
 app.post('/add/folder',(req,res)=>{
-    res.send(req.body);
-    /**const folderName = req.body.name;
-    let users;
 
-    if(req.body.users) {
-        if (typeof req.body.users === 'object')  {
-            console.log('is array');
-            users = req.body.users;
+    const name = req.body.name;
+    let users = [];
+
+    if(req.body.users){
+
+        if(typeof req.body.users === 'object'){
+
+            for(let i = 0; i < req.body.users.length; i++){
+                users.push({id:req.body.users[i],permission:req.body[req.body.users[i]]});
+            }
+
         }else{
-
-            console.log('is not array');
-            users = [];
-            users[0] = req.body.users;
+            users.push({id:req.body.users,permission:req.body[req.body.users]});
+            console.log(users);
         }
-
-    }else {
-        users = [];
     }
+    res.send(userAction.createFolder(req.session.user,name,users));
 
-    userAction.addFolder(folderName,req.session.user.id,users).then((result)=>{
-        console.log(result.users);
-        res.render('./add_folder_success/add_folder_success',{user:req.session.user,folders:folderRepo.folders,users:userRepo.users,folder:result,permissions:result.users});
-    }).catch((err)=>{
-        res.send(err);
-    });**/
+
 
 });
 

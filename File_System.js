@@ -15,16 +15,8 @@ class File_System{
     }
     createFolder(name){
 
-        let success = false;
-
-        fs.mkdir(this.dir+name,(err)=>{
-
-            if(err){throw err;}
-            success = true;
-
-        });
-
-        return success;
+        fs.mkdirSync(this.dir+name);
+        return this.checkFolder(name);
 
     }
     renameFolder(name,newname){

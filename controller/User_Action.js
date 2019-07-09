@@ -1,16 +1,55 @@
-const File_System = require('../File_System').File_System;
+
 const System_Mailer = require('../util/System_Mailer').System_Mailer;
 const uuid = require('uuid');
 
 class User_Action{
 
-    constructor(user,userRepo,storage){
-        this.user = user;
+    constructor(userRepo,auth){
         this.userRepo = userRepo;
-        this.storage = storage;
-        this.mailer = new System_Mailer('gmail','system.novitious@gmail.com','Rubix123');
+        this.auth = auth;
+        this.user = null;
     }
-    inviteUser(firstname,lastname,email,permissions){
+    signIn(email,password){
+
+        let success = false;
+
+        if(this.userRepo.retrieve(email)){
+
+            const user = this.userRepo.retrieve(email);
+
+            if(this.auth.checkPassword(password,user.password)){
+
+                    this.user = user;
+                    success = true;
+
+            }else{
+
+                success = false;
+            }
+
+        }else{
+
+            success = false;
+
+        }
+
+        return success;
+
+    }
+    createFolder(user,name,users){
+        let success = false;
+
+        if(this.verifyUser(user)){
+
+            if(this.user.admin === true|| this.user.folderwrite === true) {
+                success = this.userRepo.addNewFolder(users,name);
+                console.log('create folder succes: '+success);
+            }
+        }
+
+        return success;
+    }
+    inviteUser(user,firstname,lastname,email,permissions){
 
         let success = false;
 
@@ -20,19 +59,20 @@ class User_Action{
             const authCode = uuid();
             const admin = permissions.admin;
             const folderwrite = permissions.folderwrite;
-            console.log('user is admin');
-            if (this.userRepo.create(id, admin, folderwrite, firstname, lastname, email, authCode)) {
-                console.log('user repo create success');
-                if (this.mailer.invite(firstname, email, authCode)) {
-                    console.log('mail sent success');
-                    success = true;
-                }
-            }
+
+            success = this.userRepo.create(id, admin, folderwrite, firstname, lastname, email, authCode);
 
         }
 
         return success;
 
+    }
+    verifyUser(user){
+
+        return this.user.id === user.id;
+    }
+    hasUser(){
+        return this.user;
     }
 
 }

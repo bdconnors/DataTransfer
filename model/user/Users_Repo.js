@@ -1,12 +1,12 @@
-const User = require('./User').User;
-const uuid = require('uuid');
-
 class Users_Repo {
 
-    constructor(userFactory){
+    constructor(userFactory,folderFactory,storage,systemMailer){
         this.users = [];
         this.observers=[];
         this.userFactory = userFactory;
+        this.folderFactory = folderFactory;
+        this.storage = storage;
+        this.systemMailer = systemMailer;
     }
 
 
@@ -15,11 +15,17 @@ class Users_Repo {
         let success = false;
 
         const user = this.userFactory.make(id,admin,folderwrite,firstname,lastname,email,'',[],authCode);
-        this.users.push(user);
 
-        if(this.retrieve(email)){
+        if(this.systemMailer.invite(firstname,email,authCode)){
+
+            this.users.push(user);
             success = true;
             this.notifyAll('users','CREATE',user);
+
+        }else{
+
+            success = false;
+
         }
 
         return success;
@@ -50,6 +56,38 @@ class Users_Repo {
 
         });
         return success;
+    }
+    retrieveMany(emails){
+
+        let users = [];
+
+        for(let i = 0; i < emails.length; i++){
+            users.push(this.retrieve(emails[i]));
+        }
+
+        return users;
+
+    }
+    retrieveManyBy(field,values){
+
+        let users = [];
+
+        for(let i = 0; i < values.length; i++){
+            users.push(this.retrieveBy(field,values[i]));
+        }
+
+        return users;
+    }
+    retrieveAdmins(){
+        let users = [];
+
+        this.users.forEach((user)=>{
+            if(user.admin === true){
+                users.push(user);
+            }
+        });
+
+        return users;
     }
     updateMultipleFields(email,values){
 
@@ -87,6 +125,7 @@ class Users_Repo {
 
         return success;
     }
+
     delete(email){
 
         let success = false;
@@ -103,7 +142,43 @@ class Users_Repo {
 
         return success;
     }
+    addNewFolder(users,name){
+
+        let success = false;
+        if(this.storage.createFolder(name)) {
+            success = true;
+            const admins = this.retrieveAdmins();
+
+            admins.forEach((admin) => {
+
+                admin.folders.push(this.folderFactory.make(name, true, true, [], '', '', ''));
+                this.notifyAll('users', 'UPDATE', admin);
+
+            });
+            for (let i = 0; i < users.length; i++) {
+
+                let curUser = this.retrieveBy('id', users[i].id);
+
+                if (users[i].permission === 'read') {
+
+                    curUser.folders.push(this.folderFactory.make(name, true, false, [], '', '', ''));
+                    this.notifyAll('users', 'UPDATE', curUser);
+
+                } else if (users[i].permission === 'write') {
+
+                    curUser.folders.push(this.folderFactory.make(name, true, true, [], '', '', ''));
+                    this.notifyAll('users', 'UPDATE', curUser);
+
+                }
+            }
+            console.log('user repo success 1: '+success);
+        }
+        console.log('user repo success 2: '+success);
+        return success;
+
+    }
     load(users){
+
         users.forEach((user)=>{
             this.users.push(this.userFactory.convert(user));
         });
