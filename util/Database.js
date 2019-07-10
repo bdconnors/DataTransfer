@@ -46,12 +46,13 @@ class Database{
             return JSON.parse(JSON.stringify(res));
         }).
         catch((err)=>{
+            console.log(err);
             return JSON.parse(JSON.stringify(err));
         });
 
     }
     deleteDocuments(collection,deleteQuery){
-        console.log(deleteQuery);
+
         return this.db.collection(collection).removeMany(deleteQuery).
         then((res)=>{
             console.log(res);

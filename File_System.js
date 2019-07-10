@@ -1,5 +1,6 @@
 const fs = require('fs');
 const rimraf = require('rimraf');
+const fileTypes = require('mime-types');
 
 class File_System{
 
@@ -21,29 +22,40 @@ class File_System{
     }
     renameFolder(name,newname){
 
-        let success = false;
+        fs.renameSync(this.dir+name,this.dir+newname);
 
-        fs.rename(this.dir + name, this.dir + newname, (err) => {
+        return this.checkFolder(newname);
+    }
+    renameFile(folder,name,newname){
 
-            if (err) {throw err}
-            success = true;
 
-        });
+        fs.renameSync(this.dir+folder+'/'+name,this.dir+folder+'/'+newname);
+        console.log(this.checkFile(folder,newname));
+        return this.checkFile(folder,newname);
 
-        return success;
     }
     deleteFolder(name){
+        rimraf.sync(this.dir+name);
+        return !this.checkFolder(name);
+    }
+    deleteFile(folder,file){
 
-        let success = false;
+        fs.unlinkSync(this.dir+folder+'/'+file);
 
-        rimraf(this.dir+name,(err)=>{
+        return !this.checkFile(folder,file);
+    }
+    createFile(foldername,filename,data){
 
-            if(err){throw err}
-            success = true;
+        fs.writeFileSync(this.dir+foldername+'/'+filename,data,'base64');
+        return this.checkFile(foldername,filename);
 
-        });
-
-        return success;
+    }
+    streamFile(res,folder,file){
+        const stream = fs.createReadStream(this.dir+folder+'/'+file);
+        const mime = fileTypes.lookup(this.dir+folder+'/'+file);
+        res.setHeader('Content-Type',mime);
+        res.setHeader('Content-Disposition', 'inline; filename=' + file);
+        stream.pipe(res);
     }
 
 

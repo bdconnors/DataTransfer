@@ -59,11 +59,11 @@ const dbName = 'novvdr';
     /** Connect to Database and load Internal Data Structures **/
     db.connect().then((res)=>{
 
-        userRepo = new Users_Repo(userFactory,folderFactory,storage,systemMailer);
+        userRepo = new Users_Repo(userFactory,folderFactory,fileFactory,storage,systemMailer);
         userAction  = new User_Action(userRepo,auth);
         userRepo.subscribe(db);
 
-        db.retrieveDocuments('users',{}).then((res)=>{
+        db.retrieveDocuments('users',{},{'_id':0}).then((res)=>{
 
             userRepo.load(res);
 
@@ -317,7 +317,11 @@ app.post('/add/folder',(req,res)=>{
             console.log(users);
         }
     }
-    res.send(userAction.createFolder(req.session.user,name,users));
+    if(userAction.createFolder(req.session.user,name,users)){
+        res.redirect('/dashboard');
+    }else{
+        res.send('Server Error');
+    }
 
 
 
@@ -326,124 +330,134 @@ app.post('/add/folder',(req,res)=>{
 
 app.get('/folder/:folder',(req,res)=>{
 
-    /**const folderReq = req.params.folder;
     if(auth.checkSession(req)) {
 
-        if(userAction.getFolder('name',folderReq)) {
+        if (userAction.viewFolder(req.session.user,req.params.folder)) {
 
-            const folder = userAction.getFolder('name',folderReq);
-            res.render('./folder/folder', {
-                folder: folder,
-                users: userRepo.users,
-                folders: userAction.userFolders,
-                user: req.session.user
-            });
+            let folder = userAction.viewFolder(req.session.user,req.params.folder);
+
+            res.render('./folder/folder',{user:userAction,folder:folder});
+
         }else{
-            res.send("You're either an Un-Authorized user or the requested folder no longer exits");
+
+            res.send('Permission Denied')
+
         }
 
-
     }else{
-        req.session.origin = '/folder/'+folderReq;
-        res.redirect('/');
-    }**/
 
+        res.redirect('/');
+
+    }
 });
 
 
 app.get('/folder/:folder/:file',(req,res)=>{
 
-    /**if(folderRepo.getFolder('name',req.params.folder)){
+    if(userAction.viewFile(req.session.user,req.params.folder,req.params.file)){
 
-        let folder = folderRepo.getFolder('name', req.params.folder);
+        storage.streamFile(res,req.params.folder,req.params.file);
 
-        if (folderRepo.getFile(folder.id,'name', req.params.file)) {
-
-            let file = folderRepo.getFile(folder.id,'name', req.params.file);
-
-            if (auth.checkFilePermission(folder,file, req.session.user)) {
-
-                res.setHeader('Content-Type',file.mime);
-                res.setHeader('Content-Disposition', 'inline; filename=' + file.name);
-                let stream = fs.createReadStream('./storage/' + req.params.folder + '/' + req.params.file);
-                stream.pipe(res);
-            } else {
-                res.send('Unauthorized');
-            }
-
-        } else {
-            res.send('file not found');
-        }
     }else{
-        res.send('folder not found');
-    }**/
+        res.send('Permissions Denied');
+    }
 
 
 });
 app.get('/folder/:folder/upload/file',(req,res)=>{
 	
-	/**const user = req.session.user;
-	const folder = folderRepo.getFolder('name',req.params.folder);
-    console.log(folder);
-
-
 	if(auth.checkSession(req)){
-		if(auth.checkFolderPermission(folder,user)){
-
-			res.render('./upload_file/upload_file.ejs',{user:user,folder:folder,users:userRepo.users,folders:folderRepo.folders})
-
-		}else{
-			res.send('unauthorized user');
-		}
-	}else{
-	    req.session.origin = '/folder/'+req.params.folder+'/upload/file';
-		res.redirect('/')
-	}**/
+        if(userAction.uploadToFolder(req.session.user,req.params.folder)){
+            res.render('./upload_file/upload_file',{user:userAction,folder:req.params.folder});
+        }else{
+            res.send('Permission Denied');
+        }
+    }else{
+	    res.redirect('/');
+    }
 	
 });
 app.post('/folder/:folder/upload/file',(req,res)=>{
 
-    /**const folder = req.params.folder;
+    const folder = req.params.folder;
     const fileName = req.body.input;
     const data = req.body.data;
-    let users;
+    let users = [];
 
     if(req.body.users) {
-        if (req.body.users === []) {
-            users = req.body.users;
-        } else {
-            users = [];
-            users[0] = req.body.users;
+
+        if(typeof req.body.users === 'object'){
+
+            for(let i = 0; i < req.body.users.length; i++){
+                users.push({id:req.body.users[i],permission:req.body[req.body.users[i]]});
+            }
+
+        }else{
+            users.push({id:req.body.users,permission:req.body[req.body.users]});
+
         }
 
-    }else {
-        users = [];
     }
-    res.send(userAction.addFile(folder,fileName,data,users));**/
+    if(userAction.addNewFile(req.session.user,folder,fileName,data,users)){
+        res.redirect('/folder/'+req.params.folder);
+    }else{
+        res.send('Server Error');
+    }
 
 
 });
 
-app.post('/folder/:folder/delete/file/:file',(req,res)=>{
+app.get('/folder/:folder/delete/file/:file',(req,res)=>{
+    console.log(req.session);
 
-    /**const folder = req.params.folder;
-    const file = req.params.file;
-    userAction.deleteFile(folder,file).then((result)=>{
-        res.send(result);
-    }).catch((err)=>{
-        res.send(err);
-    });**/
+    if(userAction.deleteFile(req.session.user,req.params.folder,req.params.file)){
+        res.redirect('/folder/'+req.params.folder);
+    }else{
+        res.send('Server Error');
+    }
 
 
 });
-app.post('/delete/folder/:folder',(req,res)=>{
+app.get('/delete/folder/:folder',(req,res)=>{
+    console.log(req.session);
+    if(userAction.deleteFolder(req.session.user,req.params.folder)){
+        res.redirect('/dashboard');
+    }else{
+        res.send('Server Error');
+    }
 
-    /**const folder = req.params.folder;
-    userAction.deleteFolder('name',folder).then((result)=>{
-        res.send(result);
-    }).catch((err)=>{
-        res.send(err);
-    });**/
+
+});
+app.get('/rename/folder/:folder',(req,res)=>{
+    res.render('./rename_folder/rename_folder',{user:userAction,folder:req.params.folder});
+
+});
+app.post('/rename/folder/:folder',(req,res)=>{
+    if(userAction.renameFolder(req.session.user,req.params.folder,req.body.name)){
+        res.redirect('/dashboard');
+    }else{
+        res.send('Server error');
+    }
+
+
+});
+app.get('/rename/folder/:folder/file/:file',(req,res)=>{
+    res.render('./rename_file/rename_file',{user:userAction,file:req.params.file});
+
+});
+app.post('/rename/folder/:folder/file/:file',(req,res)=>{
+
+    console.log(req.params.folder);
+    console.log(req.params.file);
+    console.log(req.body.name);
+
+    let re = /(?:\.([^.]+))?$/;
+    let ext = re.exec(req.params.file)[1];
+    if(userAction.renameFile(req.session.user,req.params.folder,req.params.file,req.body.name+'.'+ext)){
+        res.redirect('/folder/'+req.params.folder);
+    }else{
+        res.send('Server error');
+    }
 
 
 });

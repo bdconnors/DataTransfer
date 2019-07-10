@@ -2,17 +2,17 @@
 <%- include('../include/menu.ejs',{user:user})%>
 <div class="content">
     <div id = "header"  style="padding:35px 50px;">
-        <h4><span class="glyphicon glyphicon-lock"></span> Create Folder</h4>
+        <h4><span class="glyphicon glyphicon-folder-open"></span>  Create Folder</h4>
     </div>
     <div class="body" style="padding:40px 50px;">
         <div class="center-div form-width">
         <form id="fileForm" role="form" method="post">
             <div class="form-group center-div">
-                <label for="name" class="align-left"><span class="glyphicon glyphicon-user"></span> Folder Name</label>
+                <label for="name" class="align-left"><span class="glyphicon glyphicon-folder-open"></span> Folder Name</label>
                 <input type="text" class="form-control" name="name" id="name" placeholder="Folder Name">
             </div>
             <div class="form-group center-div">
-                <label for="retype" class="align-left"><span class="glyphicon glyphicon-user"></span> User Permissions</label>
+                <label for="retype" class="align-left"><span class="glyphicon glyphicon-cog"></span> User Permissions</label>
                 <br>
                 <% for(var i = 0; i < user.userRepo.users.length; i++) {
                     console.log(user.userRepo.users);
