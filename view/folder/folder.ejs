@@ -2,45 +2,40 @@
 <body>
 <%- include('../include/menu.ejs',{user:user}) %>
 
-        <div style="display:table; margin-left:auto;margin-right:auto; text-align:center; width:20%">
+<div style="display:table; margin-left:auto;margin-right:auto; text-align:center;">
         <h3><%= folder.name%></h3>
+            <br>
         <% if(folder.write || user.user.admin == true){%>
             <button class="btn btn-info dropdown-toggle" type="button" onclick="window.location.href = '/folder/<%= folder.name%>/upload/file'"><span class="glyphicon glyphicon-upload"></span> Upload File</button>
         <%}%>
-            <br>
-            <br>
-        <table style="table-layout:fixed; width:100%;">
+        <br>
+        <br>
+    <div style="display:table; margin-left:auto;margin-right:auto;text-align:center; width:40%">
+        <table style="border-collapse:separate; border-spacing:10px 10px;">
 
-            <%var rowNumber = 4 % folder.files.length;
-            if(folder.files.length < 4 && folder.files.length !== 0){
-                rowNumber = 1;
-            }
+            <% var totalCells = folder.files.length%>
+            <% var fullRows = Math.floor(folder.files.length/3)%>
+            <% var partialRowCount = folder.files.length % 3 %>
+            <% var rows = fullRows+1%>
+            <% var cellCount = 0%>
 
-            %>
-            <%var cellPerRow = folder.files.length % 4; %>
-            <%var rowCount= 1;%>
-            <%var cellCount = 1;
-            console.log('inside ejs');
-            console.log('rowNumber: '+rowNumber);
-            console.log('cellPerRow: '+cellPerRow);
-            console.log('rowCount: '+rowCount);
-            console.log('cellCount: '+cellCount);
-
-            %>
-            <% for(rowCount; rowCount <= rowNumber; rowCount++){
-                console.log('row loop');
-                console.log('row count: '+rowNumber);
+            <%for(var i = 0; i < rows; i++){
+                console.log('row count: '+i);
             %>
             <tr>
-                <% for(cellCount; cellCount <= cellPerRow; cellCount++){
-                    console.log('cell loop');
-                    console.log('cell count: '+cellCount); %>
+                <%var cellsInRow = 3%>
+                <%if(i === fullRows){
+                    cellsInRow = partialRowCount;
+                }%>
+                <%for(var j = 0; j < cellsInRow; j++){
+                    console.log('cellCount: '+cellCount);
+                %>
                 <td>
 
                         <figure>
-                            <a style = "text-decoration: none;" href="/folder/<%= folder.name%>/<%= folder.files[cellCount-1].name%>">
+                            <a style = "text-decoration: none;" href="/folder/<%= folder.name%>/<%= folder.files[cellCount].name%>">
                                 <img src="../images/file.png">
-                                <figcaption><%= folder.files[cellCount-1].name %></figcaption>
+                                <figcaption><%= folder.files[cellCount].name %></figcaption>
                             </a>
                         </figure>
                     <%if(user.user.admin === true||folder.write == true){%>
@@ -51,19 +46,20 @@
                                     Edit
                                     <span class="caret"></span></button>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/rename/folder/<%= folder.name%>/file/<%=folder.files[cellCount-1].name%>">Rename</a></li>
-                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/folder/<%= folder.name%>/delete/file/<%=folder.files[cellCount-1].name%>">Delete</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/rename/folder/<%= folder.name%>/file/<%=folder.files[cellCount].name%>">Rename</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/folder/<%= folder.name%>/delete/file/<%=folder.files[cellCount].name%>">Delete</a></li>
                                     <li role="presentation" class="divider"></li>
                                     <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Edit Permissions</a></li>
                                 </ul>
                             </div>
                         </div>
                     <%}%>
-
+                <%cellCount++%>
                 </td>
                 <%}%>
             </tr>
             <%}%>
         </table>
+    </div>
         </div>
 <%- include footer.ejs%>

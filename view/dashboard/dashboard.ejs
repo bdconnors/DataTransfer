@@ -1,64 +1,59 @@
 <%- include header.ejs%>
-<body>
 <%- include('../include/menu.ejs',{user:user}) %>
-    <div style="display:table; margin-left:auto;margin-right:auto;" id="header">
+    <div style="display:table; margin-left:auto;margin-right:auto;text-align:center;">
         <h1>Welcome <%= user.user.firstname %></h1>
-    </div>
-    <div style="display:table; margin-left:auto;margin-right:auto; text-align:center; width:20%">
         <h3>My Folders</h3>
-        <table>
+        <br>
+        <br>
+    <div style="display:table; margin-left:auto;margin-right:auto; text-align:center; width:40%">
+        <table style="border-collapse:separate; border-spacing:10px 10px;">
 
-            <% var rowNumber =  Math.ceil(user.user.folders.length/4);%>
-            <% var cells = user.user.folders%>
-            <% var rowCount = 1 %>
-            <% var cellCount = 1%>
-            <% var remainingCells = user.user.folders.length - cellCount%>
-            <% for(rowCount; rowCount < rowNumber; rowCount++){
-                console.log('row loop');
-                console.log('row count: '+rowNumber);
+            <% var totalCells = user.user.folders.length%>
+            <% var fullRows = Math.floor(user.user.folders.length/3)%>
+            <% var partialRowCount = user.user.folders.length % 3 %>
+            <% var rows = fullRows+1%>
+            <% var cellCount = 0%>
+
+            <%for(var i = 0; i < rows; i++){
+                console.log('row count: '+i);
             %>
                 <tr>
-                    <%var limit;
-                        if(remainingCells < 4){
+                <%var cellsInRow = 3%>
+                <%if(i === fullRows){
+                    cellsInRow = partialRowCount;
+                }%>
+                <%for(var j = 0; j < cellsInRow; j++){
+                    console.log('cellCount: '+cellCount);
+                %>
+                    <td style="padding: 0 10px 0 10px;">
+                        <figure>
+                            <a style = "text-decoration: none;" href="/folder/<%= user.user.folders[cellCount].name%>">
+                                <img src="../images/folder.png">
+                                <figcaption><%= user.user.folders[cellCount].name %></figcaption>
+                            </a>
+                        </figure>
+                        <%if(user.user.admin === true || user.user.folders[cellCount].write == true){%>
+                        <div class = "container" style="width:100%">
+                            <div style="display:table; margin-left:auto;margin-right:auto; text-align:center;" class="dropdown">
+                                <button class="btn btn-info dropdown-toggle" id="menu1" type="button" data-toggle="dropdown"><span class="glyphicon-glyphicon-cog"></span> Edit
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/rename/folder/<%= user.user.folders[cellCount].name%>"><span class="glyphicon-glyphicon-pencil"></span> Rename</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/delete/folder/<%= user.user.folders[cellCount].name%>">Delete</a></li>
+                                        <li role="presentation" class="divider"></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Edit Permissions</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
 
-                            limit = remainingCells;
-
-                        }else{
-                            limit = 4;
-                        }
-                    %>
-                    <% for(var i = 0; i < limit; i++){
-
-                        console.log(cellCount);
-
-                    %>
-
-                        <td style="padding: 0 10px 0 10px;">
-
-                                <figure>
-                                    <a style = "text-decoration: none;" href="/folder/<%= user.user.folders[cellCount-1].name%>">
-                                        <img src="../images/folder.png">
-                                        <figcaption><%= user.user.folders[cellCount-1].name %></figcaption>
-                                    </a>
-                                </figure>
-                                <%if(user.user.admin === true){%>
-                                    <div class = "container" style="width:100%">
-                                        <div style="display:table; margin-left:auto;margin-right:auto; text-align:center;" class="dropdown">
-                                            <button class="btn btn-info dropdown-toggle" id="menu1" type="button" data-toggle="dropdown"><span class="glyphicon-glyphicon-cog"></span> Edit
-                                                <span class="caret"></span></button>
-                                            <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                                                <li role="presentation"><a role="menuitem" tabindex="-1" href="/rename/folder/<%= user.user.folders[cellCount-1].name%>"><span class="glyphicon-glyphicon-pencil"></span> Rename</a></li>
-                                                <li role="presentation"><a role="menuitem" tabindex="-1" href="/delete/folder/<%= user.user.folders[cellCount-1].name%>">Delete</a></li>
-                                                <li role="presentation" class="divider"></li>
-                                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Edit Permissions</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                <%}%>
-                        </td>
-                    <%cellCount++}%>
+                    <%}%>
+                    <%cellCount++%>
+                <%}%>
                 </tr>
             <%}%>
         </table>
+    </div>
     </div>
 <%- include footer.ejs %>
