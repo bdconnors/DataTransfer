@@ -1,4 +1,4 @@
-<%- include('../include/head.ejs',{title:folder.name,options:{}})%>
+<%- include('../include/head.ejs',{title:folder.name,scripts:false})%>
 <%- include('../include/menu.ejs',{system:system})%>
 <div class="content">
     <div id = "header"  style="padding:35px 50px;">
@@ -16,7 +16,7 @@
 				<input type="text" class="form-control" name="name" id="name" placeholder="New File Name">
 			</div>
 			<div class="center-div button-width">
-			<button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Rename </button>
+			<button type="submit" class="btn btn-dark btn-block" ><span class="glyphicon glyphicon-off"></span> Rename </button>
 			</div>
 		</form>
 		</div>

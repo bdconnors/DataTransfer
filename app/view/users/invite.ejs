@@ -1,10 +1,10 @@
-<%- include('../include/head.ejs',{title:'Invite User',options:{menu:true,scripts:'/users/scripts/invite.js'}})%>
+<%- include('../include/head.ejs',{title:'Invite User',scripts:'invite.js'})%>
 <body>
-<%- include('../include/menu/menu.ejs',{system:system}) %>
+<%- include('../include/menu.ejs',{system:system}) %>
 <% var user = system.getUserInfo()%>
 <div class="content">
     <div id = "header"  style="padding:35px 50px;">
-        <h4><span class="glyphicon glyphicon-user"></span> Invite User</h4>
+        <h4><i class="fa fa-user-plus fa-2x"></i> Invite User</h4>
     </div>
     <div class="body" style="padding:40px 50px;">
         <div class = "center-div form-width">
@@ -40,7 +40,7 @@
                     <option value = true >Administrator</option>
                 </select>
                 <br>
-                <button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Invite User</button>
+                <button type="submit" class="btn btn-dark btn-block" ><span class="glyphicon glyphicon-off"></span> Invite User</button>
         </form>
             <div>
     </div>

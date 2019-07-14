@@ -1,11 +1,11 @@
-<%- include('../include/head.ejs',{title:'New Project',options:{}})%>
+<%- include('../include/head.ejs',{title:'New Project',scripts:false})%>
 <body>
-<%- include('../include/menu/menu.ejs',{system:system}) %>
+<%- include('../include/menu.ejs',{system:system}) %>
 <% var user = system.getUserInfo()%>
 <% var users = system.getAllUsers()%>
 <div class="content">
     <div id = "header"  style="padding:35px 50px;">
-        <h4><span class="glyphicon glyphicon-folder-open"></span>  New Project</h4>
+        <h4><i class="fa fa-archive fa-2x" ></i>  New Project</h4>
     </div>
     <div class="body" style="padding:40px 50px;">
         <div class="center-div form-width">
@@ -23,7 +23,7 @@
                     <%}%>
                 <% } %>
             <br>
-            <button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Create</button>
+            <button type="submit" class="btn btn-dark btn-block" ><span class="glyphicon glyphicon-off"></span> Create</button>
         </form>
         </div>
     </div>

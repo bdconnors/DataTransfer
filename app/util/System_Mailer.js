@@ -29,7 +29,7 @@ class System_Mailer{
             text: 'Novitious Account Creation',
             html: `<p>Dear ${firstname},</p>
                    <p><b>Please Follow The Link Below To Create Your Novitious Account:</b></p>
-                   <p>Account Creation Link: <a href='http://74.70.197.249/newuser?authcode=${authcode}'>http://74.70.197.249/newuser?authcode=${authcode}</a></p>
+                   <p>Account Creation Link: <a href='http://74.70.197.249/users/authenticate?authcode=${authcode}'>Create Account</a></p>
                    <p>Thanks, </p>
                    <p>Novitious Team</p>
                    <br>
@@ -46,7 +46,15 @@ class System_Mailer{
         return success;
 
 
-}
+    }
+    notify(action,values){
+
+        if(action === 'USER INVITED'){
+
+            this.invite(values.activity.target.firstname,values.activity.target.email,values.activity.target.authCode);
+        }
+
+    }
 
 
 

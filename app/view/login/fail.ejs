@@ -1,27 +1,26 @@
-<%- include('../include/head.ejs',{title:'File System Login',options:{scripts:'/login/scripts/login.js'}})%>
+<%- include('../include/head.ejs',{title:'File System Login',scripts:'login.js'})%>
 <body>
             <div class="content">
-                <div id="header" style="padding:35px 50px;">
+                <div id="primaryHeader" style="padding:35px 50px;">
                     <h4><span class="glyphicon glyphicon-floppy-disk"></span> File System</h4>
                 </div>
                 <div class="body" style="padding:40px 50px;">
                     <div class = "center-div form-width">
-                        <p id="accountErr" style="color:red; visibility:visible;">*Password Incorrect or Account was not found</p>
+                        <p id="accountErr" style="color:red; visibility:visible; font-size:12px;">*Password Incorrect or Account was not found</p>
                         <form role="form" method="post">
                             <div class="form-group align-left">
-                                <label for="user"><span class="glyphicon glyphicon-envelope"></span> E-mail</label>
+                                <label for="user"><span class="glyphicon glyphicon-envelope"></span> <b>E-mail</b></label>
+                            </div>
                                 <input type="text" class="form-control" style = "background-color:pink" name="email" id="email" oninput="checkInput(this)" value="<%=email%>">
-                            </div>
                             <div class="form-group align-left">
-                                <label for="pass"><span class="glyphicon glyphicon-eye-open"></span> Password</label>
+                                <label for="pass"><span class="glyphicon glyphicon-eye-open"></span> <b>Password</b></label>
+                            </div>
                                 <input type="password" class="form-control" style = "background-color:pink" name="password" id="password" oninput="checkInput(this)" value="<%=password%>">
-                            </div>
-                            <div class="center-div button-width">
-                                <button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Login</button>
-                            </div>
+                            <br>
+                            <button type="submit" class="btn btn-dark btn-block" ><span class="glyphicon glyphicon-off"></span> Login</button>
                         </form>
                     </div>
                 </div>
             </div>
 
-<%- include('../include/footer.ejs')%>
+<%- include('../include/foot.ejs')%>

@@ -1,8 +1,8 @@
-<%- include('../include/head.ejs',{title:'Account Created',options:{}})%>
+<%- include('../include/head.ejs',{title:'Account Created',scripts:false})%>
 <body>
             <div class="content">
-                <div id = "header"  style="padding:35px 50px;">
-                    <h4><span class="glyphicon glyphicon-lock"></span> Account Creation </h4>
+                <div id = "primaryHeader"  style="padding:35px 50px;">
+                    <h4 id="primaryH4"><i class="fa fa-address-card fa-2x" ></i> </span> Account Creation </h4>
                     <h3><%= name%></h3>
                 </div>
                 <div class="body" style="padding:40px 50px;">
@@ -14,7 +14,7 @@
                             <p>E-mail: <%= email%></p>
                             <p style="font-size:12px;">** Please store your password in a secure location **</p>
                             <div class="center-div button-width">
-                            <button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Dashboard</button>
+                            <button type="submit" class="btn btn-dark btn-block" ><span class="glyphicon glyphicon-off"></span> Dashboard</button>
                             </div>
                         </form>
                         </div>

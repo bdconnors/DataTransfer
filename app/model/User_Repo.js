@@ -2,14 +2,16 @@ const uuid = require('uuid');
 
 class User_Repo {
 
-    constructor(userFactory,projectFactory){
+    constructor(userFactory,projectFactory,entityFactory,activityFactory){
         this.users = [];
         this.userFactory = userFactory;
         this.projectFactory = projectFactory;
+        this.entityFactory = entityFactory;
+        this.activityFactory = activityFactory;
         this.observers = [];
     }
 
-    createUser(admin,firstname,lastname,email){
+    createUser(createdBy,admin,firstname,lastname,email){
 
         let success = false;
         let accountType;
@@ -23,7 +25,20 @@ class User_Repo {
 
         if(this.getUser(email)){
 
-            success = newUser;
+            let creator = this.getUser(createdBy);
+            let activity = this.activityFactory.make('invited',{
+
+                    firstname:newUser.getFirstName(),
+                    lastname:newUser.getLastName(),
+                    email:newUser.getEmail(),
+                    authCode:newUser.getAuthCode()
+
+                }
+            );
+            success = {admin:creator.getFullName(),activity:activity};
+
+            creator.activity.push(activity);
+            this.notifyAll('UPDATE USER',creator);
             this.notifyAll('CREATE USER',newUser);
 
         }
@@ -115,6 +130,8 @@ class User_Repo {
         let projectId = uuid();
         let admins = this.getAdmins();
 
+        this.notifyAll('CREATE PROJECT',name);
+
         admins.forEach((admin)=>{
 
             admin.projects.push(this.projectFactory.make(projectId,name,true,true));
@@ -127,7 +144,7 @@ class User_Repo {
            let userAccount = this.getUserBy('id',user.id);
            let read;
            let write;
-
+            console.log(userAccount);
            if(user.permission === 'write'){
 
                read = true;
@@ -142,12 +159,10 @@ class User_Repo {
 
            let projectPermission = this.projectFactory.make(projectId,name,read,write);
 
-           userAccount.projects.push(projectPermission);
+           userAccount.addNewProject(projectPermission);
            this.notifyAll('UPDATE USER',userAccount);
 
         });
-
-        this.notifyAll('CREATE PROJECT',name);
 
     }
 

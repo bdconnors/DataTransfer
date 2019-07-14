@@ -1,6 +1,6 @@
-<%- include('../include/head.ejs',{title:folder.name,options:{}})%>
+<%- include('../include/head.ejs',{title:folder.name,scripts:false})%>
 <body>
-<%- include('../include/menu/menu.ejs',{system:system}) %>
+<%- include('../include/menu.ejs',{system:system}) %>
 <div id="header" style="padding:35px 50px; width:100%;">
     <h1><span class="glyphicon glyphicon-folder-open"></span> <%= folder.name%></h1>
 </div>

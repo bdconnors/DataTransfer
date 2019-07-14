@@ -16,11 +16,13 @@
     "ejs": "^2.6.2",
     "express": "^4.17.1",
     "express-session": "^1.16.2",
+    "font-awesome": "^4.7.0",
     "jquery": "^3.4.1",
     "mime-types": "^2.1.24",
     "mongodb": "^3.2.7",
     "nodemailer": "^6.2.1",
     "path": "^0.12.7",
+    "popper.js": "^1.15.0",
     "rimraf": "^2.6.3",
     "uuid": "^3.3.2"
   }

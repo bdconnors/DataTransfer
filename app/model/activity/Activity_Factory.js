@@ -2,17 +2,17 @@ const Activity = require('./Activity').Activity;
 
 class Activity_Factory{
 
-    constructor(entityFactory){
-        this.entityFactory = entityFactory;
+    constructor(){
     }
 
-    make(userId,action,target){
+    make(action,target){
 
-        return new Activity(userId,action,target);
+        return new Activity(action,target);
     }
+
     convert(obj){
 
-        return new Activity(obj.id,obj.date,obj.userId,obj.action,this.entityFactory.convert(obj.target));
+        return new Activity(obj.id,obj.date,obj.action,obj.target);
 
     }
 }

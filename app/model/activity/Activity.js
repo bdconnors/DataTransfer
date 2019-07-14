@@ -2,11 +2,10 @@ const uuid = require('uuid');
 
 class Activity{
 
-    constructor(userId,action,target){
+    constructor(action,target){
 
         this.id = uuid();
         this.date = new Date();
-        this.user = userId;
         this.action = action;
         this.target = target;
 

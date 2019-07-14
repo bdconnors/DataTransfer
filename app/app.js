@@ -49,10 +49,12 @@ const db = new Database(url,dbName);
 /** Local Storage Paths **/
 const storagePathLive = '/home/brandon/DataTransfer/docs/live/';
 const storagePathBackup = '/home/brandon/DataTransfer/docs/backup/';
+const errorLogPath = '/home/brandon/DataTransfer/logs/error_log.txt';
+const activityLogPath = '/home/brandon/DataTransfer/logs/activity_log.txt';
 
 /** Local Storage Access **/
 const File_System = require('./util/File_System').File_System;
-const storage = new File_System(storagePathLive,storagePathBackup);
+const storage = new File_System(storagePathLive,storagePathBackup,errorLogPath,activityLogPath);
 
 
 /** System Mailer **/
@@ -70,7 +72,7 @@ const Entity_Factory = require('./model/entity/Entity_Factory').Entity_Factory;
 const entityFactory = new Entity_Factory();
 
 const Activity_Factory = require('./model/activity/Activity_Factory').Activity_Factory;
-const activityFactory = new Activity_Factory(entityFactory);
+const activityFactory = new Activity_Factory();
 
 const Project_Factory = require('./model/project/Project_Factory').Project_Factory;
 const projectFactory = new Project_Factory(entityFactory);
@@ -92,10 +94,15 @@ db.connect().then(()=>{
 
     db.retrieveDocuments('users',{},{'_id':0}).then((res)=>{
 
-        userRepo = new User_Repo(userFactory,projectFactory);
+        userRepo = new User_Repo(userFactory,projectFactory,entityFactory,activityFactory);
         userRepo.load(res);
+
         console.log(userRepo.users);
-        system = new System_Controller(userRepo,mailer);
+
+        system = new System_Controller(userRepo);
+        system.subscribe(mailer);
+        system.subscribe(storage);
+
         user = new User_Action_Controller(system);
         userRepo.subscribe(db);
         userRepo.subscribe(storage);
@@ -123,7 +130,7 @@ app.post('/',(req,res)=> {
 
 });
 
-app.post('/logout',(req,res)=>{
+app.get('/logout',(req,res)=>{
 
     user.signOut(req,res);
 

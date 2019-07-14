@@ -1,6 +1,6 @@
-<%- include('../include/head.ejs',{title:folder,options:{}})%>
+<%- include('../include/head.ejs',{title:folder,scripts:false})%>
 <body>
-<%- include('../include/menu/menu.ejs',{user:user})%>
+<%- include('../include/menu.ejs',{user:user})%>
 <div class="content">
     <div id = "header"  style="padding:35px 50px;">
         <h4>Rename Folder <%= folder%></h4>
@@ -17,7 +17,7 @@
 				<input type="text" class="form-control" name="name" id="name" placeholder="New Folder Name">
 			</div>
 			<div class="center-div button-width">
-			<button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Rename </button>
+			<button type="submit" class="btn btn-dark btn-block" ><span class="glyphicon glyphicon-off"></span> Rename </button>
 			</div>
 		</form>
 		</div>

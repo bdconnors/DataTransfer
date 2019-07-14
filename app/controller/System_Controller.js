@@ -1,8 +1,8 @@
 class System_Controller{
 
-    constructor(userRepo,mailer){
+    constructor(userRepo){
         this.userRepo = userRepo;
-        this.mailer = mailer;
+        this.observers = [];
     }
 
     /** User Actions **/
@@ -42,21 +42,24 @@ class System_Controller{
             if(this.checkAdmin(req,res)){
 
                 let projectName = req.body.name;
-                let users = req.body.users;
                 let userPermissions = [];
 
-                if(typeof users === 'object') {
+                if(req.body.users) {
 
-                    for (let i = 0; i < users.length; i++) {
+                    if (typeof req.body.users === 'object') {
 
-                        let curUser = users[i];
-                        let curPermission = {id:curUser,permission:req.body[curUser]};
-                        userPermissions.push(curPermission);
+                        for (let i = 0; i < users.length; i++) {
+
+                            let curUser = users[i];
+                            let curPermission = {id: curUser, permission: req.body[curUser]};
+                            userPermissions.push(curPermission);
+                        }
+
+                    } else {
+
+                        userPermissions.push({id: users, permission: req.body[users]});
+
                     }
-
-                }else{
-
-                    userPermissions.push({id:users,permission: req.body[users]});
 
                 }
 
@@ -87,10 +90,23 @@ class System_Controller{
             
             if(this.checkAdmin(req,res)) {
 
-                if (this.userRepo.createUser(req.admin, req.firstname, req.lastname, req.email)) {
+                let activity = this.userRepo.createUser(
 
-                    let user = this.userRepo.getUser(req.email);
-                    success = this.mailer.invite(req.firstname, req.email, user.getAuthCode());
+                    this.user.email,
+                    req.body.admin,
+                    req.body.firstname,
+                    req.body.lastname,
+                    req.body.email
+
+                );
+
+                if (activity) {
+
+                    let user = this.userRepo.getUser(req.body.email);
+                    success = activity;
+
+                    this.notifyAll('USER INVITED',activity);
+
                     let accountType;
 
                     if (user.admin) {
@@ -103,11 +119,12 @@ class System_Controller{
 
                     }
 
-                    res.render('./users/invite/invite', {
+                    res.render('./users/inviteSuccess', {
 
                             name: user.getFullName(),
                             email: user.getEmail(),
-                            account: accountType
+                            account: accountType,
+                            system:this
 
                         }
                     );
@@ -162,7 +179,7 @@ class System_Controller{
     
      displayLoginFail(req, res){
 
-        res.render('./login/login_fail',{email:req.body.email,password:req.body.password});
+        res.render('./login/fail',{email:req.body.email,password:req.body.password});
 
     }
     
@@ -225,7 +242,14 @@ class System_Controller{
     }
 
     displayAuthSuccess(req,res){
-        
+
+
+         let user = this.userRepo.newUserUpdate(req.query.authCode,req.body.phone,req.body.password);
+         if(user) {
+             res.render('./user/inviteSuccess', {name: user.getFullName(), email: user.getEmail()});
+         }
+
+
     }
 
     displayProjectsIndex(req,res){
@@ -289,6 +313,19 @@ class System_Controller{
 
     getAllUsers(){ return this.userRepo.users; }
     getUserInfo(){ return this.user; }
+
+    /** Observable Functions **/
+
+    subscribe(obs){
+        this.observers.push(obs);
+    }
+
+    notifyAll(action,values){
+
+        this.observers.map(observer => observer.notify(action,values));
+
+    }
+
 }
 
 
