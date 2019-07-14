@@ -1,0 +1,66 @@
+<%- include('../include/head.ejs',{title:folder.name,options:{}})%>
+<body>
+<%- include('../include/menu/menu.ejs',{system:system}) %>
+<div id="header" style="padding:35px 50px; width:100%;">
+    <h1><span class="glyphicon glyphicon-folder-open"></span> <%= folder.name%></h1>
+</div>
+<div style="display:table; margin-left:auto;margin-right:auto; text-align:center;">
+            <br>
+        <% if(folder.write || user.user.admin == true){%>
+            <button class="btn btn-info" type="button" onclick="window.location.href = '/folder/<%= folder.name%>/upload/file'"><span class="glyphicon glyphicon-upload"></span> Upload File</button>
+        <%}%>
+        <br>
+        <br>
+    <div style="display:table; margin-left:auto;margin-right:auto;text-align:center; width:40%">
+        <table style="border-collapse:separate; border-spacing:10px 10px;">
+
+            <% var totalCells = folder.files.length%>
+            <% var fullRows = Math.floor(folder.files.length/3)%>
+            <% var partialRowCount = folder.files.length % 3 %>
+            <% var rows = fullRows+1%>
+            <% var cellCount = 0%>
+
+            <%for(var i = 0; i < rows; i++){
+                console.log('row count: '+i);
+            %>
+            <tr>
+                <%var cellsInRow = 3%>
+                <%if(i === fullRows){
+                    cellsInRow = partialRowCount;
+                }%>
+                <%for(var j = 0; j < cellsInRow; j++){
+                    console.log('cellCount: '+cellCount);
+                %>
+                <td>
+
+                        <figure>
+                            <a style = "text-decoration: none;" href="/folder/<%= folder.name%>/<%= folder.files[cellCount].name%>">
+                                <img src="../images/file.png">
+                                <figcaption><%= folder.files[cellCount].name %></figcaption>
+                            </a>
+                        </figure>
+                    <%if(user.user.admin === true||folder.write == true){%>
+                        <div class="container" style="width:100%">
+                            <div style="display:table; margin-left:auto;margin-right:auto; text-align:center;" class="dropdown">
+                                <button class="btn btn-info dropdown-toggle" id="menu1" type="button" data-toggle="dropdown">
+                                    <span class="glyphicon-glyphicon-cog"></span>
+                                    Edit
+                                    <span class="caret"></span></button>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/rename/folder/<%= folder.name%>/file/<%=folder.files[cellCount].name%>">Rename</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/folder/<%= folder.name%>/delete/file/<%=folder.files[cellCount].name%>">Delete</a></li>
+                                    <li role="presentation" class="divider"></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Edit Permissions</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    <%}%>
+                <%cellCount++%>
+                </td>
+                <%}%>
+            </tr>
+            <%}%>
+        </table>
+    </div>
+        </div>
+<%- include('../include/foot.ejs')%>

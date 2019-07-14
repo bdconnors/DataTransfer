@@ -1,0 +1,50 @@
+<%- include('../include/head.ejs',{title:'Invite User',options:{menu:true,scripts:'/users/scripts/invite.js'}})%>
+<body>
+<%- include('../include/menu/menu.ejs',{system:system}) %>
+<% var user = system.getUserInfo()%>
+<div class="content">
+    <div id = "header"  style="padding:35px 50px;">
+        <h4><span class="glyphicon glyphicon-user"></span> Invite User</h4>
+    </div>
+    <div class="body" style="padding:40px 50px;">
+        <div class = "center-div form-width">
+            <div id="error">
+                <p id="fnErr" style="display: none; color:red; font-size:12px; text-align:left;">*Enter a First Name</p>
+                <p id="lnErr" style="display: none; color:red; font-size:12px; text-align:left;">*Enter a Last Name</p>
+                <p id="emailErr" style="display: none; color:red; font-size:12px; text-align:left;">*Enter a Valid Email</p>
+            </div>
+        <form role="form" method="post" onsubmit="return validate()">
+                <div class="align-left">
+                    <label for="firstname"><span class="glyphicon glyphicon-user"></span>  First Name</label>
+                </div>
+                <input type="text" name="firstname" id="firstname" class="form-control" oninput="checkFnInput(this)" placeholder="First Name">
+
+                <br>
+            <div class="align-left">
+                <label for="lastname"><span class="glyphicon glyphicon-user"></span> Last Name</label>
+            </div>
+
+                <input type="text" name="lastname" id="lastname" class="form-control" oninput="checkLnInput(this)" placeholder="Last Name">
+            <br>
+            <div class="align-left">
+                <label for="email"><span class="glyphicon glyphicon-envelope"></span> E-mail</label>
+            </div>
+                <input type="text" name="email" id="email" class="form-control" oninput="checkEmailInput(this)" placeholder="E-mail">
+
+                <br>
+            <div class="align-left">
+                <label for="account"><span class="glyphicon glyphicon-cog"></span> Account Type</label>
+            </div>
+                <select name="admin" class="form-control">
+                    <option value = false selected="selected">Standard</option>
+                    <option value = true >Administrator</option>
+                </select>
+                <br>
+                <button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Invite User</button>
+        </form>
+            <div>
+    </div>
+</div>
+    </div>
+</div>
+<%- include('../include/foot.ejs')%>

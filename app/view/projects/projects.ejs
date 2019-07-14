@@ -1,0 +1,23 @@
+<%- include('../include/head.ejs',{title:'My Projects',options:{}})%>
+<body>
+<%- include('../include/menu/menu.ejs',{system:system}) %>
+<% var user = system.getUserInfo()%>
+<div id="header" style="padding:35px 50px; width:100%;">
+    <h1>My Projects</h1>
+</div>
+
+    <div style="display:table; margin-left:auto;margin-right:auto; text-align:center;">
+        <div class="card">
+            <h5 class="card-header">Card</h5>
+            <div class="card-body">
+                <h5 class="card-title">Title</h5>
+                <p class="card-text">asdaksdfh
+                    skljdfjasdlf
+                    kjasdhflasdhjfkhasd
+                    lkhfsadljkf
+                </p>
+                <a href="#" class="btn btn-info">Button</a>
+            </div>
+        </div>
+    </div>
+<%- include('../include/foot.ejs')%>

@@ -1,0 +1,31 @@
+<%- include('../include/head.ejs',{title:'New Project',options:{}})%>
+<body>
+<%- include('../include/menu/menu.ejs',{system:system}) %>
+<% var user = system.getUserInfo()%>
+<% var users = system.getAllUsers()%>
+<div class="content">
+    <div id = "header"  style="padding:35px 50px;">
+        <h4><span class="glyphicon glyphicon-folder-open"></span>  New Project</h4>
+    </div>
+    <div class="body" style="padding:40px 50px;">
+        <div class="center-div form-width">
+        <form id="fileForm" role="form" method="post">
+
+                <label for="name" class="align-left"><span class="glyphicon glyphicon-folder-open"></span> Project Name</label>
+                <input type="text" class="form-control" name="name" id="name" placeholder="Folder Name">
+                <br>
+                <label for="retype" class="align-left"><span class="glyphicon glyphicon-cog"></span> User Permissions</label>
+                <% for(var i = 0; i < users.length; i++) {%>
+                    <% if(users[i].getAdmin() !== true && users[i].getId() !== user.getId() && !users[i].authCode){%>
+                            <div id="<%= users[i].getId() %>">
+                                    <input type="checkbox" name="users" onclick="showPermissions('<%= users[i].getId() %>')" value="<%= users[i].id %>"> <%= users[i].getFullName()%>
+                            </div>
+                    <%}%>
+                <% } %>
+            <br>
+            <button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span> Create</button>
+        </form>
+        </div>
+    </div>
+</div>
+<%- include('../include/foot.ejs')%>

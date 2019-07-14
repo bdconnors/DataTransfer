@@ -1,0 +1,52 @@
+<%- include('../include/head.ejs',{title:'File System Home',options:{menu:true}})%>
+<body>
+<%- include('../include/menu/menu.ejs',{system:system}) %>
+<% var user = system.getUserInfo()%>
+
+<div id="header" style="padding:35px 50px; width:100%;">
+    <h1>Welcome <%= user.firstname %></h1>
+</div>
+<br>
+    <div style="display:table; margin-left:auto;margin-right:auto;text-align:center;">
+        <% if(user.admin){%>
+            <button class="btn btn-info" type="button" onclick="window.location.href = '/projects/add'"><span class="glyphicon glyphicon-inbox"></span> New Project</button>
+        <%}%>
+            &nbsp;
+            <% if(user.admin){%>
+                <button class="btn btn-info" type="button" onclick="window.location.href = '/users/invite'"><span class="glyphicon glyphicon-envelope"></span> Invite User</button>
+            <%}%>
+        <br>
+        <br>
+    <div style="display:table; margin-left:auto;margin-right:auto; text-align:center; width:40%">
+        <table style="border-collapse:separate; border-spacing:10px 10px;">
+            <% var projects = user.getProjects()%>
+            <% var totalCells = projects.length%>
+            <% var fullRows = Math.floor(projects.length/3)%>
+            <% var partialRowCount = projects.length % 3 %>
+            <% var rows = fullRows+1%>
+            <% var cellCount = 0%>
+
+            <%for(var i = 0; i < rows; i++){
+                console.log('row count: '+i);
+            %>
+                <tr>
+                <%var cellsInRow = 3%>
+                <%if(i === fullRows){
+                    cellsInRow = partialRowCount;
+                }%>
+                <%for(var j = 0; j < cellsInRow; j++){
+                    console.log('cellCount: '+cellCount);
+                %>
+                    <td style="padding: 0 10px 0 10px;">
+                        <a style = "text-decoration: none;" href="/project/<%= projects[cellCount].getName()%>">
+                            <p><span style="font-size:65px;" class="glyphicon glyphicon-inbox"></span></p>
+                            <%= projects[cellCount].getName()%>
+                        </a>
+                    <%cellCount++%>
+                <%}%>
+                </tr>
+            <%}%>
+        </table>
+    </div>
+    </div>
+<%- include('../include/foot.ejs')%>
