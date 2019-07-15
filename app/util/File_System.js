@@ -1,6 +1,7 @@
 const fs = require('fs');
 const rimraf = require('rimraf');
 const fileTypes = require('mime-types');
+const uuid = require('uuid');
 
 class File_System{
 
@@ -11,8 +12,44 @@ class File_System{
         this.activityLogPath = activityLogPath;
     }
     makeDirectory(path){
+        console.log(path);
         fs.mkdirSync(this.livePath+path);
-        fs.mkdirSync(this.backupPath+path);
+
+        if(!this.folderExistsBackup(path)){
+            fs.mkdirSync(this.backupPath+path);
+        }else{
+            fs.mkdirSync(this.backupPath+path+uuid());
+        }
+
+    }
+    writeFile(path,data){
+
+        fs.writeFileSync(this.livePath+path,data);
+        if(!this.fileExists(this.backupPath+path)) {
+            fs.writeFileSync(this.backupPath + path, data);
+        }
+
+    }
+    streamFile(path,res){
+        let stream = fs.createReadStream(this.livePath+path);
+        stream.on('open',()=>{
+            stream.pipe(res);
+        });
+    }
+    folderExists(path){
+        console.log(fs.existsSync(this.livePath+path));
+        return fs.existsSync(this.livePath+path)
+    }
+    folderExistsBackup(path){
+        return fs.existsSync(this.backupPath+path)
+    }
+    fileExists(path){
+        try{
+            fs.accessSync(this.livePath+path);
+            return true;
+        }catch(e){
+            return false;
+        }
     }
     appendActivityLog(activity){
 
@@ -29,33 +66,27 @@ class File_System{
         });
 
     }
+    notify(action,values) {
 
-    notify(action,values){
-
-        if(action === 'CREATE PROJECT'){
+        if (action === 'CREATE PROJECT') {
 
             this.makeDirectory(values);
 
-        }else if(action === 'USER INVITED'){
+        }else if (action === 'CREATE FOLDER') {
 
-            let lines = [];
+            this.makeDirectory(values);
 
-            lines.push('\t'+values.activity.date+': '+'\r\n');
-            lines.push(
 
-                '\r\n\t\t'+values.admin+' '
-                +values.activity.action+' '
-                +values.activity.target.firstname
-                + ' '+values.activity.target.lastname
-                +' to create an account.'
-            );
-            lines.push('\r\n\t\t'+'An email was sent by the system to '+values.activity.target.email+'.');
+        } else if (action === 'UPLOAD FILE') {
 
-            this.appendActivityLog(lines);
+            this.writeFile(values.dir,values.data);
+
+        }else if(action === 'LOAD'){
 
         }
-
     }
+
+
 
 }
 module.exports = {File_System:File_System};

@@ -19,6 +19,16 @@ class User_Action_Controller{
 
     }
 
+    addFolder(req,res){
+
+        this.system.addFolder(req,res);
+
+    }
+
+    uploadFile(req,res){
+        this.system.uploadFile(req,res);
+    }
+
     inviteUser(req,res){
 
         this.system.inviteUser(req,res);
@@ -43,9 +53,20 @@ class User_Action_Controller{
     }
 
     requestAddFolder(req,res){
-        this.system.displayAddFolder(req,res);
-    }
 
+        this.system.displayAddFolder(req,res);
+
+    }
+    requestFile(req,res){
+
+        this.system.displayFile(req,res);
+
+    }
+    requestUpload(req,res){
+
+        this.system.displayUpload(req,res);
+
+    }
     requestProject(req,res){
         this.system.displayProject(req,res);
     }

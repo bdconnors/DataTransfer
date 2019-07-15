@@ -2,10 +2,12 @@ const User = require('./User').User;
 
 class User_Factory{
 
-    constructor(projectFactory,activityFactory){
+    constructor(projectFactory,activityFactory,storage){
 
         this.projectFactory = projectFactory;
         this.activityFactory = activityFactory;
+        this.storage = storage;
+        this.observers = [];
     }
 
     make(admin,firstname,lastname,email){
@@ -18,7 +20,21 @@ class User_Factory{
 
         obj.projects.forEach((project)=>{
 
-            user.addProject(this.projectFactory.convert(project))
+            if(!this.projectIntegrityCheck(project)) {
+
+                for(let i = 0; obj.projects.length; i++){
+
+                    if(obj.projects[i].id === project.id){
+
+                        obj.projects.splice(i,1);
+
+                    }
+                }
+
+            }else{
+
+                user.addProject(this.projectFactory.convert(project))
+            }
 
         });
 
@@ -38,8 +54,20 @@ class User_Factory{
         if(obj.password){
             user.setPassword(obj.password);
         }
-
+        this.notifyAll('UPDATE USER',user);
         return user;
+    }
+    projectIntegrityCheck(project){
+        return this.storage.folderExists(project.name);
+    }
+    subscribe(obs){
+        this.observers.push(obs);
+    }
+
+    notifyAll(action,values){
+
+        this.observers.map(observer => observer.notify(action,values));
+
     }
 }
 module.exports={User_Factory:User_Factory};

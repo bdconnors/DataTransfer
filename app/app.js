@@ -69,16 +69,16 @@ let userRepo;
 
 /** Factories **/
 const Entity_Factory = require('./model/entity/Entity_Factory').Entity_Factory;
-const entityFactory = new Entity_Factory();
+const entityFactory = new Entity_Factory(storage);
 
 const Activity_Factory = require('./model/activity/Activity_Factory').Activity_Factory;
 const activityFactory = new Activity_Factory();
 
 const Project_Factory = require('./model/project/Project_Factory').Project_Factory;
-const projectFactory = new Project_Factory(entityFactory);
+const projectFactory = new Project_Factory(entityFactory,storage);
 
 const User_Factory = require('./model/user/User_Factory').User_Factory;
-let userFactory = new User_Factory(projectFactory,activityFactory);
+let userFactory;
 
 
 /** Controllers **/
@@ -94,12 +94,15 @@ db.connect().then(()=>{
 
     db.retrieveDocuments('users',{},{'_id':0}).then((res)=>{
 
-        userRepo = new User_Repo(userFactory,projectFactory,entityFactory,activityFactory);
+        userFactory = new User_Factory(projectFactory,activityFactory,storage);
+        userFactory.subscribe(db);
+
+        userRepo = new User_Repo(userFactory,projectFactory,entityFactory);
         userRepo.load(res);
 
         console.log(userRepo.users);
 
-        system = new System_Controller(userRepo);
+        system = new System_Controller(userRepo,storage);
         system.subscribe(mailer);
         system.subscribe(storage);
 
@@ -170,6 +173,27 @@ app.get('/projects/new/folder',(req,res)=>{
     user.requestAddFolder(req,res);
 });
 
+app.post('/projects/new/folder',(req,res)=>{
+
+    user.addFolder(req,res);
+});
+
+app.get('/projects/files/upload',(req,res)=>{
+
+    user.requestUpload(req,res);
+
+});
+
+app.post('/projects/files/upload',(req,res)=>{
+
+    user.uploadFile(req,res);
+
+});
+app.get('/projects/project/:id/files',(req,res)=>{
+
+    user.requestFile(req,res);
+
+});
 
 app.get('/users',(req,res)=>{
 

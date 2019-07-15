@@ -3,44 +3,15 @@
 <%- include('../include/menu.ejs',{system:system}) %>
 
 <% var user = system.getUserInfo()%>
-<nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
-    <a class="navbar-brand" href="#"><i class="fa fa-archive "></i> Project <%= project.name %></a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
-        <ul></ul>
-    </div>
-    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2" id="navbarNavDropdown">
-        <ul class="navbar-nav ml-auto">
-                <%if(system.user.admin === true || project.write === true){%>
-                    <li class="nav-item active">
-                        <a  class="nav-link" href="/projects/new/folder?project=<%= project.id%>"><i class="fa fa-folder"></i> New Folder</a>
-                    </li>
-                    <li class="nav-item active">
-                        <a  class="nav-link" href="/projects/files/upload?project=<%= project.id%>"><i class="fa fa-upload"></i> Upload File</a>
-                    </li>
-                <%}%>
-                <%if(system.user.admin === true){%>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="usersMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-cog"></i> Settings
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="usersMenu">
-                        </div>
-                    </li>
-                <%}%>
-        </ul>
-    </div>
-</nav>
+<%- include('../include/projectNav.ejs',{system:system,project:project})%>
 <br>
 <div style="display:table; margin-left:auto;margin-right:auto;text-align:center;">
     <div style="display:table; margin-left:auto;margin-right:auto; text-align:center; width:40%">
         <table style="border-collapse:separate; border-spacing:10px 10px; width:100%;">
             <% var entitys = project.getEntitys()%>
             <% var totalCells = entitys.length%>
-            <% var fullRows = Math.floor(entitys.length/3)%>
-            <% var partialRowCount = entitys.length % 3 %>
+            <% var fullRows = Math.floor(entitys.length/2)%>
+            <% var partialRowCount = entitys.length % 2 %>
             <% var rows = fullRows+1%>
             <% var cellCount = 0%>
 
@@ -48,7 +19,7 @@
                 console.log('row count: '+i);
             %>
             <tr>
-                <%var cellsInRow = 3%>
+                <%var cellsInRow = 2%>
                 <%if(i === fullRows){
                     cellsInRow = partialRowCount;
                 }%>
@@ -56,31 +27,35 @@
                     console.log('cellCount: '+cellCount);
                 %>
                 <td style="padding: 0 10px 0 10px;">
-                    <a style = "text-decoration: none; color:#343a40;" href="/entity/<%= entitys[cellCount].getName()%>">
+
                         <%if(entitys[cellCount].isFolder){%>
-                            <i class="fa fa-folder fa-4x"></i>
+
+                            <a style = "text-decoration: none; color:#343a40;" href="projects/<%= project.id%>/folders?id=<%= entitys[cellCount].getId()%>"><i class="fa fa-folder fa-4x"></i><%= entitys[cellCount].getName()%></a>
                         <%}else if(entitys[cellCount].ext){var ext = entitys[cellCount].ext;%>
-                            <%if(ext === 'pdf'){%>
+                            <a style = "text-decoration: none; color:#343a40;" href="./<%= project.id%>/files?id=<%= entitys[cellCount].getId()%>">
+                            <%if(ext === '.pdf'){%>
                                 <i class="fa fa-file-pdf-o fa-4x"></i>
-                            <%}else if(ext  === 'docx'|| ext === 'doc'){%>
+                            <%}else if(ext  === '.docx'|| ext === '.doc'){%>
                                 <i class="fa fa-file-word-o fa-4x"></i>
-                            <%}else if(ext === 'jpg'||ext === 'png'||ext === 'bmp'||ext==='gif'){%>
+                            <%}else if(ext === '.jpg'||ext ==='.jpeg'||ext === '.png'||ext === '.bmp'||ext==='.gif'){%>
                                 <i class="fa fa-file-image-o fa-4x"></i>
-                            <%}else if(ext === 'ppt' || ext === 'pptx'){%>
+                            <%}else if(ext === '.ppt' || ext === '.pptx'){%>
                                 <i class="fa fa-file-powerpoint-o fa-4x"></i>
-                            <%}else if(ext ==='txt'){%>
+                            <%}else if(ext ==='.txt'){%>
                                 <i class="fa fa-file-text-o fa-4x"></i>
-                            <%}else if( ext === 'zip'||ext==='rar'||ext ==='.7z'){%>
+                            <%}else if( ext === '.zip'||ext==='.rar'||ext ==='.7z'){%>
                                 <i class="fa fa-file-zip-o fa-4x"></i>
-                            <%}else if(ext === 'java'||ext ==='js'||ext==='py'||ext==='cs'||ext==='php'||ext==='html'||ext==='css'){%>
+                            <%}else if(ext === '.java'||ext ==='.js'||ext==='.py'||ext==='.cs'||ext==='.php'||ext==='.html'||ext==='.css'){%>
                                 <i class="fa fa-file-code-o fa-4x"></i>
                             <%}else{%>
                                 <i class="fa fa-file-file-o fa-4x"></i>
                             <%}%>
+                                <%= entitys[cellCount].getName()%>
+                            </a>
                         <%}%>
                         <br>
-                        <%= entitys[cellCount].getName()%>
-                    </a>
+
+
                     <%cellCount++%>
                     <%}%>
             </tr>

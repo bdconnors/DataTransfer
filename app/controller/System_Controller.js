@@ -1,7 +1,10 @@
+const uuid = require('uuid');
+
 class System_Controller{
 
-    constructor(userRepo){
+    constructor(userRepo,storage){
         this.userRepo = userRepo;
+        this.storage = storage;
         this.observers = [];
     }
 
@@ -20,7 +23,7 @@ class System_Controller{
 
             }else{
 
-                this.displayDashboard(req,res);
+                this.redirectToDashboard(res);
             }
 
         }else{
@@ -42,29 +45,15 @@ class System_Controller{
             if(this.checkAdmin(req,res)){
 
                 let projectName = req.body.name;
-                let userPermissions = [];
+                let userPermissions = this.parsePermissions(req);
 
-                if(req.body.users) {
-                    let users = req.body.users;
-                    if (typeof users === 'object') {
+                if(this.storage.folderExists(projectName)){
+                    res.render('./projects/addFail',{system:this,name:projectName});
+                }else {
 
-                        for (let i = 0; i < users.length; i++) {
-
-                            let curUser = users[i];
-                            let curPermission = {id: curUser, permission: req.body[curUser]};
-                            userPermissions.push(curPermission);
-                        }
-
-                    } else {
-
-                        userPermissions.push({id: users, permission: req.body[users]});
-
-                    }
-
+                    this.userRepo.addNewProject(projectName, userPermissions);
+                    this.redirectToDashboard(res)
                 }
-
-                this.userRepo.addNewProject(projectName,userPermissions);
-                this.displayDashboard(req,res);
 
             }else{
 
@@ -81,6 +70,62 @@ class System_Controller{
     }
     addFolder(req,res){
 
+        if(this.checkSessionIntegrity(req,res)){
+
+            if(this.user.retrieveProject(req.query.project)){
+
+                let foldername = req.body.name;
+                let dir = req.body.dir;
+                let userPermissions = this.parsePermissions(req);
+                let project = this.user.retrieveProject(req.query.project);
+                console.log(dir);
+                console.log(foldername);
+                if(this.storage.folderExists(dir+'/'+foldername)){
+                    let projUsers = this.userRepo.getProjectUsers(req.query.project,this.user.id);
+                    res.render('./projects/newFolderFail',{system:this,project:req.query.project,dir:dir,users:projUsers,name:foldername});
+                }else {
+
+                    this.userRepo.addFolder(this.user, project.id, foldername, userPermissions, dir);
+                    this.redirectToDashboard(res);
+                }
+            }else{
+                res.send('UnAuthorized');
+            }
+
+        }else{
+
+            this.redirectToLogin(res);
+
+        }
+
+
+    }
+    uploadFile(req,res){
+
+
+        if(this.checkSessionIntegrity(req,res)){
+
+            if(this.user.retrieveProject(req.query.project)){
+
+                let project = req.query.project;
+                let data = req.body.data;
+                let fileName = req.body.input;
+                let userPermissions = this.parsePermissions(req);
+                console.log(req.body);
+                console.log(userPermissions);
+                let dir = req.body.dir;
+                this.userRepo.uploadFile(project,this.user.id,data,fileName,userPermissions,dir);
+                this.redirectToDashboard(res);
+
+            }else{
+                res.send('UnAuthorized');
+            }
+
+        }else{
+
+            this.redirectToLogin(res);
+
+        }
     }
     
     /** System Actions **/
@@ -193,14 +238,55 @@ class System_Controller{
         
     }
     displayAddFolder(req,res){
-        let project = this.user.retrieveProject(req.query.project);
-        let users = this.userRepo.getProjectUsers(req.query.project,this.user.id);
-        res.render('./projects/newFolder',{system:this,project:project,users:users});
+
+         if(this.checkSessionIntegrity(req,res)) {
+             if(this.user.retrieveProject(req.query.project)) {
+                 let project = this.user.retrieveProject(req.query.project);
+                 let users = this.userRepo.getProjectUsers(req.query.project, this.user.id);
+                 res.render('./projects/newFolder', {system: this, project: project, users: users,dir:project.name});
+             }else{
+                 res.send('UnAuthorized');
+             }
+
+         }else{
+             this.redirectToLogin(res);
+         }
     }
-    displayProject(req,res){
+    displayFile(req,res){
 
          let project = this.user.retrieveProject(req.params.id);
-         res.render('./projects/project',{system:this,project:project});
+         let file = project.retrieveEntity(req.query.id);
+         this.storage.streamFile(file.dir+'/'+file.name,res);
+
+    }
+    displayUpload(req,res){
+
+        if(this.checkSessionIntegrity(req,res)) {
+            if(this.user.retrieveProject(req.query.project)) {
+                let project = this.user.retrieveProject(req.query.project);
+                let users = this.userRepo.getProjectUsers(req.query.project, this.user.id);
+                res.render('./projects/upload', {system: this, project: project, users: users,dir:project.name});
+            }else{
+                res.send('UnAuthorized');
+            }
+
+        }else{
+            this.redirectToLogin(res);
+        }
+    }
+
+    displayProject(req,res){
+
+         if(this.checkSessionIntegrity(req,res)) {
+             if(this.user.retrieveProject(req.params.id)) {
+                 let project = this.user.retrieveProject(req.params.id);
+                 res.render('./projects/project', {system: this, project: project});
+             }else{
+                 res.send('UnAuthorized');
+             }
+         }else{
+             this.redirectToLogin(res);
+         }
 
     }
     displayCreateProjectForm(req,res){
@@ -282,6 +368,9 @@ class System_Controller{
     redirectToLogin(res){
         res.redirect('/');
     }
+    redirectToDashboard(res){
+        res.redirect('/dashboard');
+    }
 
     redirectToOrigin(req,res){
         res.redirect(req.session.originPath);
@@ -314,6 +403,32 @@ class System_Controller{
     }
     
     checkAdmin(){ return this.user.admin; }
+
+    parsePermissions(req){
+
+        let userPermissions = [];
+
+        if(req.body.users) {
+            let users = req.body.users;
+            if (typeof users === 'object') {
+
+                for (let i = 0; i < users.length; i++) {
+
+                    let curUser = users[i];
+                    let curPermission = {id: curUser.id, permission: req.body[curUser]};
+                    userPermissions.push(curPermission);
+                }
+
+            } else {
+
+                userPermissions.push({id: users, permission: req.body[users]});
+
+            }
+
+        }
+
+        return userPermissions;
+    }
     
     /** User Account Retrieval Functions **/
 

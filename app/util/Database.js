@@ -110,9 +110,6 @@ class Database{
                 return err;
             });
 
-        }else if(action === 'CREATE PROJECT'){
-
-
         }
 
     }

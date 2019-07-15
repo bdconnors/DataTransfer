@@ -53,7 +53,12 @@ class Project{
     }
 
     getId(){ return this.id; }
-    setId(id){ this.id = id; }
+    setId(id){
+        console.log('Param Id in Proj Model: '+id);
+        this.id = id;
+        console.log('Id in Proj Model: '+this.id);
+
+    }
 
     getName(){ return this.name; }
     setName(name){ this.name = name; }

@@ -13,8 +13,8 @@
         <table style="border-collapse:separate; border-spacing:10px 10px; width:100%;">
             <% var projects = user.getProjects()%>
             <% var totalCells = projects.length%>
-            <% var fullRows = Math.floor(projects.length/3)%>
-            <% var partialRowCount = projects.length % 3 %>
+            <% var fullRows = Math.floor(projects.length/2)%>
+            <% var partialRowCount = projects.length % 2 %>
             <% var rows = fullRows+1%>
             <% var cellCount = 0%>
 
@@ -22,7 +22,7 @@
                 console.log('row count: '+i);
             %>
                 <tr>
-                <%var cellsInRow = 3%>
+                <%var cellsInRow = 2%>
                 <%if(i === fullRows){
                     cellsInRow = partialRowCount;
                 }%>

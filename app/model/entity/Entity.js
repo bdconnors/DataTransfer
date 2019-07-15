@@ -3,20 +3,18 @@ const fs = require('fs');
 
 class Entity{
 
-    constructor(dir,name,author,read,write,isFolder){
+    constructor(id,name,author,read,write,isFolder,dir){
 
-        this.id = uuid();
+        this.id = id;
         this.name = name;
         this.author = author;
         this.read = read;
         this.write = write;
         this.isFolder = isFolder;
         this.dir = dir;
-        this.size = fs.statSync(this.dir).size;
-        this.created = fs.statSync(this.dir).ctime;
-        this.modified = fs.statSync(this.dir).mtime;
-        this.accessed = fs.statSync(this.dir).atime;
-
+        this.created = '';
+        this.accessed = '';
+        this.modified = '';
     }
 
     getId(){ return this.id; }
@@ -40,27 +38,28 @@ class Entity{
     getDir(){ return this.dir; }
     setDir(dir){ this.dir = dir; }
 
+
     getSize() {
 
-        this.size = fs.statSync(this.dir).size;
+        this.size = fs.statSync('/home/brandon/DataTransfer/docs/live/'+this.dir).size;
         return this.size;
 
     }
     getCreated() {
 
-        this.created = fs.statSync(this.dir).ctime;
+        this.created = fs.statSync('/home/brandon/DataTransfer/docs/live/'+this.dir).ctime;
         return this.created;
 
     }
     getModified() {
 
-        this.modified = fs.statSync(this.dir).mtime;
+        this.modified = fs.statSync('/home/brandon/DataTransfer/docs/live/'+this.dir).mtime;
         return this.modified;
 
     }
     getAccessed() {
 
-        this.accessed = fs.statSync(this.dir).atime;
+        this.accessed = fs.statSync('/home/brandon/DataTransfer/docs/live/'+this.dir).atime;
         return this.accessed;
 
     }

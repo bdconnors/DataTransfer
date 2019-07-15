@@ -2,8 +2,8 @@ const Entity = require('./Entity').Entity;
 
 class Folder extends Entity{
 
-    constructor(dir,name,author,read,write){
-        super(dir,name,author,read,write,true);
+    constructor(id,name,author,read,write,dir){
+        super(id,name,author,read,write,true,dir);
         this.files = [];
     }
 

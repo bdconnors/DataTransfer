@@ -2,12 +2,12 @@ const uuid = require('uuid');
 
 class User_Repo {
 
-    constructor(userFactory,projectFactory,entityFactory,activityFactory){
+    constructor(userFactory,projectFactory,entityFactory,storage){
         this.users = [];
         this.userFactory = userFactory;
         this.projectFactory = projectFactory;
         this.entityFactory = entityFactory;
-        this.activityFactory = activityFactory;
+        this.storage = storage;
         this.observers = [];
     }
 
@@ -26,18 +26,9 @@ class User_Repo {
         if(this.getUser(email)){
 
             let creator = this.getUser(createdBy);
-            let activity = this.activityFactory.make('invited',{
 
-                    firstname:newUser.getFirstName(),
-                    lastname:newUser.getLastName(),
-                    email:newUser.getEmail(),
-                    authCode:newUser.getAuthCode()
-
-                }
-            );
             success = {admin:creator.getFullName(),activity:activity};
 
-            creator.activity.push(activity);
             this.notifyAll('UPDATE USER',creator);
             this.notifyAll('CREATE USER',newUser);
 
@@ -135,11 +126,100 @@ class User_Repo {
             this.notifyAll('UPDATE USER',success)
         }
 
+
         return success;
+    }
+    addFolder(author,project,name,userPermissions,dir){
+
+        let folderId = uuid();
+        let admins = this.getAdmins();
+        this.notifyAll('CREATE FOLDER',dir+'/'+name);
+        admins.forEach((admin)=>{
+            let projectPermission = admin.retrieveProject(project);
+            let folderPermission = this.entityFactory.make(folderId,name,author.id,true,true,true,dir);
+            folderPermission.getCreated();
+            projectPermission.entitys.push(folderPermission);
+            this.notifyAll('UPDATE USER',admin);
+        });
+
+        userPermissions.forEach((user)=>{
+            let accountInfo = this.getUserBy('id',user.id);
+            let projectPermission = accountInfo.retrieveProject(project);
+
+            let read;
+            let write;
+            if(user.permission === 'write'){
+
+                read = true;
+                write = false;
+
+            }else if(user.permission === 'read'){
+
+                read = true;
+                write = true;
+
+            }
+
+            let folderPermission = this.entityFactory.make(folderId,name,author,read,write,true,dir);
+            folderPermission.getCreated();
+            projectPermission.entitys.push(folderPermission);
+            this.notifyAll('UPDATE USER',accountInfo);
+
+        });
+
+    }
+    uploadFile(project,author,data,name,userPermissions,dir){
+        console.log(data);
+        let dataBuffer = Buffer.from(data,'base64');
+        this.notifyAll('UPLOAD FILE',{dir:dir+'/'+name,data:dataBuffer});
+        let admins = this.getAdmins();
+        let fileId = uuid();
+
+        admins.forEach((admin)=>{
+
+            let proj = admin.retrieveProject(project);
+            let filePermission = this.entityFactory.make(fileId,name,author,true,true,false,dir);
+            filePermission.getCreated();
+            filePermission.getExt();
+            filePermission.getMime();
+            proj.entitys.push(filePermission);
+            this.notifyAll('UPDATE USER',admin);
+
+        });
+
+        userPermissions.forEach((user)=>{
+
+            let userAccount = this.getUserBy('id',user.id);
+            let proj = userAccount.retrieveProject(project);
+
+            let read;
+            let write;
+            if(user.permission === 'write'){
+
+                read = true;
+                write = false;
+
+            }else if(user.permission === 'read'){
+
+                read = true;
+                write = true;
+
+            }
+
+            let filePermission = this.entityFactory.make(fileId,name,author,read,write,false,dir);
+            filePermission.getCreated();
+            filePermission.getExt();
+            filePermission.getMime();
+            proj.entitys.push(filePermission);
+            this.notifyAll('UPDATE USER',userAccount);
+
+        });
+
     }
     addNewProject(name,userPermissions){
 
         let projectId = uuid();
+        console.log('Id in add new proj: '+projectId);
         let admins = this.getAdmins();
 
         this.notifyAll('CREATE PROJECT',name);

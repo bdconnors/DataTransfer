@@ -4,9 +4,9 @@ const fileTypes = require('mime-types');
 
 class File extends Entity {
 
-    constructor(dir,name,author,read,write) {
+    constructor(id,name,author,read,write,dir) {
 
-        super(dir,name,author,read,write,false);
+        super(id,name,author,read,write,false,dir);
         this.ext = path.extname(this.dir + name);
         this.mime = fileTypes.lookup(this.dir + name);
 
@@ -14,14 +14,14 @@ class File extends Entity {
 
     getExt() {
 
-        this.ext = path.extname(this.dir + name);
+        this.ext = path.extname('/home/brandon/DataTransfer/docs/live/'+this.dir + this.name);
         return this.ext;
 
     }
 
     getMime() {
 
-        this.mime = fileTypes.lookup(this.dir + name);
+        this.mime = fileTypes.lookup('/home/brandon/DataTransfer/docs/live/'+this.dir + this.name);
         return this.mime;
 
     }

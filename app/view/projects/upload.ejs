@@ -1,0 +1,42 @@
+<%- include('../include/head.ejs',{title:'Upload File',scripts:'upload.js'})%>
+<body>
+<%- include('../include/menu.ejs',{system:system})%>
+<div class="content">
+<%- include('../include/projectNav.ejs',{project:project})%>
+    <div class="body" style="padding:40px 50px;">
+        <div class = "center-div form-width">
+            <form id="fileForm" role="form" method="post">
+                <div class="form-group align-left">
+                    <label for="name"><span class="glyphicon glyphicon-user"></span> File Upload</label>
+                    <input type="file" class="form-control" name="input" id="input" onchange="setData()">
+                    <input type="hidden" name="data" id="data">
+                    <input type="hidden" name="dir" id="dir" value="<%= dir%>">
+                </div>
+                <div class="form-group align-left">
+                    <%if(users.length > 0){%>
+                        <label for="retype" class="align-left"></span> User Permissions</label>
+                    <%}%>
+                    <% for(var i = 0; i < users.length; i++) {
+                        var curUser = users[i];
+                    %>
+                    <%for(var j = 0; j < curUser.projects.length; j++){
+                        var curProject = curUser.projects[j];
+                        console.log(curUser.projects);
+                        console.log
+                    %>
+                    <%if(curProject.id === project.id){%>
+                        <% if(users[i].getAdmin() !== true && system.user.getId() !== users[i].getId() && !users[i].authCode){%>
+                            <div id="<%= users[i].getId() %>">
+                                <input type="checkbox" id="users" name="users" onclick="showPermissions('<%= users[i].getId() %>')" value="<%= users[i].id %>"> <%= users[i].getFullName()%>
+                            </div>
+                        <%}%>
+                    <%}%>
+                    <%}%>
+                    <% } %>
+                </div>
+                <button type="submit" class="btn btn-dark btn-block" >Upload</button>
+            </form>
+        </div>
+    </div>
+</div>
+<%- include('../include/foot.ejs')%>
