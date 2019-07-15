@@ -1,0 +1,66 @@
+<%- include('../include/head.ejs',{title:'New Project',scripts:false})%>
+<body>
+<%- include('../include/menu.ejs',{system:system}) %>
+<div class="content">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+        <a class="navbar-brand" href="/projects/project/<%= project.id%>"><i class="fa fa-archive "></i> Project <%= project.name %></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+            <ul></ul>
+        </div>
+        <div class="navbar-collapse collapse w-100 order-3 dual-collapse2" id="navbarNavDropdown">
+            <ul class="navbar-nav ml-auto">
+                <%if(system.user.admin === true || project.write === true){%>
+                    <li class="nav-item active">
+                        <a  class="nav-link" href="/projects/new/folder?project=<%= project.id%>"><i class="fa fa-folder"></i> New Folder</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a  class="nav-link" href="/projects/files/upload?project=<%= project.id%>"><i class="fa fa-upload"></i> Upload File</a>
+                    </li>
+                <%}%>
+                <%if(system.user.admin === true){%>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="usersMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-cog"></i> Settings
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="usersMenu">
+                        </div>
+                    </li>
+                <%}%>
+            </ul>
+        </div>
+    </nav>
+    <div class="body" style="padding:40px 50px;">
+        <div class="center-div form-width">
+            <form id="fileForm" role="form" method="post">
+
+                <label for="name" class="align-left"><span class="glyphicon glyphicon-folder-open"></span> Folder Name</label>
+                <input type="text" class="form-control" name="name" id="name" placeholder="Folder Name">
+                <br>
+                <%if(users.length > 0){%>
+                    <label for="retype" class="align-left"><span class="glyphicon glyphicon-cog"></span> User Permissions</label>
+                <%}%>
+                <% for(var i = 0; i < users.length; i++) {
+                    var curUser = users[i];
+                %>
+                    <%for(var j = 0; j < curUser.projects.length; j++){
+                        var curProject = curUser.projects[j];
+                    %>
+                        <%if(curProject.id === project.name){%>
+                            <% if(users[i].getAdmin() !== true && users[i].getId() !== user.getId() && !users[i].authCode){%>
+                                <div id="<%= users[i].getId() %>">
+                                    <input type="checkbox" name="users" onclick="showPermissions('<%= users[i].getId() %>')" value="<%= users[i].id %>"> <%= users[i].getFullName()%>
+                                </div>
+                            <%}%>
+                        <%}%>
+                    <%}%>
+                <% } %>
+                <br>
+                <button type="submit" class="btn btn-dark btn-block" ><span class="glyphicon glyphicon-off"></span> Create</button>
+            </form>
+        </div>
+    </div>
+</div>
+<%- include('../include/foot.ejs')%>

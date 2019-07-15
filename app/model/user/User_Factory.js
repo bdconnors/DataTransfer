@@ -27,7 +27,7 @@ class User_Factory{
         });
 
         if(obj.authCode){
-            console.log('auth code from DB: '+obj.authCode);
+
             user.setAuthCode(obj.authCode);
         }
 

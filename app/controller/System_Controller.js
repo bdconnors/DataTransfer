@@ -45,8 +45,8 @@ class System_Controller{
                 let userPermissions = [];
 
                 if(req.body.users) {
-
-                    if (typeof req.body.users === 'object') {
+                    let users = req.body.users;
+                    if (typeof users === 'object') {
 
                         for (let i = 0; i < users.length; i++) {
 
@@ -78,6 +78,9 @@ class System_Controller{
 
         }
         
+    }
+    addFolder(req,res){
+
     }
     
     /** System Actions **/
@@ -146,28 +149,21 @@ class System_Controller{
 
     }
 
-    authenticateNewUser(req,res){
+    authenticateNewUser(req,res) {
 
-        if(this.userRepo.getUserBy('authCode',req.query.authcode)) {
 
-            if (this.userRepo.newUserUpdate(req.query.authcode, req.body.phone, req.body.password)) {
-                
-                let user = this.userRepo.getUserBy('phone',req.body.phone);
-                this.displayAuthSuccess('./users/authSuccess', {name:user.getFullName(),email:user.getEmail()});
-                
-            }else{
-                
-                res.send('server error could update');
-                
-            }
-            
-        }else{
-            
-            res.send('server error user not found');
-            
+        if (this.userRepo.newUserUpdate(req.body.authcode, req.body.phone, req.body.password)) {
+
+            this.displayAuthSuccess(req, res);
+
+        } else {
+
+            res.send('server error');
+
         }
-        
+
     }
+
     
     /** System Displays **/
 
@@ -196,6 +192,17 @@ class System_Controller{
         }
         
     }
+    displayAddFolder(req,res){
+        let project = this.user.retrieveProject(req.query.project);
+        let users = this.userRepo.getProjectUsers(req.query.project,this.user.id);
+        res.render('./projects/newFolder',{system:this,project:project,users:users});
+    }
+    displayProject(req,res){
+
+         let project = this.user.retrieveProject(req.params.id);
+         res.render('./projects/project',{system:this,project:project});
+
+    }
     displayCreateProjectForm(req,res){
 
         if(this.checkSessionIntegrity(req,res)){
@@ -216,6 +223,7 @@ class System_Controller{
         }
         
     }
+
     displayInviteUserForm(req,res){
         
         if(this.checkSessionIntegrity(req,res)) {
@@ -235,21 +243,19 @@ class System_Controller{
     }
 
     displayUserAuthForm(req,res){
-
+        console.log(req.query)
         let user = this.userRepo.getUserBy('authCode',req.query.authcode);
-        res.render('./users/auth',{name:user.getFullName()});
+        res.render('./users/auth',{name:user.getFullName(),authCode:req.query.authcode});
 
     }
 
     displayAuthSuccess(req,res){
 
 
-         let user = this.userRepo.newUserUpdate(req.query.authCode,req.body.phone,req.body.password);
+         let user = this.userRepo.newUserUpdate(req.body.authCode,req.body.phone,req.body.password);
          if(user) {
-             res.render('./user/inviteSuccess', {name: user.getFullName(), email: user.getEmail()});
+             res.render('./users/authSuccess', {name: user.getFullName(), email: user.getEmail()});
          }
-
-
     }
 
     displayProjectsIndex(req,res){

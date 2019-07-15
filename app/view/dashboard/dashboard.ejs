@@ -4,7 +4,7 @@
 <% var user = system.getUserInfo()%>
 
 <div id="header" style="padding:35px 50px; width:100%;">
-    <h1> <i class="fa fa-user-circle-o fa-2x" ></i> Welcome <%= user.firstname %></h1>
+    <h1> <i class="fa fa-user-circle-o " ></i> Welcome <%= user.firstname %></h1>
 </div>
 <br>
     <div style="display:table; margin-left:auto;margin-right:auto;text-align:center;">
@@ -30,7 +30,7 @@
                     console.log('cellCount: '+cellCount);
                 %>
                     <td style="padding: 0 10px 0 10px;">
-                        <a style = "text-decoration: none; color:#343a40;" href="/project/<%= projects[cellCount].getName()%>">
+                        <a style = "text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount].getId()%>">
                             <i class="fa fa-archive fa-4x"></i>
                             <br>
                             <%= projects[cellCount].getName()%>

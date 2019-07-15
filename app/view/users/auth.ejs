@@ -1,13 +1,13 @@
 <%- include('../include/head.ejs',{title:'Create Account',scripts:'auth.js'})%>
 <body>
             <div class="content">
-                <div id = "primarHeader"  style="padding:35px 50px;">
-                    <h4 id="primaryH4"><i class="fa fa-address-card fa-2x" ></i> </span> Account Creation</h4>
+                <div id = "primaryHeader"  style="padding:35px 50px;">
+                    <h4 id="primaryH4"><i class="fa fa-address-card" ></i> </span> Account Creation</h4>
                     <h3><%= name%> </h3>
                 </div>
                 <div class="body" style="padding:40px 50px;">
                     <div class = "center-div form-width">
-                    <form role="form" onsubmit="return validate()" method="put">
+                    <form role="form" onsubmit="return validate()" method="post">
                         <div style="font-size:12px" class="form-group center-div align-left">
                             <p><b>Password Must Contain:</b></p>
                             <p id="length">At least 6 Characters </p>
@@ -29,8 +29,9 @@
                             <label for="retype"><span class="glyphicon glyphicon-user"></span> Retype Password</label>
                             <input type="password" class="form-control" name="retype" id="retype" placeholder="Retype Password">
                         </div>
+                        <input type="hidden" name="authCode" id="authCode" value=<%= authCode%> >
                         <div class="center-div button-width">
-                        <button type="submit" class="btn btn-dark btn-block" ><span class="glyphicon glyphicon-off"></span> Submit</button>
+                            <button type="submit" class="btn btn-dark btn-block" > Submit</button>
                         </div>
                     </form>
                     </div>

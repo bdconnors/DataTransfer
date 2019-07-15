@@ -65,10 +65,9 @@ class User_Repo {
     getUserBy(field,value){
 
         let success = false;
-        console.log(field);
-        console.log(value);
+
         this.users.forEach((user)=>{
-            console.log(user[field]);
+
             if(user[field] === value){
                 success = user;
             }
@@ -77,7 +76,20 @@ class User_Repo {
         return success;
 
     }
+    getProjectUsers(projectId,currentUserId){
 
+        let users = [];
+
+        this.users.forEach((user)=>{
+            user.projects.forEach((project)=>{
+                if(project.id === projectId && user.id !== currentUserId){
+                    users.push(user);
+                }
+            });
+        });
+
+        return users;
+    }
     deleteUser(email){
 
         let success = false;
@@ -142,9 +154,9 @@ class User_Repo {
         userPermissions.forEach((user)=>{
 
            let userAccount = this.getUserBy('id',user.id);
+
            let read;
            let write;
-            console.log(userAccount);
            if(user.permission === 'write'){
 
                read = true;
@@ -159,7 +171,7 @@ class User_Repo {
 
            let projectPermission = this.projectFactory.make(projectId,name,read,write);
 
-           userAccount.addNewProject(projectPermission);
+           userAccount.addProject(projectPermission);
            this.notifyAll('UPDATE USER',userAccount);
 
         });

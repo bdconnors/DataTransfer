@@ -148,6 +148,12 @@ app.get('/projects',(req,res)=>{
 
 });
 
+app.get('/projects/project/:id',(req,res)=>{
+
+    user.requestProject(req,res);
+
+});
+
 app.get('/projects/add',(req,res)=>{
 
     user.requestCreateProjectForm(req,res);
@@ -158,6 +164,12 @@ app.post('/projects/add',(req,res)=>{
 
     user.createProject(req,res);
 });
+
+app.get('/projects/new/folder',(req,res)=>{
+
+    user.requestAddFolder(req,res);
+});
+
 
 app.get('/users',(req,res)=>{
 
@@ -181,7 +193,7 @@ app.get('/users/authenticate',(req,res)=>{
     system.displayUserAuthForm(req,res);
 });
 
-app.put('/users/authenticate',(req,res)=>{
+app.post('/users/authenticate',(req,res)=>{
 
     system.authenticateNewUser(req,res);
 

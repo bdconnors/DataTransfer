@@ -12,9 +12,11 @@
         <form id="fileForm" role="form" method="post">
 
                 <label for="name" class="align-left"><span class="glyphicon glyphicon-folder-open"></span> Project Name</label>
-                <input type="text" class="form-control" name="name" id="name" placeholder="Folder Name">
+                <input type="text" class="form-control" name="name" id="name" placeholder="Project Name">
                 <br>
+                <%if(users.length > 0){%>
                 <label for="retype" class="align-left"><span class="glyphicon glyphicon-cog"></span> User Permissions</label>
+                <%}%>
                 <% for(var i = 0; i < users.length; i++) {%>
                     <% if(users[i].getAdmin() !== true && users[i].getId() !== user.getId() && !users[i].authCode){%>
                             <div id="<%= users[i].getId() %>">

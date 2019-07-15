@@ -41,6 +41,14 @@ class User_Action_Controller{
         this.system.displayProjectsIndex(req,res);
 
     }
+
+    requestAddFolder(req,res){
+        this.system.displayAddFolder(req,res);
+    }
+
+    requestProject(req,res){
+        this.system.displayProject(req,res);
+    }
     requestCreateProjectForm(req,res){
 
         this.system.displayCreateProjectForm(req,res)

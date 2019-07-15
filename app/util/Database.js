@@ -46,7 +46,6 @@ class Database{
             return JSON.parse(JSON.stringify(res));
         }).
         catch((err)=>{
-            console.log(err);
             return JSON.parse(JSON.stringify(err));
         });
 
@@ -73,7 +72,7 @@ class Database{
     }
 
     notify(action,value) {
-        console.log(value);
+
         if(action === 'CREATE USER') {
             return this.createDocuments('users',[value]).then((res) => {
                 return res;

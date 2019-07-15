@@ -17,13 +17,13 @@ class User{
 
     addProject(project){ this.projects.push(project); }
 
-    retrieveProject(name){
+    retrieveProject(id){
 
         let success = false;
 
         this.projects.forEach((project)=>{
 
-            if(project.name === name){
+            if(project.id === id){
                 success = project;
             }
 
