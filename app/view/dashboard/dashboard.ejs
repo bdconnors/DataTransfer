@@ -3,18 +3,18 @@
 <%- include('../include/menu.ejs',{system:system}) %>
 <% var user = system.getUserInfo()%>
 
-<div id="header" style="padding:35px 50px; width:100%;">
+<div id="welcomeHeader" style="padding:35px 50px; width:100%;">
     <h1> <i class="fa fa-user-circle-o " ></i> Welcome <%= user.firstname %></h1>
 </div>
 <br>
     <div style="display:table; margin-left:auto;margin-right:auto;text-align:center;">
-
-    <div style="display:table; margin-left:auto;margin-right:auto; text-align:center; width:40%">
+    <div style="display:table; margin-left:auto;margin-right:auto; text-align:center; width:40%;">
         <table style="border-collapse:separate; border-spacing:10px 10px; width:100%;">
+            <%var columnSize = 3%>
             <% var projects = user.getProjects()%>
             <% var totalCells = projects.length%>
-            <% var fullRows = Math.floor(projects.length/3)%>
-            <% var partialRowCount = projects.length % 3 %>
+            <% var fullRows = Math.floor(projects.length/columnSize)%>
+            <% var partialRowCount = projects.length % columnSize%>
             <% var rows = fullRows+1%>
             <% var cellCount = 0%>
 
@@ -30,23 +30,30 @@
                     console.log('cellCount: '+cellCount);
                 %>
                     <td style="padding: 0 10px 0 10px;">
-                        <%if(user.admin){%>
-                            <div class="dropdown">
-                                <button style = "background-color:transparent; font-size:16px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
-                                    <i class="fa fa-pencil"></i> Edit
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="projSettings">
-                                    <button class="dropdown-item" type="button">Rename</button>
+                        <div class="dropdown">
+                            <button style = "background-color:transparent; font-size:16px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
+                                <i class="fa fa-cog"></i> Options
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="projSettings">
+                                <form action="/projects/project/<%= projects[cellCount].getId()%>" method="get">
+                                    <button class="dropdown-item" type="submit"><i class="fa fa-eye"></i> View</button>
+                                </form>
+                                <%if(user.admin){%>
+                                    <form action="/projects/project/<%= projects[cellCount].id%>/rename%>" method="get">
+                                        <button type="submit" class="dropdown-item"><i class="fa fa-pencil"></i> Rename</button>
+                                    </form>
                                     <form action="/projects/project/<%= projects[cellCount].id%>/delete%>" method="post">
-                                        <button type="submit" class="dropdown-item">Delete</button>
+                                        <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i> Delete</button>
                                     </form>
                                         <div class="dropdown-divider"></div>
-                                        <button class="dropdown-item" type="button">Permissions</button>
-                                </div>
+                                    <form action="/projects/project/<%= projects[cellCount].id%>/permissions%>" method="get">
+                                        <button type="submit" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
+                                    </form>
+                                <%}%>
                             </div>
-                        <%}%>
-                        <a style = "text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount].getId()%>">
-                            <i class="fa fa-archive fa-3x"></i><br><%= projects[cellCount].getName()%>
+                        </div>
+                        <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount].getId()%>">
+                            <i class="fa fa-archive fa-3x"></i><br><span style="font-size:14px;"><%= projects[cellCount].getName()%></span>
                         </a>
                     <%cellCount++%>
                 <%}%>

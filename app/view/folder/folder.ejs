@@ -4,6 +4,9 @@
 
 <% var user = system.getUserInfo()%>
 <%- include('../include/folderNav.ejs',{system:system,project:project,folder:folder})%>
+<div class="bg-secondary" id = "header"  style="padding:35px 50px;border: 1px solid #343a40;">
+    <h4 class="bg-secondary" ><i class="fa fa-folder fa-lg" ></i>  <%= folder.name%></h4>
+</div>
 <br>
 <div style="display:table; margin-left:auto;margin-right:auto;text-align:center;">
     <div style="display:table; margin-left:auto;margin-right:auto; text-align:center; width:40%">
@@ -53,10 +56,10 @@
                     <%}%>
                         <%if(entitys[cellCount].isFolder){%>
 
-                            <a style = "text-decoration: none; color:#343a40;" href="projects/<%= project.id%>/folders?id=<%= entitys[cellCount].getId()%>">
+                            <a style = "text-decoration: none; color:#343a40;" href="projects/<%= project.id%>/folders/folder/<%= entitys[cellCount].getId()%>">
                                 <i class="fa fa-folder fa-3x"></i>
                                 <br>
-                                <%= entitys[cellCount].getName()%>
+                                <span style="font-size:14px;"><%= entitys[cellCount].getName()%></span>
                             </a>
                         <%}else if(entitys[cellCount].ext){var ext = entitys[cellCount].ext;%>
                             <a style = "text-decoration: none; color:#343a40;" href="./<%= project.id%>/files?id=<%= entitys[cellCount].getId()%>">
@@ -78,7 +81,7 @@
                                 <i class="fa fa-file-file-o fa-3x"></i>
                             <%}%>
                                 <br>
-                                <%= entitys[cellCount].getName()%>
+                                <span id="iconLabel" style="font-size:16px;"><%= entitys[cellCount].getName()%></span>
                             </a>
                         <%}%>
                         <br>

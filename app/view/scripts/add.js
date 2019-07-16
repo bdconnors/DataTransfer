@@ -13,7 +13,7 @@ function validate(){
 function showPermissions(id){
     const userDiv = document.getElementById(id);
     if(containsSelect(userDiv)){
-        userDiv.removeChild(userDiv.childNodes[3]);
+        userDiv.removeChild(userDiv.childNodes[5]);
         return;
     }
     console.log(userDiv);

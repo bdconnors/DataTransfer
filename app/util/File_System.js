@@ -26,6 +26,12 @@ class File_System{
         console.log(path);
         rimraf.sync(this.livePath+path);
     }
+    renameDirectory(oldir,newdir){
+
+        fs.renameSync(this.livePath+oldir,this.livePath+newdir);
+        fs.renameSync(this.backupPath+oldir,this.backupPath+newdir);
+
+    }
     writeFile(path,data){
 
         fs.writeFileSync(this.livePath+path,data,{encoding:'base64'});
@@ -82,6 +88,13 @@ class File_System{
         if (action === 'CREATE PROJECT') {
 
             this.makeDirectory(values);
+            this.makeDirectory(values+'/Intellectual Property');
+            this.makeDirectory(values+'/Regulatory Affairs');
+            this.makeDirectory(values+'/Clinical Information');
+            this.makeDirectory(values+'/Market Analysis');
+            this.makeDirectory(values+'/Business Development');
+            this.makeDirectory(values+'/Misc');
+
 
         }else if (action === 'CREATE FOLDER') {
 
@@ -98,6 +111,8 @@ class File_System{
             this.deleteDirectory(values);
         }else if(action === 'DELETE FOLDER'){
             this.deleteDirectory(values);
+        }else if(action === 'RENAME FOLDER'){
+            this.renameDirectory(values.olddir,values.newdir)
         }
     }
 

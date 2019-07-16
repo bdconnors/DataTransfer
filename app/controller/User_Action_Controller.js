@@ -19,74 +19,136 @@ class User_Action_Controller{
 
     }
 
+    inviteUser(req,res){
+
+        this.system.inviteUser(req,res);
+
+    }
+
+
+    /** User Project Actions **/
+
+    createProject(req,res){
+
+        this.system.createProject(req,res);
+
+    }
+
+    viewProject(req,res){
+
+        this.system.displayProject(req,res);
+
+    }
+
+    updateProjectPermissions(req,res){
+
+        this.system.updateProjectPermissions(req,res);
+
+    }
+
+    deleteProject(req,res){
+
+        this.system.deleteProject(req,res);
+    }
+
+    uploadToProject(req,res){
+
+        this.system.uploadFile(req,res);
+
+    }
+
+    /** User Folder Actions **/
+
     addFolder(req,res){
 
         this.system.addFolder(req,res);
 
     }
 
-    uploadFile(req,res){
-        this.system.uploadFile(req,res);
-    }
+    viewFolder(req,res){
 
-    deleteFile(req,res){
-        this.system.deleteFile(req,res);
-    }
-    deleteProject(req,res){
-
-        this.system.deleteProject(req,res);
-    }
-    deleteFolder(req,res){
-        this.system.deleteFolder(req,res);
-    }
-    inviteUser(req,res){
-
-        this.system.inviteUser(req,res);
-    }
-
-    createProject(req,res){
-
-        this.system.createProject(req,res);
-    }
-
-    /** View Requests **/
-
-    requestUserDashboard(req,res){
-
-       this.system.displayDashboard(req,res);
-
-    }
-    requestProjectsIndex(req,res){
-
-        this.system.displayProjectsIndex(req,res);
-
-    }
-    requestFolder(req,res){
         this.system.displayFolder(req,res);
-    }
-    requestAddFolder(req,res){
-
-        this.system.displayAddFolder(req,res);
 
     }
-    requestFile(req,res){
+
+    renameFolder(req,res){
+
+        this.system.renameFolder(req,res);
+
+    }
+
+    deleteFolder(req,res){
+
+        this.system.deleteFolder(req,res);
+
+    }
+
+
+    /** User File Actions **/
+
+    viewFile(req,res){
 
         this.system.displayFile(req,res);
 
     }
-    requestUpload(req,res){
+
+    downloadFile(req,res){
+
+        this.system.downloadFile(req,res);
+
+    }
+
+    deleteFile(req,res){
+
+        this.system.deleteFile(req,res);
+
+    }
+
+
+    /** View Requests **/
+
+    userDashboard(req,res){
+
+       this.system.displayDashboard(req,res);
+
+    }
+
+    projectPermissionsForm(req,res){
+
+        this.system.displayProjectPermissions(req,res);
+
+    }
+
+    projectsIndex(req,res){
+
+        this.system.displayProjectsIndex(req,res);
+
+    }
+
+    addFolderForm(req,res){
+
+        this.system.displayAddFolder(req,res);
+
+    }
+
+    uploadForm(req,res){
 
         this.system.displayUpload(req,res);
 
     }
-    requestProject(req,res){
-        this.system.displayProject(req,res);
+    folderRenameForm(req,res){
+
+        this.system.displayFolderRename(req,res);
+
     }
-    requestCreateProjectForm(req,res){
+
+    createProjectForm(req,res){
 
         this.system.displayCreateProjectForm(req,res)
+
     }
-    requestInviteUserForm(req,res){
+
+    inviteUserForm(req,res){
 
         this.system.displayInviteUserForm(req,res);
 

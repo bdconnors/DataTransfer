@@ -10,17 +10,22 @@
     <div class="body" style="padding:40px 50px;">
         <div class="center-div form-width">
         <form id="fileForm" role="form" method="post">
-                <label for="name" class="align-left"><span class="glyphicon glyphicon-folder-open"></span> Project Name</label>
+            <label for="name" class="align-left"><i class="fa fa-archive"></i> <b>Project Name:</b></label>
                 <input type="text" class="form-control" name="name" id="name" placeholder="Project Name">
                 <br>
                 <%if(users.length > 0){%>
-                <label for="retype" class="align-left"><span class="glyphicon glyphicon-cog"></span> User Permissions</label>
+                <label for="retype" class="align-left"><i class="fa fa-users"></i><b> User Permissions:</b></label>
                 <%}%>
                 <% for(var i = 0; i < users.length; i++) {%>
                     <% if(users[i].getAdmin() !== true && users[i].getId() !== user.getId() && !users[i].authCode){%>
-                            <div id="<%= users[i].getId() %>">
-                                    <input type="checkbox" name="users" onclick="showPermissions('<%= users[i].getId() %>')" value="<%= users[i].id %>"> <%= users[i].getFullName()%>
-                            </div>
+                    <div id="<%= users[i].getId() %>">
+                        &nbsp;&nbsp;&nbsp;&nbsp;<b><%= users[i].getFullName()%>:</b>
+                        <select name="<%= users[i].getId() %>" id="<%= users[i].getId() %>">
+                            <option value="none">None</option>
+                            <option value="write">Read Only</option>
+                            <option value="read">Read/Write/Edit</option>
+                        </select>
+                    </div>
                     <%}%>
                 <% } %>
             <br>

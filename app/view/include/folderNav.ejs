@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+<nav style="border: 1px solid #343a40;" class="navbar navbar-expand-lg navbar-dark bg-secondary">
     <a class="navbar-brand" href="/projects/project/<%= project.id%>"><i class="fa fa-archive"></i></a>
     <a class="navbar-brand" href="#"><i class="fa fa-folder "></i> <%= folder.name %></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#projectDropDown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,7 +19,22 @@
                     <a class="nav-link dropdown-toggle" href="#" id="usersMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fa fa-cog"></i> Settings
                     </a>
+                    <%
+                        var deletePath = "/projects/project/"+project.id+"/folders/delete?id="+folder.id;
+                        var renamePath = "/projects/project/"+project.id+"/folders/folder/"+folder.id+"/rename";
+                        var permissionsPath = "/projects/project/"+project.id+"/folders/folder/"+folder.id+"/permissions";
+                    %>
                     <div class="dropdown-menu" aria-labelledby="usersMenu">
+                        <form action = "<%= renamePath%>" method="get">
+                            <button class="dropdown-item" type="submit"><i class="fa fa-pencil"></i> Rename</button>
+                        </form>
+                        <form action="<%= deletePath%>" method="post">
+                            <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i>  Delete</button>
+                        </form>
+                        <div class="dropdown-divider"></div>
+                        <form action="<%= permissionsPath%>" method="get">
+                            <button type="submit" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
+                        </form>
                     </div>
                 </li>
             <%}%>

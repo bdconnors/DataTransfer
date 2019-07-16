@@ -8,7 +8,7 @@ class System_Controller{
         this.observers = [];
     }
 
-    /** User Actions **/
+    /** User Action Requests **/
     
     signIn(req,res){
 
@@ -53,7 +53,13 @@ class System_Controller{
                     res.render('./projects/addFail',{system:this,name:projectName});
                 }else {
 
-                    this.userRepo.addNewProject(projectName, userPermissions);
+                    let users = this.userRepo.addNewProject(projectName, userPermissions);
+                    users.forEach((user)=>{
+                        if(user.id !== this.user.id && !user.admin) {
+                            this.notifyAll('PROJECT ADD', {user: user, project: projectName});
+                        }
+
+                    });
                     this.redirectToDashboard(res)
                 }
 
@@ -69,6 +75,60 @@ class System_Controller{
 
         }
         
+    }
+    updateProjectPermissions(req,res){
+
+        if(this.checkSessionIntegrity(req)) {
+
+            if(this.user.retrieveProject(req.params.id)){
+
+                if(this.user.admin){
+
+                    let project = this.user.retrieveProject(req.params.id);
+
+                    if(req.body.users){
+
+                        let permissions = [];
+
+                        if(typeof req.body.users === 'object'){
+
+                            for(let i = 0; i < req.body.users; i ++){
+
+                                permissions.push({id:req.body.users[i],permission:req.body[req.body.users[i]]});
+                            }
+
+
+                        }else{
+                            console.log({id:req.body.users,permission:req.body[req.body.users]});
+                            permissions.push({id:req.body.users,permission:req.body[req.body.users]});
+
+                        }
+
+                        this.userRepo.updateProjectPermissions(project,permissions);
+                        res.redirect('/projects/project/'+project.id);
+
+                    }else{
+
+                        res.redirect('/projects/project/'+project.id);
+
+                    }
+
+                }else{
+
+                    res.send('UnAuthorized');
+
+                }
+            }else{
+                res.end('UnAuthorized');
+            }
+
+
+        }else{
+
+            this.redirectToLogin(res)
+
+        }
+
     }
     addFolder(req,res){
 
@@ -86,7 +146,12 @@ class System_Controller{
                     res.render('./projects/newFolderFail',{system:this,project:req.query.project,dir:dir,users:projUsers,name:foldername});
                 }else {
 
-                    this.userRepo.addFolder(this.user, project.id, foldername, userPermissions, dir);
+                    let users = this.userRepo.addFolder(this.user, project.id, foldername, userPermissions, dir);
+                    users.forEach(user=>{
+                        if(user.id !== this.user.id && !user.admin) {
+                            this.notifyAll('FOLDER ADD', {user: user, folder: foldername, project: project.name});
+                        }
+                    });
                     res.redirect('/projects/project/'+project.id);
                 }
             }else{
@@ -108,16 +173,25 @@ class System_Controller{
 
             if(this.user.retrieveProject(req.query.project)){
 
-                let project = req.query.project;
-                let data = req.body.data;
-                let fileName = req.body.input;
-                let userPermissions = this.parsePermissions(req);
-                if(this.storage.fileExists(project.name+'/'+fileName)){
-                    res.send('Already Exists')
-                }else {
-                    let dir = req.body.dir;
-                    this.userRepo.uploadFile(project, this.user.id, data, fileName, userPermissions, dir);
-                    res.redirect('/projects/project/'+project);
+                let userPermission= this.user.retrieveProject(req.query.project);
+                if(this.user.admin || userPermission.write) {
+                    let data = req.body.data;
+                    let fileName = req.body.input;
+                    let userPermissions = this.parsePermissions(req);
+                    if (this.storage.fileExists(userPermission.name + '/' + fileName)) {
+                        res.send('Already Exists')
+                    } else {
+                        let dir = req.body.dir;
+                        let users = this.userRepo.uploadFile(req.query.project, this.user.id, data, fileName, userPermissions, dir);
+                        users.forEach(user => {
+                            if(user.id !== this.user.id && !user.admin) {
+                                this.notifyAll('FILE ADD', {user: user, file: fileName, project: userPermission.name})
+                            }
+                        });
+                        res.redirect('/projects/project/' + req.query.project);
+                    }
+                }else{
+                    res.send('UnAuthorized');
                 }
 
             }else{
@@ -146,6 +220,33 @@ class System_Controller{
         }else{
             this.redirectToLogin(res);
         }
+    }
+    renameFolder(req,res){
+
+        if(this.checkSessionIntegrity(req)){
+
+            if(this.user.retrieveProject(req.params.id)){
+
+                let project = this.user.retrieveProject(req.params.id);
+                let folder = project.retrieveEntity(req.params.folderid);
+
+                if(this.user.admin || project.write){
+
+                    this.userRepo.renameFolder(project,folder,req.body.name);
+                    res.redirect('/projects/project/'+project.id);
+                }else{
+
+                    res.send('Un-Authorized');
+                }
+
+            }else{
+                res.send('Un-Authorized')
+            }
+
+        }else{
+            this.redirectToLogin(res);
+        }
+
     }
     deleteFolder(req,res){
         if(this.checkSessionIntegrity(req)) {
@@ -188,6 +289,24 @@ class System_Controller{
 
 
     }
+    downloadFile(req,res){
+
+        if(this.checkSessionIntegrity(req)) {
+
+            let project = this.user.retrieveProject(req.params.id);
+            let file = project.retrieveEntity(req.params.fileid);
+
+            if(this.user.admin ||file.write) {
+                this.storage.streamFile(file, res, 'attachment');
+            }else{
+                res.send('UnAuthorized to Download')
+            }
+
+        }else{
+            this.redirectToLogin(res);
+        }
+
+    }
     /** System Actions **/
     
     inviteUser(req,res) {
@@ -198,7 +317,6 @@ class System_Controller{
 
                 let user = this.userRepo.createUser(
 
-                    this.user.email,
                     req.body.admin,
                     req.body.firstname,
                     req.body.lastname,
@@ -245,7 +363,7 @@ class System_Controller{
 
     }
 
-    authenticateNewUser(req,res) {
+    authenticate(req,res) {
 
 
         if (this.userRepo.newUserUpdate(req.body.authcode, req.body.phone, req.body.password)) {
@@ -291,7 +409,7 @@ class System_Controller{
     displayFolder(req,res){
          if(this.checkSessionIntegrity(req,res)){
              let project = this.user.retrieveProject(req.params.id);
-             let folder = project.retrieveEntity(req.query.id);
+             let folder = project.retrieveEntity(req.params.folderid);
              if(this.user.admin || folder.read){
                  res.render('./folder/folder',{system:this,project:project,folder:folder});
              }else{
@@ -316,18 +434,43 @@ class System_Controller{
              this.redirectToLogin(res);
          }
     }
+    displayFolderRename(req,res){
+
+        if(this.checkSessionIntegrity(req,res)) {
+
+            if(this.user.retrieveProject(req.params.id)) {
+
+                let project = this.user.retrieveProject(req.params.id);
+                let folder = project.retrieveEntity(req.params.folderid);
+
+                if(this.user.admin || project.write){
+                    res.render('./folder/rename',{system:this,project:project,folder:folder})
+                }else{
+                    res.send('UnAuthorized Action');
+                }
+
+            }else{
+                res.send('UnAuthorized');
+            }
+
+        }else{
+            this.redirectToLogin(res);
+        }
+
+    }
     displayFile(req,res){
 
          if(this.checkSessionIntegrity(req)) {
 
              let project = this.user.retrieveProject(req.params.id);
-             let file = project.retrieveEntity(req.query.id);
+             let file = project.retrieveEntity(req.params.fileid);
 
-             if(this.user.admin || file.read) {
-                 this.storage.streamFile(file,res,'inline');
+             if(this.user.admin ||file.read) {
+                 this.storage.streamFile(file, res, 'inline');
              }else{
-                 res.send('UnAuthorized');
+                 res.send('UnAuthorized to View')
              }
+
          }else{
              this.redirectToLogin(res);
          }
@@ -371,6 +514,23 @@ class System_Controller{
          }
 
     }
+    displayProjectPermissions(req,res){
+
+         if(this.checkSessionIntegrity(req)){
+
+             if(this.user.admin){
+                 let project = this.user.retrieveProject(req.params.id);
+                 let projectUsers = this.userRepo.getProjectUsers(project.id);
+                 res.render('./projects/permissions',{system:this,project:project,projectUsers:projectUsers});
+
+             }else{
+                 res.send('unauthorized');
+             }
+
+         }else{
+             this.redirectToLogin(res);
+         }
+    }
     displayCreateProjectForm(req,res){
 
         if(this.checkSessionIntegrity(req,res)){
@@ -410,7 +570,7 @@ class System_Controller{
 
     }
 
-    displayUserAuthForm(req,res){
+    displayAuthenticationForm(req,res){
 
         let user = this.userRepo.getUserBy('authCode',req.query.authcode);
         res.render('./users/auth',{name:user.getFullName(),authCode:req.query.authcode});

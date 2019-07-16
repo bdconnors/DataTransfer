@@ -5,7 +5,7 @@
     font-size: 30px;
 }
 
-#primaryHeader{
+#primaryHeader,#welcomeHeader{
     background-color: #343a40;
     color:white !important;
     text-align: center;
@@ -47,5 +47,8 @@ tr td:last-child{
     }
     .button-width{
         width:100%;
+    }
+    #welcomeHeader{
+        display:none;
     }
 }

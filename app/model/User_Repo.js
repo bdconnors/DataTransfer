@@ -137,12 +137,12 @@ class User_Repo {
 
             let read;
             let write;
-            if(user.permission === 'write'){
+            if(user.permission === 'read'){
 
                 read = true;
                 write = false;
 
-            }else if(user.permission === 'read'){
+            }else if(user.permission === 'write'){
 
                 read = true;
                 write = true;
@@ -155,9 +155,26 @@ class User_Repo {
             this.notifyAll('UPDATE USER',accountInfo);
 
         });
+        return this.getEntityUsers(project,folderId);
 
     }
+    renameFolder(project,folder,newName){
 
+        this.notifyAll('RENAME FOLDER',{olddir:project.name+'/'+folder.name,newdir:project.name+'/'+newName});
+        let users = this.getProjectUsers(project.id);
+
+        users.forEach(user=>{
+
+            let projectPermission = user.retrieveProject(project.id);
+            let folderPermission = projectPermission.retrieveEntity(folder.id);
+            folderPermission.setName(newName);
+
+            this.notifyAll('UPDATE USER',user);
+
+        });
+        return this.getProjectUsers(project.id);
+
+    }
     uploadFile(project,author,data,name,userPermissions,dir){
 
         let dataBuffer = Buffer.from(data,'base64');
@@ -204,6 +221,7 @@ class User_Repo {
             this.notifyAll('UPDATE USER',userAccount);
 
         });
+        return this.getEntityUsers(project,fileId);
 
     }
     deleteFolder(project,folder){
@@ -216,8 +234,7 @@ class User_Repo {
                         if(proj.entitys[i].id === folder.id){
 
                             proj.entitys.splice(i,1);
-                            console.log('folder dir: ' +folder.dir);
-                            console.log('folder name: '+folder.name);
+
                             this.notifyAll('DELETE FOLDER',folder.dir+'/'+folder.name);
                             this.notifyAll('UPDATE USER',user);
                         }
@@ -248,13 +265,29 @@ class User_Repo {
 
         let projectId = uuid();
 
+        let clinFolderId = uuid();
+        let regAffFolderId = uuid();
+        let ipFolderId = uuid();
+        let markAnalyFolderId = uuid();
+        let busDevFolderId = uuid();
+        let miscFolderId = uuid();
+
         let admins = this.getAdmins();
 
         this.notifyAll('CREATE PROJECT',name);
 
         admins.forEach((admin)=>{
 
-            admin.projects.push(this.projectFactory.make(projectId,name,true,true));
+            let project = this.projectFactory.make(projectId,name,true,true);
+
+            project.addEntity(this.entityFactory.make(ipFolderId,'Intellectual Property','System',true,true,true,name));
+            project.addEntity(this.entityFactory.make(regAffFolderId,'Regulatory Affairs','System',true,true,true,name));
+            project.addEntity(this.entityFactory.make(clinFolderId,'Clinical Information','System',true,true,true,name));
+            project.addEntity(this.entityFactory.make(markAnalyFolderId,'Market Analysis','System',true,true,true,name));
+            project.addEntity(this.entityFactory.make(busDevFolderId,'Business Development','System',true,true,true,name));
+            project.addEntity(this.entityFactory.make(miscFolderId,'Misc','System',true,true,true,name));
+
+            admin.projects.push(project);
             this.notifyAll('UPDATE USER',admin);
 
         });
@@ -265,12 +298,12 @@ class User_Repo {
 
            let read;
            let write;
-           if(user.permission === 'write'){
+           if(user.permission === 'read'){
 
                read = true;
                write = false;
 
-           }else if(user.permission === 'read'){
+           }else if(user.permission === 'write'){
 
                read = true;
                write = true;
@@ -279,16 +312,70 @@ class User_Repo {
 
            let projectPermission = this.projectFactory.make(projectId,name,read,write);
 
+            projectPermission.addEntity(this.entityFactory.make(ipFolderId,'Intellectual Property','System',read,write,true,name));
+            projectPermission.addEntity(this.entityFactory.make(regAffFolderId,'Regulatory Affairs','System',read,write,true,name));
+            projectPermission.addEntity(this.entityFactory.make(clinFolderId,'Clinical Information','System',read,write,true,name));
+            projectPermission.addEntity(this.entityFactory.make(markAnalyFolderId,'Market Analysis','System',read,write,true,name));
+            projectPermission.addEntity(this.entityFactory.make(busDevFolderId,'Business Development','System',read,write,true,name));
+            projectPermission.addEntity(this.entityFactory.make(miscFolderId,'Misc','System',read,write,true,name));
+
            userAccount.addProject(projectPermission);
            this.notifyAll('UPDATE USER',userAccount);
 
         });
+        return this.getProjectUsers(projectId);
+
+    }
+    updateProjectPermissions(project,permissions){
+        console.log(permissions);
+        permissions.forEach(permission =>{
+
+            let user = this.getUserBy('id',permission.id);
+            let userProjectPermission;
+            let read;
+            let write;
+
+            if (permission.permission === 'read') {
+                read = true;
+                write = false;
+            } else if (permission.permission === 'write') {
+                read = true;
+                write = true;
+            }
+
+            if(user.retrieveProject(project.id)) {
+
+                userProjectPermission = user.retrieveProject(project.id);
+
+                if (permission.permission === 'delete') {
+
+                    user.deleteProject(project.id);
+                    this.notifyAll('UPDATE USER', user);
+
+                } else {
+
+                    userProjectPermission.setRead(read);
+                    userProjectPermission.setWrite(write);
+                    this.notifyAll('UPDATE USER', user);
+                }
+
+            }else{
+
+                userProjectPermission = this.projectFactory.make(project.id,project.name,read,write);
+                user.addProject(userProjectPermission);
+                this.notifyAll('UPDATE USER', user);
+
+            }
+
+        });
+
+        return this.getProjectUsers(project.id);
 
     }
     deleteProject(project){
 
         let projectUsers = this.getProjectUsers(project.id);
-        console.log(projectUsers);
+
         projectUsers.forEach((user)=>{
            user.deleteProject(project.id);
            this.notifyAll('UPDATE USER',user);
@@ -310,6 +397,21 @@ class User_Repo {
         });
 
         return admins;
+    }
+    getEntityUsers(projectid,id){
+
+        let folderUsers = [];
+        let projectUsers = this.getProjectUsers(projectid);
+        projectUsers.forEach(user=>{
+            user.projects.forEach(project=>{
+                project.entitys.forEach(entity=>{
+                    if(entity.id === id){
+                        folderUsers.push(user);
+                    }
+                })
+            })
+        });
+        return folderUsers;
     }
 
     userIntegrityCheck(user){
