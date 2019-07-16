@@ -2,39 +2,28 @@ const uuid = require('uuid');
 
 class User_Repo {
 
-    constructor(userFactory,projectFactory,entityFactory,storage){
+    constructor(userFactory,projectFactory,entityFactory){
         this.users = [];
         this.userFactory = userFactory;
         this.projectFactory = projectFactory;
         this.entityFactory = entityFactory;
-        this.storage = storage;
         this.observers = [];
     }
 
-    createUser(createdBy,admin,firstname,lastname,email){
+    createUser(admin,firstname,lastname,email){
 
-        let success = false;
         let accountType;
 
         accountType = admin === 'true';
 
-        let newUser = this.userFactory.make(accountType,firstname,lastname,email);
-        newUser.addAuthCode();
+        let user = this.userFactory.make(accountType,firstname,lastname,email);
+        user.addAuthCode();
 
-        this.users.push(newUser);
+        this.users.push(user);
 
-        if(this.getUser(email)){
+        this.notifyAll('CREATE USER',user);
 
-            let creator = this.getUser(createdBy);
-
-            success = {admin:creator.getFullName(),activity:activity};
-
-            this.notifyAll('UPDATE USER',creator);
-            this.notifyAll('CREATE USER',newUser);
-
-        }
-
-        return success;
+        return user;
 
     }
 
@@ -67,13 +56,13 @@ class User_Repo {
         return success;
 
     }
-    getProjectUsers(projectId,currentUserId){
+    getProjectUsers(projectId){
 
         let users = [];
 
         this.users.forEach((user)=>{
             user.projects.forEach((project)=>{
-                if(project.id === projectId && user.id !== currentUserId){
+                if(project.id === projectId){
                     users.push(user);
                 }
             });
@@ -168,8 +157,9 @@ class User_Repo {
         });
 
     }
+
     uploadFile(project,author,data,name,userPermissions,dir){
-        console.log(data);
+
         let dataBuffer = Buffer.from(data,'base64');
         this.notifyAll('UPLOAD FILE',{dir:dir+'/'+name,data:dataBuffer});
         let admins = this.getAdmins();
@@ -194,12 +184,12 @@ class User_Repo {
 
             let read;
             let write;
-            if(user.permission === 'write'){
+            if(user.permission === 'read'){
 
                 read = true;
                 write = false;
 
-            }else if(user.permission === 'read'){
+            }else if(user.permission === 'write'){
 
                 read = true;
                 write = true;
@@ -216,10 +206,48 @@ class User_Repo {
         });
 
     }
+    deleteFolder(project,folder){
+
+        this.users.forEach((user)=>{
+            user.projects.forEach((proj)=>{
+                if(proj.id === project.id){
+
+                    for(let i = 0; i < proj.entitys.length; i++){
+                        if(proj.entitys[i].id === folder.id){
+
+                            proj.entitys.splice(i,1);
+                            console.log('folder dir: ' +folder.dir);
+                            console.log('folder name: '+folder.name);
+                            this.notifyAll('DELETE FOLDER',folder.dir+'/'+folder.name);
+                            this.notifyAll('UPDATE USER',user);
+                        }
+                    }
+                }
+            });
+        });
+
+    }
+    deleteFile(project,file){
+        this.users.forEach((user)=>{
+            user.projects.forEach((proj)=>{
+                if(proj.id === project.id){
+
+                    for(let i = 0; i < proj.entitys.length; i++){
+                        if(proj.entitys[i].id === file.id){
+
+                            proj.entitys.splice(i,1);
+                            this.notifyAll('DELETE FILE',file.dir+'/'+file.name);
+                            this.notifyAll('UPDATE USER',user);
+                        }
+                    }
+                }
+            });
+        });
+    }
     addNewProject(name,userPermissions){
 
         let projectId = uuid();
-        console.log('Id in add new proj: '+projectId);
+
         let admins = this.getAdmins();
 
         this.notifyAll('CREATE PROJECT',name);
@@ -257,7 +285,16 @@ class User_Repo {
         });
 
     }
+    deleteProject(project){
 
+        let projectUsers = this.getProjectUsers(project.id);
+        console.log(projectUsers);
+        projectUsers.forEach((user)=>{
+           user.deleteProject(project.id);
+           this.notifyAll('UPDATE USER',user);
+        });
+        this.notifyAll('DELETE PROJECT',project.name);
+    }
     getAdmins(){
 
         let admins =[];
@@ -273,6 +310,11 @@ class User_Repo {
         });
 
         return admins;
+    }
+
+    userIntegrityCheck(user){
+
+        return this.userFactory.convert(user);
     }
 
     load(users) {

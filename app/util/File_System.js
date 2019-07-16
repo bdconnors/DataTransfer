@@ -12,7 +12,7 @@ class File_System{
         this.activityLogPath = activityLogPath;
     }
     makeDirectory(path){
-        console.log(path);
+
         fs.mkdirSync(this.livePath+path);
 
         if(!this.folderExistsBackup(path)){
@@ -22,17 +22,28 @@ class File_System{
         }
 
     }
+    deleteDirectory(path){
+        console.log(path);
+        rimraf.sync(this.livePath+path);
+    }
     writeFile(path,data){
 
-        fs.writeFileSync(this.livePath+path,data);
+        fs.writeFileSync(this.livePath+path,data,{encoding:'base64'});
         if(!this.fileExists(this.backupPath+path)) {
-            fs.writeFileSync(this.backupPath + path, data);
+            fs.writeFileSync(this.backupPath + path, data,{encoding:'base64'});
         }
 
     }
-    streamFile(path,res){
-        let stream = fs.createReadStream(this.livePath+path);
+    deleteFile(path){
+        fs.unlink(this.livePath+path,(err)=>{
+
+        });
+    }
+    streamFile(file,res,disposition){
+
+        let stream = fs.createReadStream(this.livePath+file.dir+'/'+file.name);
         stream.on('open',()=>{
+            res.setHeader('Content-Disposition',disposition+'; filename='+file.name);
             stream.pipe(res);
         });
     }
@@ -81,8 +92,12 @@ class File_System{
 
             this.writeFile(values.dir,values.data);
 
-        }else if(action === 'LOAD'){
-
+        }else if(action === 'DELETE FILE'){
+            this.deleteFile(values);
+        }else if(action === 'DELETE PROJECT'){
+            this.deleteDirectory(values);
+        }else if(action === 'DELETE FOLDER'){
+            this.deleteDirectory(values);
         }
     }
 

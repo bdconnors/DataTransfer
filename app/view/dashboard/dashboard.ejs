@@ -13,8 +13,8 @@
         <table style="border-collapse:separate; border-spacing:10px 10px; width:100%;">
             <% var projects = user.getProjects()%>
             <% var totalCells = projects.length%>
-            <% var fullRows = Math.floor(projects.length/2)%>
-            <% var partialRowCount = projects.length % 2 %>
+            <% var fullRows = Math.floor(projects.length/3)%>
+            <% var partialRowCount = projects.length % 3 %>
             <% var rows = fullRows+1%>
             <% var cellCount = 0%>
 
@@ -22,7 +22,7 @@
                 console.log('row count: '+i);
             %>
                 <tr>
-                <%var cellsInRow = 2%>
+                <%var cellsInRow = 3%>
                 <%if(i === fullRows){
                     cellsInRow = partialRowCount;
                 }%>
@@ -30,10 +30,23 @@
                     console.log('cellCount: '+cellCount);
                 %>
                     <td style="padding: 0 10px 0 10px;">
+                        <%if(user.admin){%>
+                            <div class="dropdown">
+                                <button style = "background-color:transparent; font-size:16px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
+                                    <i class="fa fa-pencil"></i> Edit
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="projSettings">
+                                    <button class="dropdown-item" type="button">Rename</button>
+                                    <form action="/projects/project/<%= projects[cellCount].id%>/delete%>" method="post">
+                                        <button type="submit" class="dropdown-item">Delete</button>
+                                    </form>
+                                        <div class="dropdown-divider"></div>
+                                        <button class="dropdown-item" type="button">Permissions</button>
+                                </div>
+                            </div>
+                        <%}%>
                         <a style = "text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount].getId()%>">
-                            <i class="fa fa-archive fa-4x"></i>
-                            <br>
-                            <%= projects[cellCount].getName()%>
+                            <i class="fa fa-archive fa-3x"></i><br><%= projects[cellCount].getName()%>
                         </a>
                     <%cellCount++%>
                 <%}%>

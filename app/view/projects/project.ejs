@@ -10,8 +10,8 @@
         <table style="border-collapse:separate; border-spacing:10px 10px; width:100%;">
             <% var entitys = project.getEntitys()%>
             <% var totalCells = entitys.length%>
-            <% var fullRows = Math.floor(entitys.length/2)%>
-            <% var partialRowCount = entitys.length % 2 %>
+            <% var fullRows = Math.floor(entitys.length/3)%>
+            <% var partialRowCount = entitys.length % 3 %>
             <% var rows = fullRows+1%>
             <% var cellCount = 0%>
 
@@ -19,7 +19,7 @@
                 console.log('row count: '+i);
             %>
             <tr>
-                <%var cellsInRow = 2%>
+                <%var cellsInRow = 3%>
                 <%if(i === fullRows){
                     cellsInRow = partialRowCount;
                 }%>
@@ -27,29 +27,57 @@
                     console.log('cellCount: '+cellCount);
                 %>
                 <td style="padding: 0 10px 0 10px;">
+                    <%if(user.admin || entitys[cellCount].write){%>
 
+                        <div class="dropdown">
+                            <button style = "background-color:transparent; font-size:16px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
+                                <i class="fa fa-pencil"></i> Edit
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="projSettings">
+                                <%var path;%>
+                                <%if(entitys[cellCount].isFolder){
+                                    path = "./"+project.id+"/folders/delete?id="+entitys[cellCount].getId();
+                                }else{
+                                    path = "./"+project.id+"/files/delete?id="+entitys[cellCount].getId();
+                                }%>
+                                <button class="dropdown-item" type="button">Rename</button>
+                                <form action="<%= path%>" method="post">
+                                    <button type="submit" class="dropdown-item">Delete</button>
+                                </form>
+                                <% if(user.admin){%>
+                                    <div class="dropdown-divider"></div>
+                                    <button class="dropdown-item" type="button">Permissions</button>
+                            <%}%>
+                            </div>
+                        </div>
+                    <%}%>
                         <%if(entitys[cellCount].isFolder){%>
 
-                            <a style = "text-decoration: none; color:#343a40;" href="projects/<%= project.id%>/folders?id=<%= entitys[cellCount].getId()%>"><i class="fa fa-folder fa-4x"></i><%= entitys[cellCount].getName()%></a>
+                            <a style = "text-decoration: none; color:#343a40;" href="./<%= project.id%>/folders/folder?id=<%= entitys[cellCount].getId()%>">
+                                <i class="fa fa-folder fa-3x"></i>
+                                <br>
+                                <%= entitys[cellCount].getName()%>
+                            </a>
                         <%}else if(entitys[cellCount].ext){var ext = entitys[cellCount].ext;%>
                             <a style = "text-decoration: none; color:#343a40;" href="./<%= project.id%>/files?id=<%= entitys[cellCount].getId()%>">
                             <%if(ext === '.pdf'){%>
-                                <i class="fa fa-file-pdf-o fa-4x"></i>
+                                <i class="fa fa-file-pdf-o fa-3x"></i>
                             <%}else if(ext  === '.docx'|| ext === '.doc'){%>
-                                <i class="fa fa-file-word-o fa-4x"></i>
+                                <i class="fa fa-file-word-o fa-3x"></i>
                             <%}else if(ext === '.jpg'||ext ==='.jpeg'||ext === '.png'||ext === '.bmp'||ext==='.gif'){%>
-                                <i class="fa fa-file-image-o fa-4x"></i>
+                                <i class="fa fa-file-image-o fa-3x"></i>
                             <%}else if(ext === '.ppt' || ext === '.pptx'){%>
-                                <i class="fa fa-file-powerpoint-o fa-4x"></i>
+                                <i class="fa fa-file-powerpoint-o fa-3x"></i>
                             <%}else if(ext ==='.txt'){%>
-                                <i class="fa fa-file-text-o fa-4x"></i>
+                                <i class="fa fa-file-text-o fa-3x"></i>
                             <%}else if( ext === '.zip'||ext==='.rar'||ext ==='.7z'){%>
-                                <i class="fa fa-file-zip-o fa-4x"></i>
+                                <i class="fa fa-file-zip-o fa-3x"></i>
                             <%}else if(ext === '.java'||ext ==='.js'||ext==='.py'||ext==='.cs'||ext==='.php'||ext==='.html'||ext==='.css'){%>
-                                <i class="fa fa-file-code-o fa-4x"></i>
+                                <i class="fa fa-file-code-o fa-3x"></i>
                             <%}else{%>
-                                <i class="fa fa-file-file-o fa-4x"></i>
+                                <i class="fa fa-file-file-o fa-3x"></i>
                             <%}%>
+                                <br>
                                 <%= entitys[cellCount].getName()%>
                             </a>
                         <%}%>

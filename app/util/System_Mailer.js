@@ -51,7 +51,7 @@ class System_Mailer{
 
         if(action === 'USER INVITED'){
 
-            this.invite(values.activity.target.firstname,values.activity.target.email,values.activity.target.authCode);
+            this.invite();
         }
 
     }

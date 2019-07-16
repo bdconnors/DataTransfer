@@ -25,8 +25,14 @@ class Entity_Factory {
         if (obj.isFolder) {
 
             if (this.entityIntegrityCheck(obj)) {
+
                 entity = new Folder(obj.id, obj.name, obj.author, obj.read, obj.write, obj.dir);
-                entity.files = obj.files;
+
+                obj.files.forEach(file =>{
+                    if(this.entityIntegrityCheck(file)){
+                        entity.addFile(this.convert(file));
+                    }
+                });
             }
 
         } else {

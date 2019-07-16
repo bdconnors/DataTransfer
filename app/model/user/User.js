@@ -48,13 +48,13 @@ class User{
         return success;
 
     }
-    deleteProject(name){
+    deleteProject(id){
 
         let success = false;
 
         for(let i= 0; i < this.projects.length; i++){
 
-            if(this.projects[i].name === name){
+            if(this.projects[i].id === id){
 
                 success = this.projects[i];
                 this.projects.splice(i,1);

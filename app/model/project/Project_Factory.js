@@ -8,7 +8,7 @@ class Project_Factory {
     }
 
     make(id,name,read,write){
-        console.log('Id in proj factory: '+id);
+
         return new Project(id,name,read,write);
 
     }
@@ -32,7 +32,9 @@ class Project_Factory {
         return this.storage.folderExists(folder.dir+'/'+folder.name);
     }
     fileIntegrityCheck(file){
+
         return this.storage.fileExists(file.dir+'/'+file.name);
+
     }
     entityIntegrityCheck(entity){
 
@@ -50,12 +52,13 @@ class Project_Factory {
 
                     }
                 }
-                exists = true;
+                exists = this.entityFactory.convert(entity);
             }
 
         }else{
-
-            exists = this.fileIntegrityCheck(entity);
+            if(this.fileIntegrityCheck(entity)) {
+                exists = this.entityFactory.convert(entity);
+            }
 
         }
 

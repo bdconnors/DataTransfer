@@ -29,6 +29,16 @@ class User_Action_Controller{
         this.system.uploadFile(req,res);
     }
 
+    deleteFile(req,res){
+        this.system.deleteFile(req,res);
+    }
+    deleteProject(req,res){
+
+        this.system.deleteProject(req,res);
+    }
+    deleteFolder(req,res){
+        this.system.deleteFolder(req,res);
+    }
     inviteUser(req,res){
 
         this.system.inviteUser(req,res);
@@ -51,7 +61,9 @@ class User_Action_Controller{
         this.system.displayProjectsIndex(req,res);
 
     }
-
+    requestFolder(req,res){
+        this.system.displayFolder(req,res);
+    }
     requestAddFolder(req,res){
 
         this.system.displayAddFolder(req,res);

@@ -2,10 +2,9 @@ const User = require('./User').User;
 
 class User_Factory{
 
-    constructor(projectFactory,activityFactory,storage){
+    constructor(projectFactory,storage){
 
         this.projectFactory = projectFactory;
-        this.activityFactory = activityFactory;
         this.storage = storage;
         this.observers = [];
     }
@@ -38,9 +37,6 @@ class User_Factory{
 
         });
 
-        obj.activity.forEach((activity)=>{
-            user.addActivity(this.activityFactory.convert(activity));
-        });
 
         if(obj.authCode){
 

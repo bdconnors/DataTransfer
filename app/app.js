@@ -4,6 +4,7 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const cors  = require('cors');
 const uuid = require('uuid');
+const path = require('path');
 
 /** Use Express for App Engine and listen on port 80**/
 const app = express();
@@ -94,21 +95,23 @@ db.connect().then(()=>{
 
     db.retrieveDocuments('users',{},{'_id':0}).then((res)=>{
 
-        userFactory = new User_Factory(projectFactory,activityFactory,storage);
-        userFactory.subscribe(db);
+        userFactory = new User_Factory(projectFactory,storage);
 
         userRepo = new User_Repo(userFactory,projectFactory,entityFactory);
+        userFactory.subscribe(db);
         userRepo.load(res);
+
 
         console.log(userRepo.users);
 
         system = new System_Controller(userRepo,storage);
         system.subscribe(mailer);
-        system.subscribe(storage);
+
 
         user = new User_Action_Controller(system);
         userRepo.subscribe(db);
         userRepo.subscribe(storage);
+        userRepo.subscribe(system)
 
     }).catch((err)=>{
         throw err
@@ -189,9 +192,31 @@ app.post('/projects/files/upload',(req,res)=>{
     user.uploadFile(req,res);
 
 });
+app.post('/projects/project/:id/delete',(req,res)=>{
+
+    user.deleteProject(req,res);
+
+});
 app.get('/projects/project/:id/files',(req,res)=>{
 
     user.requestFile(req,res);
+
+});
+
+app.post('/projects/project/:id/files/delete',(req,res)=>{
+
+    user.deleteFile(req,res);
+
+});
+
+app.post('/projects/project/:id/folders/delete',(req,res)=>{
+    console.log('in app');
+    user.deleteFolder(req,res);
+
+});
+app.get('/projects/project/:id/folders/folder',(req,res)=>{
+
+    user.requestFolder(req,res);
 
 });
 
