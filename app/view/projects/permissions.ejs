@@ -6,10 +6,10 @@
     var users = system.getAllUsers();
 %>
 <%- include('../include/projectNav.ejs',{system:system,project:project})%>
+<div  id = "header" class="bg-secondary" style="padding:35px 50px;">
+    <h4 class="bg-secondary"><i class="fa fa-archive fa-lg" ></i>  Project <%= project.name%> Permissions</h4>
+</div>
 <div class="content">
-    <div style = "border: 1px solid #343a40;" id = "header" class="bg-secondary" style="padding:35px 50px;">
-        <h4 class="bg-secondary"><i class="fa fa-archive fa-lg" ></i>  Project <%= project.name%> Permissions</h4>
-    </div>
     <div class="body" style="padding:40px 50px;">
         <div class="center-div form-width">
             <form id="fileForm" role="form" method="post">

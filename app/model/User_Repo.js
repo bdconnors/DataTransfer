@@ -108,6 +108,11 @@ class User_Repo {
         if(this.getUserBy('authCode',authCode)) {
 
             success = this.getUserBy('authCode',authCode);
+            if(success.admin){
+                let admins = this.getAdmins();
+                let privs = admins[0].getProjects();
+                success.setProjects(privs);
+            }
             success.setPhone(phone);
             success.setHashPassword(password);
             success.deleteAuthCode();
@@ -118,22 +123,23 @@ class User_Repo {
 
         return success;
     }
-    addFolder(author,project,name,userPermissions,dir){
+    addFolder(author,project,name,userPermissions){
 
         let folderId = uuid();
         let admins = this.getAdmins();
+        let dir = project.name;
         this.notifyAll('CREATE FOLDER',dir+'/'+name);
         admins.forEach((admin)=>{
-            let projectPermission = admin.retrieveProject(project);
+            let projectPermission = admin.retrieveProject(project.id);
             let folderPermission = this.entityFactory.make(folderId,name,author.id,true,true,true,dir);
             folderPermission.getCreated();
-            projectPermission.entitys.push(folderPermission);
+            projectPermission.addEntity(folderPermission);
             this.notifyAll('UPDATE USER',admin);
         });
 
         userPermissions.forEach((user)=>{
             let accountInfo = this.getUserBy('id',user.id);
-            let projectPermission = accountInfo.retrieveProject(project);
+            let projectPermission = accountInfo.retrieveProject(project.id);
 
             let read;
             let write;
@@ -160,7 +166,7 @@ class User_Repo {
     }
     renameFolder(project,folder,newName){
 
-        this.notifyAll('RENAME FOLDER',{olddir:project.name+'/'+folder.name,newdir:project.name+'/'+newName});
+        this.notifyAll('RENAME ENTITY',{olddir:project.name+'/'+folder.name,newdir:project.name+'/'+newName});
         let users = this.getProjectUsers(project.id);
 
         users.forEach(user=>{
@@ -175,8 +181,8 @@ class User_Repo {
         return this.getProjectUsers(project.id);
 
     }
-    uploadFile(project,author,data,name,userPermissions,dir){
-
+    uploadFileToProject(project,author,data,name,userPermissions){
+        let dir = project.name;
         let dataBuffer = Buffer.from(data,'base64');
         this.notifyAll('UPLOAD FILE',{dir:dir+'/'+name,data:dataBuffer});
         let admins = this.getAdmins();
@@ -184,7 +190,7 @@ class User_Repo {
 
         admins.forEach((admin)=>{
 
-            let proj = admin.retrieveProject(project);
+            let proj = admin.retrieveProject(project.id);
             let filePermission = this.entityFactory.make(fileId,name,author,true,true,false,dir);
             filePermission.getCreated();
             filePermission.getExt();
@@ -197,7 +203,7 @@ class User_Repo {
         userPermissions.forEach((user)=>{
 
             let userAccount = this.getUserBy('id',user.id);
-            let proj = userAccount.retrieveProject(project);
+            let proj = userAccount.retrieveProject(project.id);
 
             let read;
             let write;
@@ -221,8 +227,40 @@ class User_Repo {
             this.notifyAll('UPDATE USER',userAccount);
 
         });
-        return this.getEntityUsers(project,fileId);
+        return this.getEntityUsers(project.id,fileId);
 
+    }
+    renameFile(project,folder,file,newName){
+        
+        let ext = file.ext;
+        
+        if(folder){
+            this.notifyAll('RENAME ENTITY',{olddir:project.name+'/'+folder.name+'/'+file.name,newdir:project.name+'/'+folder.name+'/'+newName+ext});
+            let folderUsers = this.getFolderEntityUsers(project.id,folder.id,file.id);
+            folderUsers.forEach(user=>{
+                
+                let projectPermission = user.retrieveProject(project.id);
+                let folderPermission = projectPermission.retrieveEntity(folder.id);
+                let filePermission = folderPermission.retrieveFile(file.id);
+                filePermission.setName(newName+ext);
+                this.notifyAll('UPDATE USER',user);
+                
+            });
+            
+        }else{
+            this.notifyAll('RENAME ENTITY',{olddir:project.name+'/'+file.name,newdir:project.name+'/'+newName+ext});
+            let projectUsers = this.getProjectUsers(project.id);
+            projectUsers.forEach(user=>{
+                
+                let projectPermission = user.retrieveProject(project.id);
+                let filePermission = projectPermission.retrieveEntity(file.id);
+                filePermission.setName(newName+ext);
+                this.notifyAll('UPDATE USER',user);
+                
+            });
+            
+        }
+        
     }
     deleteFolder(project,folder){
 
@@ -244,37 +282,103 @@ class User_Repo {
         });
 
     }
-    deleteFile(project,file){
-        this.users.forEach((user)=>{
-            user.projects.forEach((proj)=>{
-                if(proj.id === project.id){
+    deleteFile(project,folder,file){
 
-                    for(let i = 0; i < proj.entitys.length; i++){
-                        if(proj.entitys[i].id === file.id){
+        let dir;
 
-                            proj.entitys.splice(i,1);
-                            this.notifyAll('DELETE FILE',file.dir+'/'+file.name);
-                            this.notifyAll('UPDATE USER',user);
-                        }
-                    }
-                }
+        if(folder){
+            dir = project.name+'/'+folder.name+'/'+file.name;
+            this.notifyAll("DELETE FILE",dir);
+            let folderUsers = this.getEntityUsers(project.id,folder.id);
+
+            folderUsers.forEach(user=>{
+
+                let projectPermission = user.retrieveProject(project.id);
+                let folderPermission = projectPermission.retrieveEntity(folder.id);
+                folderPermission.deleteFile(file.id);
+                this.notifyAll('UPDATE USER',user);
             });
+
+        }else {
+            dir = project.name+'/'+file.name;
+            this.notifyAll("DELETE FILE",dir);
+            let projectUsers = this.getProjectUsers(project.id);
+            projectUsers.forEach(user=>{
+
+                let projectPermission = user.retrieveProject(project.id);
+                project.deleteEntity(file.id);
+                this.notifyAll('UPDATE USER',user);
+            });
+        }
+    }
+    uploadFileToFolder(project,folder,author,data,name,userPermissions) {
+
+        let dir = project.name+'/'+folder.name;
+        this.notifyAll('UPLOAD FILE', {dir: dir+'/'+name, data: data});
+        let admins = this.getAdmins();
+        let fileid = uuid();
+
+
+        admins.forEach(admin =>{
+            let projectPermission = admin.retrieveProject(project.id);
+            let folderPermission = projectPermission.retrieveEntity(folder.id);
+            folderPermission.files.push(this.entityFactory.make(fileid,name,author,true,true,false,dir));
+            this.notifyAll('UPDATE USER',admin);
         });
+
+        let read;
+        let write;
+
+        userPermissions.forEach(permission =>{
+
+            let user = this.getUserBy('id',permission.id);
+
+            if(permission.permission === 'read'){
+
+                read = true;
+                write = false;
+
+            }else if(permission.permission === 'write'){
+
+                read = true;
+                write = true;
+
+            }
+
+            let projectPermission = user.retrieveProject(project.id);
+            let folderPermission = projectPermission.retrieveEntity(folder.id);
+            folderPermission.files.push(this.entityFactory.make(fileid,name,author,read,write,false,dir));
+            this.notifyAll('UPDATE USER',user);
+        });
+
+        return this.getFolderEntityUsers(project.id,folder.id,fileid);
+
     }
     addNewProject(name,userPermissions){
 
         let projectId = uuid();
 
         let clinFolderId = uuid();
+        let clinName = 'Clinical Information';
         let regAffFolderId = uuid();
+        let regAffName = 'Regulatory Affairs';
         let ipFolderId = uuid();
+        let ipName = 'Intellectual Property';
         let markAnalyFolderId = uuid();
+        let markAnaylName='Market Analysis';
         let busDevFolderId = uuid();
+        let busDevName = 'Business Development';
         let miscFolderId = uuid();
+        let miscName = 'Misc';
 
         let admins = this.getAdmins();
-
-        this.notifyAll('CREATE PROJECT',name);
+        this.notifyAll('CREATE FOLDER',name);
+        this.notifyAll('CREATE FOLDER',name+'/'+ipName);
+        this.notifyAll('CREATE FOLDER',name+'/'+regAffName);
+        this.notifyAll('CREATE FOLDER',name+'/'+clinName);
+        this.notifyAll('CREATE FOLDER',name+'/'+markAnaylName);
+        this.notifyAll('CREATE FOLDER',name+'/'+busDevName);
+        this.notifyAll('CREATE FOLDER',name+'/'+miscName);
 
         admins.forEach((admin)=>{
 
@@ -374,13 +478,31 @@ class User_Repo {
     }
     deleteProject(project){
 
+        this.notifyAll('DELETE FOLDER',project.name);
+
         let projectUsers = this.getProjectUsers(project.id);
 
         projectUsers.forEach((user)=>{
            user.deleteProject(project.id);
            this.notifyAll('UPDATE USER',user);
         });
-        this.notifyAll('DELETE PROJECT',project.name);
+    }
+    renameProject(project,newName){
+        console.log(project.name);
+        this.notifyAll('RENAME ENTITY',{olddir:project.name,newdir:newName});
+
+        let projectUsers = this.getProjectUsers(project.id);
+
+        projectUsers.forEach(user=>{
+
+            let projectPermission = user.retrieveProject(project.id);
+            projectPermission.setName(newName);
+            this.notifyAll('UPDATE USER',user);
+
+        });
+
+
+
     }
     getAdmins(){
 
@@ -414,9 +536,19 @@ class User_Repo {
         return folderUsers;
     }
 
-    userIntegrityCheck(user){
+    getFolderEntityUsers(projectid,folderid,id){
 
-        return this.userFactory.convert(user);
+        let entityUsers = [];
+        let folderUsers = this.getEntityUsers(projectid,folderid);
+        folderUsers.forEach(user=>{
+            let project = user.retrieveProject(projectid);
+            let folder = project.retrieveEntity(folderid);
+            if(folder.retrieveFile(id)){
+
+                entityUsers.push(user);
+            }
+        });
+        return entityUsers;
     }
 
     load(users) {

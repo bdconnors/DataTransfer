@@ -11,26 +11,26 @@ class Folder extends Entity{
 
         this.files.push(file);
     }
-    retrieveFile(name){
+    retrieveFile(id){
 
         let success = false;
 
-        this.files.for((file)=>{
+        this.files.forEach((file)=>{
 
-           if(file.name === name){ success = file; }
+           if(file.id === id){ success = file; }
 
         });
 
         return success;
 
     }
-    updateFile(name,field,value){
+    updateFile(id,field,value){
 
         let success = false;
 
         this.files.forEach((file)=>{
 
-            if(file.name === name){ file[field] = value; }
+            if(file.id === id){ file[field] = value; }
 
             success = file;
 
@@ -39,13 +39,13 @@ class Folder extends Entity{
         return success;
 
     }
-    deleteFile(name){
+    deleteFile(id){
 
         let success = false;
 
         for(let i = 0; i < this.files.length; i++){
 
-            if(this.files[i].name === name){
+            if(this.files[i].id === id){
 
                 success = this.files[i];
 

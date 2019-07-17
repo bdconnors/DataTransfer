@@ -3,10 +3,10 @@
 <%- include('../include/menu.ejs',{system:system}) %>
 <% var user = system.getUserInfo()%>
 <% var users = system.getAllUsers()%>
+<div class= "bg-dark" id = "header"  style="padding:35px 50px;">
+    <h4 class= "bg-dark" ><i class="fa fa-archive fa-lg" ></i>  New Project</h4>
+</div>
 <div class="content">
-    <div id = "header"  style="padding:35px 50px;">
-        <h4><i class="fa fa-archive fa-lg" ></i>  New Project</h4>
-    </div>
     <div class="body" style="padding:40px 50px;">
         <div class="center-div form-width">
         <form id="fileForm" role="form" method="post">

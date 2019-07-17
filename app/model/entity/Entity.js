@@ -41,25 +41,25 @@ class Entity{
 
     getSize() {
 
-        this.size = fs.statSync('/home/brandon/DataTransfer/docs/live/'+this.dir).size;
+        this.size = fs.statSync('/home/brandon/DataTransfer/docs/live/'+this.dir+'/'+this.name).size;
         return this.size;
 
     }
     getCreated() {
 
-        this.created = fs.statSync('/home/brandon/DataTransfer/docs/live/'+this.dir).ctime;
+        this.created = fs.statSync('/home/brandon/DataTransfer/docs/live/'+this.dir+'/'+this.name).ctime;
         return this.created;
 
     }
     getModified() {
 
-        this.modified = fs.statSync('/home/brandon/DataTransfer/docs/live/'+this.dir).mtime;
+        this.modified = fs.statSync('/home/brandon/DataTransfer/docs/live/'+this.dir+'/'+this.name).mtime;
         return this.modified;
 
     }
     getAccessed() {
 
-        this.accessed = fs.statSync('/home/brandon/DataTransfer/docs/live/'+this.dir).atime;
+        this.accessed = fs.statSync('/home/brandon/DataTransfer/docs/live/'+this.dir+'/'+this.name).atime;
         return this.accessed;
 
     }

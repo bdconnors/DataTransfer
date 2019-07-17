@@ -7,9 +7,9 @@
     <h1> <i class="fa fa-user-circle-o " ></i> Welcome <%= user.firstname %></h1>
 </div>
 <br>
-    <div style="display:table; margin-left:auto;margin-right:auto;text-align:center;">
-    <div style="display:table; margin-left:auto;margin-right:auto; text-align:center; width:40%;">
-        <table style="border-collapse:separate; border-spacing:10px 10px; width:100%;">
+
+    <div class="table-responsive">
+        <table class="table-borderless">
             <%var columnSize = 3%>
             <% var projects = user.getProjects()%>
             <% var totalCells = projects.length%>
@@ -19,7 +19,7 @@
             <% var cellCount = 0%>
 
             <%for(var i = 0; i < rows; i++){
-                console.log('row count: '+i);
+
             %>
                 <tr>
                 <%var cellsInRow = 3%>
@@ -27,9 +27,9 @@
                     cellsInRow = partialRowCount;
                 }%>
                 <%for(var j = 0; j < cellsInRow; j++){
-                    console.log('cellCount: '+cellCount);
+
                 %>
-                    <td style="padding: 0 10px 0 10px;">
+                    <td>
                         <div class="dropdown">
                             <button style = "background-color:transparent; font-size:16px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
                                 <i class="fa fa-cog"></i> Options
@@ -60,6 +60,5 @@
                 </tr>
             <%}%>
         </table>
-    </div>
     </div>
 <%- include('../include/foot.ejs')%>

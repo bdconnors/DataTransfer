@@ -23,10 +23,10 @@ class File_System{
 
     }
     deleteDirectory(path){
-        console.log(path);
+
         rimraf.sync(this.livePath+path);
     }
-    renameDirectory(oldir,newdir){
+    renameEntity(oldir,newdir){
 
         fs.renameSync(this.livePath+oldir,this.livePath+newdir);
         fs.renameSync(this.backupPath+oldir,this.backupPath+newdir);
@@ -54,7 +54,6 @@ class File_System{
         });
     }
     folderExists(path){
-        console.log(fs.existsSync(this.livePath+path));
         return fs.existsSync(this.livePath+path)
     }
     folderExistsBackup(path){
@@ -97,22 +96,15 @@ class File_System{
 
 
         }else if (action === 'CREATE FOLDER') {
-
             this.makeDirectory(values);
-
-
         } else if (action === 'UPLOAD FILE') {
-
             this.writeFile(values.dir,values.data);
-
         }else if(action === 'DELETE FILE'){
             this.deleteFile(values);
-        }else if(action === 'DELETE PROJECT'){
-            this.deleteDirectory(values);
         }else if(action === 'DELETE FOLDER'){
             this.deleteDirectory(values);
-        }else if(action === 'RENAME FOLDER'){
-            this.renameDirectory(values.olddir,values.newdir)
+        }else if(action === 'RENAME ENTITY'){
+            this.renameEntity(values.olddir,values.newdir)
         }
     }
 

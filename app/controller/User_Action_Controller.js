@@ -51,9 +51,15 @@ class User_Action_Controller{
         this.system.deleteProject(req,res);
     }
 
+    renameProject(req,res){
+
+        this.system.renameProject(req,res);
+
+    }
+
     uploadToProject(req,res){
 
-        this.system.uploadFile(req,res);
+        this.system.uploadFileToProject(req,res);
 
     }
 
@@ -82,6 +88,9 @@ class User_Action_Controller{
         this.system.deleteFolder(req,res);
 
     }
+    uploadToFolder(req,res){
+        this.system.uploadFileToFolder(req,res)
+    }
 
 
     /** User File Actions **/
@@ -103,6 +112,13 @@ class User_Action_Controller{
         this.system.deleteFile(req,res);
 
     }
+
+    renameFile(req,res){
+
+        this.system.renameFile(req,res);
+
+    }
+
 
 
     /** View Requests **/
@@ -131,20 +147,35 @@ class User_Action_Controller{
 
     }
 
-    uploadForm(req,res){
+    folderUploadForm(req,res){
+        this.system.displayFolderUploadForm(req,res);
+    }
 
-        this.system.displayUpload(req,res);
+    projectUploadForm(req,res){
+
+        this.system.displayProjectUploadForm(req,res);
 
     }
+
+    fileRenameForm(req,res){
+
+        this.system.displayFileRenameForm(req,res);
+    }
+
     folderRenameForm(req,res){
 
-        this.system.displayFolderRename(req,res);
+        this.system.displayFolderRenameForm(req,res);
 
     }
 
     createProjectForm(req,res){
 
         this.system.displayCreateProjectForm(req,res)
+
+    }
+    projectRenameForm(req,res){
+
+        this.system.displayProjectRenameForm(req,res);
 
     }
 

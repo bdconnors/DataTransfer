@@ -1,6 +1,6 @@
 <nav style="border: 1px solid #343a40;" class="navbar navbar-expand-lg navbar-dark bg-secondary">
     <a class="navbar-brand" href="/projects/project/<%= project.id%>"><i class="fa fa-archive"></i></a>
-    <a class="navbar-brand" href="#"><i class="fa fa-folder "></i> <%= folder.name %></a>
+    <a class="navbar-brand" href="/projects/project.<%= project.id%>/folders/folder/<%= folder.id%>"><i class="fa fa-folder "></i> <%= folder.name %></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#projectDropDown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <i class="fa fa-chevron-circle-down"></i>
     </button>
@@ -11,7 +11,7 @@
         <ul class="navbar-nav ml-auto">
             <%if(system.user.admin === true || project.write === true){%>
                 <li class="nav-item active">
-                    <a  class="nav-link" href="/projects/project/<%= project.id%>/folder/upload?folder= <%= folder.id%>"><i class="fa fa-upload"></i> Upload File</a>
+                    <a  class="nav-link" href="/projects/project/<%= project.id%>/folders/folder/<%= folder.id%>/upload"><i class="fa fa-upload"></i> Upload File</a>
                 </li>
             <%}%>
             <%if(system.user.admin === true){%>

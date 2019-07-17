@@ -70,13 +70,13 @@ let userRepo;
 
 /** Factories **/
 const Entity_Factory = require('./model/entity/Entity_Factory').Entity_Factory;
-const entityFactory = new Entity_Factory(storage);
+const entityFactory = new Entity_Factory();
 
 const Activity_Factory = require('./model/activity/Activity_Factory').Activity_Factory;
 const activityFactory = new Activity_Factory();
 
 const Project_Factory = require('./model/project/Project_Factory').Project_Factory;
-const projectFactory = new Project_Factory(entityFactory,storage);
+const projectFactory = new Project_Factory(entityFactory);
 
 const User_Factory = require('./model/user/User_Factory').User_Factory;
 let userFactory;
@@ -95,10 +95,9 @@ db.connect().then(()=>{
 
     db.retrieveDocuments('users',{},{'_id':0}).then((res)=>{
 
-        userFactory = new User_Factory(projectFactory,storage);
+        userFactory = new User_Factory(projectFactory);
 
         userRepo = new User_Repo(userFactory,projectFactory,entityFactory);
-        userFactory.subscribe(db);
         userRepo.load(res);
 
 
@@ -160,34 +159,25 @@ app.get('/projects/project/:id',(req,res)=>{
 
 });
 
-app.get('/projects/add',(req,res)=>{
+app.get('/projects/newproject',(req,res)=>{
 
     user.createProjectForm(req,res);
 
 });
 
-app.post('/projects/add',(req,res)=>{
+app.post('/projects/newproject',(req,res)=>{
 
     user.createProject(req,res);
 });
 
-app.get('/projects/new/folder',(req,res)=>{
 
-    user.addFolderForm(req,res);
-});
+app.get('/projects/project/:id/upload',(req,res)=>{
 
-app.post('/projects/new/folder',(req,res)=>{
-
-    user.addFolder(req,res);
-});
-
-app.get('/projects/files/upload',(req,res)=>{
-
-    user.uploadForm(req,res);
+    user.projectUploadForm(req,res);
 
 });
 
-app.post('/projects/files/upload',(req,res)=>{
+app.post('/projects/project/:id/upload',(req,res)=>{
 
     user.uploadToProject(req,res);
 
@@ -200,9 +190,16 @@ app.post('/projects/project/:id/delete',(req,res)=>{
 
 app.get('/projects/project/:id/rename',(req,res)=>{
 
-    res.send('project rename');
+    user.projectRenameForm(req,res);
 
 });
+
+app.post('/projects/project/:id/rename',(req,res)=>{
+
+    user.renameProject(req,res)
+
+});
+
 app.get('/projects/project/:id/permissions',(req,res)=>{
 
     user.projectPermissionsForm(req,res);
@@ -227,7 +224,7 @@ app.get('/projects/project/:id/files/attachment/:fileid',(req,res)=>{
 
 });
 
-app.post('/projects/project/:id/files/delete',(req,res)=>{
+app.post('/projects/project/:id/files/:fileid/delete',(req,res)=>{
 
     user.deleteFile(req,res);
 
@@ -239,8 +236,23 @@ app.get('/projects/project/:id/files/:fileid/permissions',(req,res)=>{
 });
 app.get('/projects/project/:id/files/:fileid/rename',(req,res)=>{
 
-    res.send('Rename File');
+    user.fileRenameForm(req,res);
 
+});
+app.post('/projects/project/:id/files/:fileid/rename',(req,res)=>{
+
+    user.renameFile(req,res);
+
+});
+
+app.get('/projects/project/:id/folders/new',(req,res)=>{
+
+    user.addFolderForm(req,res);
+});
+
+app.post('/projects/project/:id/folders/new',(req,res)=>{
+
+    user.addFolder(req,res);
 });
 
 app.post('/projects/project/:id/folders/delete',(req,res)=>{
@@ -253,6 +265,16 @@ app.get('/projects/project/:id/folders/folder/:folderid',(req,res)=>{
     user.viewFolder(req,res);
 
 });
+app.get('/projects/project/:id/folders/folder/:folderid/upload',(req,res)=>{
+
+    user.folderUploadForm(req,res);
+
+});
+app.post('/projects/project/:id/folders/folder/:folderid/upload',(req,res)=>{
+
+    user.uploadToFolder(req,res);
+
+});
 app.get('/projects/project/:id/folders/folder/:folderid/rename',(req,res)=>{
 
     user.folderRenameForm(req,res);
@@ -262,15 +284,6 @@ app.post('/projects/project/:id/folders/folder/:folderid/rename',(req,res)=>{
 
     user.renameFolder(req,res);
 
-});
-app.get('/projects/project/:id/folders/folder/:fileid/permissions',(req,res)=>{
-
-    res.send('Folder Permissions');
-
-});
-app.get('/users',(req,res)=>{
-
-    res.send('Users Index');
 });
 
 app.get('/users/invite',(req,res)=>{
