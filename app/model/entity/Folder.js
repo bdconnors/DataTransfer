@@ -2,72 +2,68 @@ const Entity = require('./Entity').Entity;
 
 class Folder extends Entity{
 
-    constructor(id,name,author,read,write,dir){
-        super(id,name,author,read,write,true,dir);
-        this.files = [];
+    constructor(id,projectId,dir,name,author){
+
+        super(id,projectId,dir,name,author,true);
+        this.children = [];
+
     }
 
-    addFile(file){
+   addChild(id){
 
-        this.files.push(file);
-    }
-    retrieveFile(id){
+        this.children.push(id);
 
-        let success = false;
+   }
+   getChild(id){
 
-        this.files.forEach((file)=>{
+        let child = false;
 
-           if(file.id === id){ success = file; }
+        this.children.forEach(childId =>{
+
+            if(childId === id){
+
+                child = childId;
+            }
 
         });
 
-        return success;
+        return child;
+   }
+   updateChild(id,newId){
 
-    }
-    updateFile(id,field,value){
+        let oldChild = false;
 
-        let success = false;
+        for(let i = 0; i < this.children.length; i++){
 
-        this.files.forEach((file)=>{
+            if(this.children[i] === id){
 
-            if(file.id === id){ file[field] = value; }
+                oldChild = this.children[i];
+                this.children[i] = newId;
+            }
 
-            success = file;
+        }
 
-        });
+        return oldChild;
+   }
+   deleteChild(id){
 
-        return success;
+        let child = false;
 
-    }
-    deleteFile(id){
+        for(let i = 0; i < this.children.length; i++){
 
-        let success = false;
+            if(this.children[i] === id){
 
-        for(let i = 0; i < this.files.length; i++){
-
-            if(this.files[i].id === id){
-
-                success = this.files[i];
-
-                this.files.splice(i,1);
+                child = this.children[i];
+                this.children.splice(i,1);
 
             }
 
         }
 
-        return success;
-    }
+        return child;
 
-    getFiles(){
 
-        return this.files;
-
-    }
-    setFiles(files){
-
-        this.files = files;
-
-    }
+   }
 
 }
 module.exports = {Folder:Folder};

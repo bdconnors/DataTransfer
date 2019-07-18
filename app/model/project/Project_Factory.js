@@ -2,24 +2,11 @@ const Project = require('./Project').Project;
 
 class Project_Factory {
 
-    constructor(entityFactory){
-        this.entityFactory = entityFactory;
-    }
+    constructor(){}
 
-    make(id,name,read,write){
+    make(name){
 
-        return new Project(id,name,read,write);
-
-    }
-    convert(obj){
-
-        let project = new Project(obj.id,obj.name,obj.read,obj.write,obj.dir);
-
-        obj.entitys.forEach((entity)=>{
-            project.addEntity(this.entityFactory.convert(entity));
-        });
-
-        return project;
+        return new Project(name);
 
     }
 

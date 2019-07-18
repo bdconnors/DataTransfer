@@ -4,9 +4,9 @@ const fileTypes = require('mime-types');
 
 class File extends Entity {
 
-    constructor(id,name,author,read,write,dir) {
+    constructor(id,projectId,dir,name,author) {
 
-        super(id,name,author,read,write,false,dir);
+        super(id,projectId,dir,name,author,false);
         this.ext = path.extname(this.dir + name);
         this.mime = fileTypes.lookup(this.dir + name);
 

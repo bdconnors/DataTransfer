@@ -63,93 +63,171 @@ const System_Mailer = require('./util/System_Mailer').System_Mailer;
 const mailer = new System_Mailer('gmail','system.novitious@gmail.com','Rubix123');
 
 
-/** User Repository **/
-const User_Repo = require('./model/User_Repo').User_Repo;
+/** Repositories (Observables) **/
+const User_Repo = require('./model/repos/User_Repo').User_Repo;
 let userRepo;
 
+const Project_Repo = require('./model/repos/Project_Repo').Project_Repo;
+let projectRepo;
+
+const Entity_Repo = require('./model/repos/Entity_Repo').Entity_Repo;
+let entityRepo;
+
+const Permission_Repo = require('./model/repos/Permission_Repo').Permission_Repo;
+let permissionRepo;
+
+/** Observers **/
+const User_Observer = require('./model/repos/observers/User_Observer').User_Observer;
+let userObs;
+
+const Project_Observer = require('./model/repos/observers/Project_Observer').Project_Observer;
+let projectObs;
+
+const Entity_Observer = require('./model/repos/observers/Entity_Observer').Entity_Observer;
+let entityObs;
+
+const Permissions_Observer = require('./model/repos/observers/Permission_Observer').Permission_Observer;
+let permissionObs;
 
 /** Factories **/
-const Entity_Factory = require('./model/entity/Entity_Factory').Entity_Factory;
-const entityFactory = new Entity_Factory();
-
-const Activity_Factory = require('./model/activity/Activity_Factory').Activity_Factory;
-const activityFactory = new Activity_Factory();
+const User_Factory = require('./model/user/User_Factory').User_Factory;
+let userFactory = new User_Factory();
 
 const Project_Factory = require('./model/project/Project_Factory').Project_Factory;
-const projectFactory = new Project_Factory(entityFactory);
+let projectFactory = new Project_Factory();
 
-const User_Factory = require('./model/user/User_Factory').User_Factory;
-let userFactory;
+const Entity_Factory = require('./model/entity/Entity_Factory').Entity_Factory;
+let entityFactory = new Entity_Factory();
+
+const Permission_Factory = require('./model/permissions/Permission_Factory').Permission_Factory;
+let permissionFactory = new Permission_Factory();
 
 
 /** Controllers **/
-const System_Controller = require('./controller/System_Controller').System_Controller;
-let system;
+const Entity_Controller = require('./controller/Entity_Controller').Entity_Controller;
+let entityControl;
+
+const Permission_Controller = require('./controller/Permission_Controller').Permission_Controller;
+let permissionControl;
+
+const Project_Controller = require('./controller/Project_Controller').Project_Controller;
+let projectControl;
+
+const User_Controller = require('./controller/User_Controller').User_Controller;
+let userControl;
 
 const User_Action_Controller = require('./controller/User_Action_Controller').User_Action_Controller;
 let user;
 
+const System_Authorization_Controller = require('./controller/System_Authorization_Controller').System_Authorization_Controller;
+let sysAuth;
+
+const System_Path_Controller = require('./controller/System_Path_Controller').System_Path_Controller;
+let sysPath;
+
+const System_Action_Controller = require('./controller/System_Action_Controller').System_Action_Controller;
+let sys;
+
 
 /** Connect to Database and load Internal Data Structures **/
-db.connect().then(()=>{
+db.connect().then((mongo)=>{
 
-    db.retrieveDocuments('users',{},{'_id':0}).then((res)=>{
+    userObs = new User_Observer(mongo);
+    projectObs = new Project_Observer(mongo);
+    entityObs = new Entity_Observer(mongo);
+    permissionObs = new Permissions_Observer(mongo);
 
-        userFactory = new User_Factory(projectFactory);
+    entityObs.get({}).then(res=>{
 
-        userRepo = new User_Repo(userFactory,projectFactory,entityFactory);
-        userRepo.load(res);
+        entityRepo = new Entity_Repo(entityFactory);
+        entityRepo.load(res);
+        entityRepo.subscribe(entityObs);
+        console.log(entityRepo.entities);
 
+        permissionObs.get({}).then(res=>{
 
-        console.log(userRepo.users);
+            permissionRepo = new Permission_Repo(permissionFactory);
+            permissionRepo.load(res);
+            permissionRepo.subscribe(permissionObs);
+            console.log(permissionRepo.permissions);
 
-        system = new System_Controller(userRepo,storage);
-        system.subscribe(mailer);
+            projectObs.get({}).then(res=>{
 
+                projectRepo = new Project_Repo(projectFactory);
+                projectRepo.load(res);
+                projectRepo.subscribe(projectObs);
+                console.log(projectRepo.projects);
 
-        user = new User_Action_Controller(system);
-        userRepo.subscribe(db);
-        userRepo.subscribe(storage);
-        userRepo.subscribe(system)
+                userObs.get({}).then(res=>{
 
-    }).catch((err)=>{
-        throw err
-    });
+                    userRepo = new User_Repo(userFactory);
+                    userRepo.load(res);
+                    userRepo.subscribe(userObs);
+                    console.log(userRepo.users);
 
-}).catch((err)=>{
-    throw err
-});
+                    entityControl = new Entity_Controller(entityRepo);
+                    permissionControl = new Permission_Controller(permissionRepo);
+                    projectControl = new Project_Controller(projectRepo);
+                    userControl = new User_Controller(userRepo);
+
+                    sysPath = new System_Path_Controller(projectControl,entityControl);
+                    sys = new System_Action_Controller(sysPath,mailer,storage);
+                    sysAuth = new System_Authorization_Controller(sys,userControl,permissionControl);
+
+                    user = new User_Action_Controller(sysAuth);
+
+                }).catch(err=>{throw err});
+
+            }).catch(err=>{throw err});
+
+        }).catch(err=>{throw err});
+
+    }).catch(err=>{throw err});
+
+}).catch((err)=>{throw err});
 
 
 /** Routes **/
 
 app.get('/',(req,res)=>{
 
-    system.displayLogin(req,res)
+    sys.redirectToLogin(req,res);
 
 });
 
-app.post('/',(req,res)=> {
+app.get('/login',(req,res)=>{
 
-   user.signIn(req,res);
+    sys.serveLogin(req,res)
+
+});
+
+app.post('/login',(req,res)=> {
+
+   user.logIn(req,res)
 
 });
 
 app.get('/logout',(req,res)=>{
 
-    user.signOut(req,res);
+    user.logOut(req,res);
+
+});
+
+app.get('/unauthorized',(req,res)=>{
+
+    sys.serveUnAuthorized(req,res);
 
 });
 
 app.get('/dashboard',(req,res)=>{
 
-    user.userDashboard(req,res);
+    user.requestUserDashboard(req,res);
 
 });
 
 app.get('/users/invite',(req,res)=>{
 
-    user.inviteUserForm(req,res)
+    user.requestInviteForm(req,res);
 
 });
 
@@ -159,7 +237,7 @@ app.post('/users/invite',(req,res)=>{
 
 });
 
-app.get('/users/authenticate',(req,res)=>{
+/**app.get('/users/authenticate',(req,res)=>{
 
     system.displayAuthenticationForm(req,res);
 });
@@ -335,6 +413,6 @@ app.post('/projects/project/:id/folders/folder/:folderid/permissions',(req,res)=
 
     res.send(req.body);
 
-});
+});**/
 
 

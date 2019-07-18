@@ -3,42 +3,73 @@ const fs = require('fs');
 
 class Entity{
 
-    constructor(id,name,author,read,write,isFolder,dir){
+    constructor(id,projectId,dir,name,author,isFolder){
 
         this.id = id;
+        this.projectId = projectId;
+        this.dir = dir;
+        this.isFolder = isFolder;
         this.name = name;
         this.author = author;
-        this.read = read;
-        this.write = write;
-        this.isFolder = isFolder;
-        this.dir = dir;
+        this.parents = [];
         this.created = '';
         this.accessed = '';
         this.modified = '';
     }
 
-    getId(){ return this.id; }
-    setId(id){ this.id = id; }
+    addParent(id){
 
-    getName(){ return this.name; }
-    setName(name){ this.name = name; }
+        this.parents.push(id);
 
-    getAuthor(){ return this.author; }
-    setAuthor(author){ this.author = author; }
+    }
+    getParent(id){
 
-    getRead(){ return this.read; }
-    setRead(read){ this.read = read; }
+        let parent = false;
 
-    getWrite(){ return this.write; }
-    setWrite(write){ this.write = write; }
+        this.parents.forEach(parentId=>{
 
-    getIsFolder(){ return this.isFolder; }
-    setIsFolder(isFolder){ this.isFolder = isFolder }
+            if(parentId === id){
+                parent = parentId;
+            }
 
-    getDir(){ return this.dir; }
-    setDir(dir){ this.dir = dir; }
+        });
 
+        return parent;
 
+    }
+    updateParent(id,newId){
+
+        let oldParent = false;
+
+        for(let i = 0; i < this.parents.length; i++){
+
+            if(this.parents[i] === id){
+
+                oldParent = this.parents[i];
+                this.parents[i] = newId;
+
+            }
+        }
+
+        return oldParent;
+
+    }
+    deleteParent(id){
+
+        let parent = false;
+
+        for(let i = 0; i < this.parents.length; i++){
+
+            if(this.parents[i] === id){
+
+                parent = this.parents[i];
+                this.parents.splice(i,1);
+
+            }
+        }
+
+        return parent
+    }
     getSize() {
 
         this.size = fs.statSync('/home/brandon/DataTransfer/docs/live/'+this.dir+'/'+this.name).size;

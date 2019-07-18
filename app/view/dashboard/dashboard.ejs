@@ -1,13 +1,11 @@
 <%- include('../include/head.ejs',{title:'File System Home',scripts:false})%>
 <body>
-<%- include('../include/menu.ejs',{system:system}) %>
-<% var user = system.getUserInfo()%>
+<%- include('../include/menu.ejs',{projects:projects,users:users}) %>
 
 <div id="welcomeHeader" style="padding:35px 50px; width:100%;">
     <h1> <i class="fa fa-user-circle-o " ></i> Welcome <%= user.firstname %></h1>
 </div>
 <br>
-<% var projects = user.getProjects()%>
 <% var totalCells = projects.length%>
 <% var fullRows = Math.floor(projects.length/3)%>
 <% var partialRowCount = projects.length % 3 %>
@@ -31,7 +29,7 @@
                             <i class="fa fa-cog"></i> Options
                         </button>
                         <div class="dropdown-menu" aria-labelledby="projSettings">
-                            <form action="/projects/project/<%= projects[cellCount1].getId()%>" method="get">
+                            <form action="/projects/project/<%= projects[cellCount1].id%>" method="get">
                                 <button class="dropdown-item" type="submit"><i class="fa fa-eye"></i> View</button>
                             </form>
                             <%if(user.admin){%>
@@ -55,7 +53,7 @@
         <div style="text-align:center;" class="row">
             <%for(let l = 0; l < cellsInRow; l++){%>
                 <div class="col">
-                    <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount2].getId()%>">
+                    <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount2].id%>">
                         <i class="fa fa-archive fa-3x"></i>
                     </a>
                 </div>
@@ -65,8 +63,8 @@
         <div style="text-align:center;" class="row">
             <%for(let m = 0; m < cellsInRow; m++){%>
                 <div class="col">
-                    <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount3].getId()%>">
-                        <%= projects[cellCount3].getName()%>
+                    <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount3].id%>">
+                        <%= projects[cellCount3].name%>
                     </a>
                 </div>
                 <%cellCount3++%>

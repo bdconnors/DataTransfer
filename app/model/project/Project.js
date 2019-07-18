@@ -1,76 +1,59 @@
+const uuid = require('uuid');
 class Project{
 
-    constructor(id,name,read,write){
-        this.id = id;
+    constructor(name){
+        this.id = uuid();
         this.name = name;
-        this.read = read;
-        this.write = write;
         this.entitys = [];
     }
 
     addEntity(entity){ this.entitys.push(entity); }
     retrieveEntity(id){
 
-        let success = false;
+        let entity = false;
 
-        this.entitys.forEach((entity)=>{
+        this.entitys.forEach((ent)=>{
 
-            if(entity.id === id){ success = entity; }
+            if(entity.id === id){ entity = ent; }
 
         });
 
-        return success;
+        return entity;
     }
-    updateEntity(id,field,value){
+    updateEntity(id,newEntity){
 
-        let success = false;
+        let oldEntity = false;
 
-        this.entitys.forEach((entity)=>{
 
-            if(entity.id === id){ entity[field] = value; }
+        for(let i = 0; i < this.entitys.length; i++) {
 
-        });
+            if (this.entitys[i].id === id) {
 
-        return success;
+                oldEntity = this.entitys[i];
+                this.entitys[i] = newEntity;
 
+            }
+        }
+
+        return oldEntity;
     }
     deleteEntity(id){
 
-        let success = false;
+        let entity = false;
 
         for(let i = 0; i < this.entitys.length; i++){
 
             if(this.entitys[i].id === id) {
 
-                success = this.entitys[i];
+                entity = this.entitys[i];
                 this.entitys.splice(i, 1);
             }
 
         }
 
-        return success;
+        return entity;
 
     }
-
-    getId(){ return this.id; }
-    setId(id){
-        console.log('Param Id in Proj Model: '+id);
-        this.id = id;
-        console.log('Id in Proj Model: '+this.id);
-
-    }
-
-    getName(){ return this.name; }
-    setName(name){ this.name = name; }
-
-    getRead(){ return this.read; }
-    setRead(read){ this.read = read; }
-
-    getWrite(){ return this.write; }
-    setWrite(write){ this.write = write; }
-
-    getEntitys(){ return this.entitys; }
-    setEntitys(entitys){ this.entitys = entitys; }
 
 }
 module.exports = {Project:Project};

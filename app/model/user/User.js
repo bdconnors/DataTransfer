@@ -10,61 +10,118 @@ class User{
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
-        this.projects = [];
+        this.projectPermissions = [];
+        this.entityPermissions = [];
         this.activity =[];
 
     }
 
-    addProject(project){ this.projects.push(project); }
+    addProjectPermission(project){ this.projects.push(project); }
 
-    retrieveProject(id){
+    getProjectPermission(id){
 
-        let success = false;
+        let permission = false;
 
-        this.projects.forEach((project)=>{
+        this.projectPermissions.forEach((perm)=>{
 
-            if(project.id === id){
-                success = project;
+            if(permission.id === id){
+                permission = perm;
             }
 
         });
 
-        return success;
+        return permission
     }
 
-    updateProject(name,field,value){
+    updateProjectPermission(id,newPermission){
 
-        let success = false;
 
-        this.projects.forEach((project)=>{
+        let oldPermission = false;
 
-            if(project.name === name){
-                project[field] = value;
-                success = project;
+        for(let i = 0; i < this.projectPermissions.length; i++){
+
+            if(this.projectPermissions[i].id === id){
+
+                oldPermission = this.projectPermissions[i];
+                this.projectPermissions[i] = newPermission;
             }
 
-        });
+        }
 
-        return success;
+        return oldPermission;
 
     }
-    deleteProject(id){
+    deleteProjectPermission(id){
 
-        let success = false;
+        let permission = false;
 
-        for(let i= 0; i < this.projects.length; i++){
+        for(let i= 0; i < this.projectPermissions.length; i++){
 
-            if(this.projects[i].id === id){
+            if(this.projectPermissions[i] === id){
 
-                success = this.projects[i];
-                this.projects.splice(i,1);
+                permission = this.projectPermissions[i];
+                this.projectPermissions.splice(i,1);
 
             }
 
         }
 
-        return success;
+        return permission;
     }
+
+    addEntityPermission(permission){ this.entityPermissions.push(permission); }
+
+    getEntityPermission(id){
+
+        let permission = false;
+
+        this.entityPermissions.forEach((entityPermission)=>{
+
+            if(entityPermission === id){
+                permission = entityPermission;
+            }
+
+        });
+
+        return permission;
+    }
+
+    updateEntityPermission(id,newPermission){
+
+
+        let oldPermission = false;
+
+        for(let i = 0; i < this.entityPermissions.length; i++){
+
+            if(this.entityPermissions[i] === id){
+
+                oldPermission = this.entityPermissions[i];
+                this.entityPermissions[i] = newPermission;
+            }
+
+        }
+
+        return oldPermission;
+
+    }
+    deleteEntityPermission(id){
+
+        let permission = false;
+
+        for(let i= 0; i < this.entityPermissions.length; i++){
+
+            if(this.entityPermissions[i] === id){
+
+                permission = this.entityPermissions[i];
+                this.entityPermissions.splice(i,1);
+
+            }
+
+        }
+
+        return permission;
+    }
+
 
     addActivity(activity){ this.activity.push(activity); }
 
@@ -74,7 +131,7 @@ class User{
 
         this.activity.forEach((activity)=>{
 
-            if(activity.id === id){
+            if(activity === id){
                 success = activity;
             }
 
@@ -83,76 +140,42 @@ class User{
         return success;
     }
 
-    updateActivity(id,field,value){
+    updateActivity(id,newActivity){
 
-        let success = false;
+        let oldActivity = false;
 
-        this.activity.forEach((activity)=>{
+        for(let i = 0; i < this.activity.length; i++){
 
-            if(activity.id === id){
-                activity[field] = value;
-                success = activity;
-            }
+            if(this.activity[i] === id) {
 
-        });
-
-        return success;
-
-    }
-
-    deleteActivity(id){
-
-        let success = false;
-
-        for(let i= 0; i < this.activity.length; i++){
-
-            if(this.activity[i].id === id){
-
-                this.activity.splice(i,1);
-                success = this.activity[i];
+                oldActivity = this.activity[i];
+                this.activity[i] = newActivity;
 
             }
 
         }
 
-        return success;
+        return oldActivity
+
     }
 
-    getId(){ return this.id; }
-    setId(id){ this.id = id; }
+    deleteActivity(id){
 
-    getAdmin(){ return this.admin; }
-    setAdmin(admin){ this.admin = admin; }
+        let activity = false;
 
-    getFirstName(){ return this.firstname; }
-    setFirstName(firstname){ this.firstname = firstname; }
+        for(let i= 0; i < this.activity.length; i++){
 
-    getLastName(){ return this.lastname; }
-    setLastName(lastname){ this.lastname = lastname; }
+            if(this.activity[i] === id){
 
-    getFullName(){ return this.firstname+' '+this.lastname; }
+                activity = this.activity[i];
+                this.activity.splice(i,1);
+            }
 
-    getEmail(){ return this.email; }
-    setEmail(email){ this.email = email; }
+        }
 
-    getPhone(){ return this.phone; }
-    setPhone(phone){ this.phone = phone }
-
-    getPassword(){ return this.password; }
-    setPassword(password){ this.password = password}
-    setHashPassword(password){ this.password = bcrypt.hashSync(password,12); }
-    verifyPassword(password){
-        return bcrypt.compareSync(password,this.password)
+        return activity;
     }
 
-    getProjects(){ return this.projects; }
-    setProjects(projects){ this.projects = projects; }
-
-    getActivity(){ return this.activity; }
-    setActivity(activity){ this.activity = activity; }
-
-    getAuthCode(){ return this.authCode; }
-    setAuthCode(authCode){ this.authCode = authCode; }
     addAuthCode(){this.authCode = uuid()}
     deleteAuthCode(){ delete this.authCode; }
 
