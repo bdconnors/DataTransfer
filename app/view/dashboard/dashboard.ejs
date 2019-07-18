@@ -7,58 +7,71 @@
     <h1> <i class="fa fa-user-circle-o " ></i> Welcome <%= user.firstname %></h1>
 </div>
 <br>
+<% var projects = user.getProjects()%>
+<% var totalCells = projects.length%>
+<% var fullRows = Math.floor(projects.length/3)%>
+<% var partialRowCount = projects.length % 3 %>
+<% var rows = fullRows+1%>
+<% var cellCount1 = 0%>
+<% var cellCount2 = 0%>
+<% var cellCount3 = 0%>
+<div class="container">
 
-    <div class="table-responsive">
-        <table class="table-borderless">
-            <%var columnSize = 3%>
-            <% var projects = user.getProjects()%>
-            <% var totalCells = projects.length%>
-            <% var fullRows = Math.floor(projects.length/columnSize)%>
-            <% var partialRowCount = projects.length % columnSize%>
-            <% var rows = fullRows+1%>
-            <% var cellCount = 0%>
+    <%for(var i = 0; i < rows; i++){%>
+        <%var cellsInRow = 3%>
+        <%if(i === fullRows){
+            cellsInRow = partialRowCount;
+        }%>
 
-            <%for(var i = 0; i < rows; i++){
-
-            %>
-                <tr>
-                <%var cellsInRow = 3%>
-                <%if(i === fullRows){
-                    cellsInRow = partialRowCount;
-                }%>
-                <%for(var j = 0; j < cellsInRow; j++){
-
-                %>
-                    <td>
-                        <div class="dropdown">
-                            <button style = "background-color:transparent; font-size:16px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
-                                <i class="fa fa-cog"></i> Options
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="projSettings">
-                                <form action="/projects/project/<%= projects[cellCount].getId()%>" method="get">
-                                    <button class="dropdown-item" type="submit"><i class="fa fa-eye"></i> View</button>
+        <div style="text-align:center;" class="row">
+            <%for(var k = 0; k < cellsInRow; k++){%>
+                <div class="col">
+                    <div class="dropdown">
+                        <button style = "background-color:transparent; font-size:16px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
+                            <i class="fa fa-cog"></i> Options
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="projSettings">
+                            <form action="/projects/project/<%= projects[cellCount1].getId()%>" method="get">
+                                <button class="dropdown-item" type="submit"><i class="fa fa-eye"></i> View</button>
+                            </form>
+                            <%if(user.admin){%>
+                                <form action="/projects/project/<%= projects[cellCount1].id%>/rename%>" method="get">
+                                    <button type="submit" class="dropdown-item"><i class="fa fa-pencil"></i> Rename</button>
                                 </form>
-                                <%if(user.admin){%>
-                                    <form action="/projects/project/<%= projects[cellCount].id%>/rename%>" method="get">
-                                        <button type="submit" class="dropdown-item"><i class="fa fa-pencil"></i> Rename</button>
-                                    </form>
-                                    <form action="/projects/project/<%= projects[cellCount].id%>/delete%>" method="post">
-                                        <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i> Delete</button>
-                                    </form>
-                                        <div class="dropdown-divider"></div>
-                                    <form action="/projects/project/<%= projects[cellCount].id%>/permissions%>" method="get">
-                                        <button type="submit" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
-                                    </form>
-                                <%}%>
-                            </div>
+                                <form action="/projects/project/<%= projects[cellCount1].id%>/delete%>" method="post">
+                                    <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i> Delete</button>
+                                </form>
+                                <div class="dropdown-divider"></div>
+                                <form action="/projects/project/<%= projects[cellCount1].id%>/permissions%>" method="get">
+                                    <button type="submit" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
+                                </form>
+                            <%}%>
                         </div>
-                        <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount].getId()%>">
-                            <i class="fa fa-archive fa-3x"></i><br><span style="font-size:14px;"><%= projects[cellCount].getName()%></span>
-                        </a>
-                    <%cellCount++%>
-                <%}%>
-                </tr>
+                    </div>
+                </div>
+                <%cellCount1++%>
             <%}%>
-        </table>
-    </div>
+        </div>
+        <div style="text-align:center;" class="row">
+            <%for(let l = 0; l < cellsInRow; l++){%>
+                <div class="col">
+                    <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount2].getId()%>">
+                        <i class="fa fa-archive fa-3x"></i>
+                    </a>
+                </div>
+                <%cellCount2++%>
+            <%}%>
+        </div>
+        <div style="text-align:center;" class="row">
+            <%for(let m = 0; m < cellsInRow; m++){%>
+                <div class="col">
+                    <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount3].getId()%>">
+                        <%= projects[cellCount3].getName()%>
+                    </a>
+                </div>
+                <%cellCount3++%>
+            <%}%>
+        </div>
+    <%}%>
+</div>
 <%- include('../include/foot.ejs')%>

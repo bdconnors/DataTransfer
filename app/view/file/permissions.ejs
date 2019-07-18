@@ -1,0 +1,84 @@
+<%- include('../include/head.ejs',{title:'File System Home',scripts:'add.js'})%>
+<body>
+<%- include('../include/menu.ejs',{system:system}) %>
+<%
+    var user = system.getUserInfo()
+    var users = system.getAllUsers();
+%>
+<%- include('../include/projectNav.ejs',{system:system,project:project})%>
+<div  id = "header" class="bg-secondary" style="padding:35px 50px;">
+    <h4 class="bg-secondary"><i class="fa fa-file fa-lg" ></i>  <%= file.name%> Permissions</h4>
+</div>
+<div class="content">
+    <div class="body" style="padding:40px 50px;">
+        <div class="center-div form-width">
+            <form id="fileForm" role="form" method="post">
+                <%  var projectUsersDisplayed = 0;%>
+                <label for="users" class="align-left"> <i class="fa fa-users"></i> <b>Current Permissions:</b> </label>
+                <%for(var i = 0; i < fileUsers.length; i++) {
+
+                    var curUser = users[i];
+                    var checked = false;
+                    var project = users[i].retrieveProject(project.id);
+                    var permission = project.retrieveEntity(file.id)
+                    var readSelected;
+                    var writeSelected;
+
+                    if(permission.read && permission.write){
+
+                        readSelected = false;
+                        writeSelected = true;
+
+                    }else if(permission.read && !permission.write){
+
+                        readSelected = true;
+                        writeSelected = false;
+
+                    }%>
+
+                    <% if(curUser.getAdmin() !== true && system.user.getId() !== curUser.getId()){%>
+                        <div id="<%= users[i].getId() %>">
+                            <input style="display:none;" checked="true" type="checkbox" name="users"  value="<%= curUser.id %>"><i class="fa fa-user"></i> <%= users[i].getFullName()%>
+                            <div class="form-width">
+                                <select name="<%= curUser.getId()%>" id="<%= curUser.getId()%>">
+                                    <option selected="<%=readSelected%>" value="read">  Read</option>
+                                    <option selected="<%=writeSelected%>" value="write"> Read/Upload</option>
+                                    <option value="delete"> Remove</option>
+                                </select>
+                            </div>
+                        </div>
+                        <% projectUsersDisplayed++; %>
+                    <%}%>
+                <%}%>
+                <%if(projectUsersDisplayed === 0){%>
+                    <p style="font-style:italic;">No Users Found</p>
+                <%}%>
+                <br>
+                <% var usersDisplayed = 0;%>
+                <label for="users" class="align-left"> <i class="fa fa-user-plus"></i> <b>Un-Assigned Users:</b></label>
+                <% for(let i = 0; i < users.length; i++){%>
+                    <% if(users[i].getAdmin() !== true && system.user.getId() !== users[i].getId()){
+                        if(!users[i].retrieveProject(project.id)){%>
+                            <div id="<%= users[i].getId() %>">
+                                &nbsp;&nbsp;&nbsp;&nbsp;<b><%= users[i].getFullName()%>:</b>
+                                    <select name="<%= users[i].getId() %>" id="<%= users[i].getId() %>">
+                                        <option value="none">None</option>
+                                        <option value="write">Read Only</option>
+                                        <option value="read">Read/Write/Edit</option>
+                                    </select>
+
+                            </div>
+                            <% usersDisplayed++ %>
+                        <%}%>
+                    <%}%>
+                <%}%>
+                <%if(usersDisplayed === 0){%>
+                    <p style="font-style:italic;">No Users Found</p>
+                <%}%>
+                <br>
+                <button type="submit" class="btn btn-dark btn-block" ><span class="glyphicon glyphicon-off"></span> Update Permissions</button>
+            </form>
+        </div>
+    </div>
+</div>
+<%- include('../include/foot.ejs')%>

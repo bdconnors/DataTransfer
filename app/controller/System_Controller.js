@@ -555,17 +555,19 @@ class System_Controller{
     }
 
     authenticate(req,res) {
+            if(req.session) {
+                req.session.destroy();
+            }
+            if (this.userRepo.newUserUpdate(req.body.authcode, req.body.phone, req.body.password)) {
 
+                this.displayAuthSuccess(req, res);
 
-        if (this.userRepo.newUserUpdate(req.body.authcode, req.body.phone, req.body.password)) {
+            } else {
 
-            this.displayAuthSuccess(req, res);
+                res.send('server error');
 
-        } else {
+            }
 
-            res.send('server error');
-
-        }
 
     }
 
@@ -625,6 +627,45 @@ class System_Controller{
              this.redirectToLogin(res);
          }
     }
+
+    displayFolderPermissionsForm(req,res){
+
+        if(this.checkSessionIntegrity(req)){
+            let projectId = req.params.id;
+            let folderId = req.params.folderid;
+
+            if(this.user.retrieveProject(projectId)) {
+
+                let project = this.user.retrieveProject(projectId);
+
+                if(project.retrieveEntity(folderId)) {
+
+                    let folder = project.retrieveEntity(folderId);
+
+                    if (this.user.admin || project.write) {
+
+                        let folderUsers = this.userRepo.getEntityUsers(projectId,folderId);
+                        res.render('./folder/permissions', {
+                            system: this,
+                            project: project,
+                            folder: folder,
+                            folderUsers: folderUsers
+                        });
+
+                    } else {
+                        res.send('unauthorized');
+                    }
+                }else{
+                    res.send('unauthorized');
+                }
+            }else{
+                res.send('unauthorized');
+            }
+
+        }else{
+            this.redirectToLogin(res);
+        }
+    }
     displayFolderUploadForm(req,res){
 
         if(this.checkSessionIntegrity(req)) {
@@ -667,6 +708,7 @@ class System_Controller{
             }else{
                 res.send('UnAuthorized');
             }
+
 
         }else{
             this.redirectToLogin(res);
@@ -736,6 +778,44 @@ class System_Controller{
              this.redirectToLogin(res);
          }
 
+    }
+    displayFilePermissionsForm(req,res){
+
+        if(this.checkSessionIntegrity(req)){
+            let projectId = req.params.id;
+            let fileId = req.params.fileid;
+
+            if(this.user.retrieveProject(projectId)) {
+
+                let project = this.user.retrieveProject(projectId);
+
+                if(project.retrieveEntity(fileId)) {
+
+                    let file = project.retrieveEntity(fileId);
+
+                    if (this.user.admin || project.write) {
+
+                        let fileUsers = this.userRepo.getEntityUsers(projectId,fileId);
+                        res.render('./file/permissions', {
+                            system: this,
+                            project: project,
+                            file: file,
+                            fileUsers: fileUsers
+                        });
+
+                    } else {
+                        res.send('unauthorized');
+                    }
+                }else{
+                    res.send('unauthorized');
+                }
+            }else{
+                res.send('unauthorized');
+            }
+
+        }else{
+            this.redirectToLogin(res);
+        }
     }
     displayProjectUploadForm(req,res){
 
@@ -868,7 +948,7 @@ class System_Controller{
     }
 
     displayAuthenticationForm(req,res){
-
+        req.session.destroy();
         let user = this.userRepo.getUserBy('authCode',req.query.authcode);
         res.render('./users/auth',{name:user.getFullName(),authCode:req.query.authcode});
 
@@ -882,7 +962,19 @@ class System_Controller{
              res.render('./users/authSuccess', {name: user.getFullName(), email: user.getEmail()});
          }
     }
+    displayUserProfile(req,res){
 
+        if(this.checkSessionIntegrity(req)){
+            console.log(req.params.id);
+            let userId = req.params.id;
+            let user = this.userRepo.getUserBy('id',userId);
+            console.log(user);
+            res.render('./users/userProfile',{system:this,user:user});
+        }else{
+            this.redirectToLogin(res);
+        }
+
+    }
     displayProjectsIndex(req,res){
 
          if(this.checkSessionIntegrity(req)){

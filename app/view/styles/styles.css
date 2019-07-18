@@ -36,11 +36,6 @@ body{
     margin:0;
 }
 
-tr td:last-child{
-    width:1%;
-    white-space:nowrap;
-}
-
 .row-centered{
     text-align:center;
 }
@@ -60,8 +55,5 @@ tr td:last-child{
     }
     .button-width{
         width:100%;
-    }
-    #welcomeHeader{
-        display:none;
     }
 }

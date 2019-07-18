@@ -93,6 +93,7 @@ class User_Action_Controller{
     }
 
 
+
     /** User File Actions **/
 
     viewFile(req,res){
@@ -151,6 +152,12 @@ class User_Action_Controller{
         this.system.displayFolderUploadForm(req,res);
     }
 
+    folderPermissionsForm(req,res){
+
+        this.system.displayFolderPermissionsForm(req,res);
+
+    }
+
     projectUploadForm(req,res){
 
         this.system.displayProjectUploadForm(req,res);
@@ -160,6 +167,12 @@ class User_Action_Controller{
     fileRenameForm(req,res){
 
         this.system.displayFileRenameForm(req,res);
+    }
+
+    filePermissionsForm(req,res){
+
+        this.system.displayFilePermissionsForm(req,res);
+
     }
 
     folderRenameForm(req,res){
@@ -174,7 +187,6 @@ class User_Action_Controller{
 
     }
     projectRenameForm(req,res){
-
         this.system.displayProjectRenameForm(req,res);
 
     }
@@ -183,6 +195,10 @@ class User_Action_Controller{
 
         this.system.displayInviteUserForm(req,res);
 
+    }
+
+    userProfile(req,res){
+        this.system.displayUserProfile(req,res);
     }
 
 }

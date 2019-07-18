@@ -147,6 +147,41 @@ app.get('/dashboard',(req,res)=>{
 
 });
 
+app.get('/users/invite',(req,res)=>{
+
+    user.inviteUserForm(req,res)
+
+});
+
+app.post('/users/invite',(req,res)=>{
+
+    user.inviteUser(req,res);
+
+});
+
+app.get('/users/authenticate',(req,res)=>{
+
+    system.displayAuthenticationForm(req,res);
+});
+
+app.post('/users/authenticate',(req,res)=>{
+
+    system.authenticate(req,res);
+
+});
+
+app.get('/users/user/:id',(req,res)=>{
+
+    user.userProfile(req,res);
+
+});
+
+app.get('/users/delete',(req,res)=>{
+
+    res.send('delete user');
+
+});
+
 app.get('/projects',(req,res)=>{
 
     user.projectsIndex(req,res);
@@ -231,7 +266,12 @@ app.post('/projects/project/:id/files/:fileid/delete',(req,res)=>{
 });
 app.get('/projects/project/:id/files/:fileid/permissions',(req,res)=>{
 
-    res.send('File Permissions');
+    user.filePermissionsForm(req,res);
+
+});
+app.get('/projects/project/:id/files/:fileid/permissions',(req,res)=>{
+
+    res.send(req.body);
 
 });
 app.get('/projects/project/:id/files/:fileid/rename',(req,res)=>{
@@ -286,26 +326,15 @@ app.post('/projects/project/:id/folders/folder/:folderid/rename',(req,res)=>{
 
 });
 
-app.get('/users/invite',(req,res)=>{
+app.get('/projects/project/:id/folders/folder/:folderid/permissions',(req,res)=>{
 
-    user.inviteUserForm(req,res)
+    user.folderPermissionsForm(req,res);
+
+});
+app.post('/projects/project/:id/folders/folder/:folderid/permissions',(req,res)=>{
+
+    res.send(req.body);
 
 });
 
-app.post('/users/invite',(req,res)=>{
-
-    user.inviteUser(req,res);
-
-});
-
-app.get('/users/authenticate',(req,res)=>{
-
-    system.displayAuthenticationForm(req,res);
-});
-
-app.post('/users/authenticate',(req,res)=>{
-
-    system.authenticate(req,res);
-
-});
 

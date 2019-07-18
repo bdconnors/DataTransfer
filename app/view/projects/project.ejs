@@ -17,17 +17,16 @@
 <% var cellCount2 = 0%>
 <% var cellCount3 = 0%>
 <div class="container">
-    <div class="table-responsive">
-        <table class="table-borderless">
+
             <%for(var i = 0; i < rows; i++){%>
                 <%var cellsInRow = 3%>
                 <%if(i === fullRows){
                     cellsInRow = partialRowCount;
                 }%>
 
-                        <tr>
+                        <div style="text-align:center;" class="row">
                             <%for(var k = 0; k < cellsInRow; k++){%>
-                                <td style="text-align:center;">
+                                <div class="col">
                                     <div class="dropdown">
                                         <button style = "background-color:transparent; font-size:12px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
                                         <i class="fa fa-cog"></i> Options
@@ -73,13 +72,13 @@
                                             <%}%>
                                         </div>
                                     </div>
-                                </td>
+                                </div>
                                 <%cellCount1++%>
                             <%}%>
-                        </tr>
-                        <tr>
+                        </div>
+                        <div style="text-align:center;" class="row">
                             <%for(let l = 0; l < cellsInRow; l++){%>
-                                <td style="text-align:center;">
+                                <div class="col">
                                     <%if(entitys[cellCount2].isFolder){%>
                                         <a style = "text-decoration: none; color:#343a40;" href="./<%= project.id%>/folders/folder/<%= entitys[cellCount2].getId()%>">
                                             <i class="fa fa-folder fa-3x"></i>
@@ -109,21 +108,20 @@
                                             <%}%>
                                         </a>
                                     <%}%>
-                                </td>
+                                </div>
                                 <%cellCount2++%>
                             <%}%>
-                        </tr>
+                        </div>
+                        <div style="text-align:center;" class="row">
                             <%for(let m = 0; m < cellsInRow; m++){%>
-                                <td style="text-align:center">
+                                <div class="col">
                                     <a style = "text-decoration: none; color:#343a40;" href="./<%= project.id%>/files/inline/<%= entitys[cellCount3].getId()%>">
                                         <%= entitys[cellCount3].getName()%>
                                     </a>
-                                </td>
+                                </div>
                                 <%cellCount3++%>
                             <%}%>
-                        </tr>
+                        </div>
             <%}%>
-        </table>
-    </div>
 </div>
 <%- include('../include/foot.ejs')%>

@@ -36,13 +36,14 @@
 
 					<%for(var i=0; i < users.length; i++) {%>
 						<%if(!users[i].authCode){%>
-							<a class ="dropdown-item" ><i class="fa fa-user-circle-o"></i> <%= users[i].getFullName() %></a>
+							<a href ="/users/user/<%= users[i].id%>" class ="dropdown-item" ><i class="fa fa-user-circle-o"></i> <%= users[i].getFullName() %></a>
 						<%}%>
 					<%}%>
 
 					<%if(user.getAdmin() === true){%>
 						<div class="dropdown-divider"></div>
-						<a class ="dropdown-item" href="/users/invite"><i class="fa fa-user-plus"></i> Invite User</a>
+						<a class ="dropdown-item" href="/users/invite"><i class="fa fa-envelope"></i> Invite User</a>
+						<a class ="dropdown-item" href="/users/delete"><i class="fa fa-minus"></i> Delete User</a>
 					<%}%>
 				</div>
 			</li>

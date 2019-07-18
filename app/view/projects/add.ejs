@@ -13,8 +13,9 @@
             <label for="name" class="align-left"><i class="fa fa-archive"></i> <b>Project Name:</b></label>
                 <input type="text" class="form-control" name="name" id="name" placeholder="Project Name">
                 <br>
-                <%if(users.length > 0){%>
                 <label for="retype" class="align-left"><i class="fa fa-users"></i><b> User Permissions:</b></label>
+                <%if(users.length > 0){%>
+                <br><p style="font-style:italic;">No Users Found</p>
                 <%}%>
                 <% for(var i = 0; i < users.length; i++) {%>
                     <% if(users[i].getAdmin() !== true && users[i].getId() !== user.getId() && !users[i].authCode){%>
