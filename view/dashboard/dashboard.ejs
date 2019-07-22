@@ -1,0 +1,77 @@
+<% var projects = system.projects %>
+<% var user = system.user %>
+<%- include('../include/head.ejs',{title:'FileSchema System Home',scripts:false})%>
+<body>
+<%- include('../include/menu.ejs',{system:system}) %>
+
+<div id="welcomeHeader" style="padding:35px 50px; width:100%;">
+    <h1> <i class="fa fa-user-circle-o " ></i> Welcome <%= user.firstname %></h1>
+</div>
+<br>
+<% var totalCells = projects.length%>
+<% var fullRows = Math.floor(projects.length/3)%>
+<% var partialRowCount = projects.length % 3 %>
+<% var rows = fullRows+1%>
+<% var cellCount1 = 0%>
+<% var cellCount2 = 0%>
+<% var cellCount3 = 0%>
+<div class="container">
+
+    <%for(var i = 0; i < rows; i++){%>
+        <%var cellsInRow = 3%>
+        <%if(i === fullRows){
+            cellsInRow = partialRowCount;
+        }%>
+
+        <div style="text-align:center;" class="row">
+            <%for(var k = 0; k < cellsInRow; k++){%>
+                <div class="col">
+                    <div class="dropdown">
+                        <button style = "background-color:transparent; font-size:16px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
+                            <i class="fa fa-cog"></i> Options
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="projSettings">
+                            <form action="/projects/project/<%= projects[cellCount1].id%>" method="get">
+                                <button class="dropdown-item" type="submit"><i class="fa fa-eye"></i> View</button>
+                            </form>
+                            <%if(user.admin){%>
+                                <form action="/projects/project/<%= projects[cellCount1].id%>/rename%>" method="get">
+                                    <button type="submit" class="dropdown-item"><i class="fa fa-pencil"></i> Rename</button>
+                                </form>
+                                <form action="/projects/project/<%= projects[cellCount1].id%>/delete%>" method="post">
+                                    <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i> Delete</button>
+                                </form>
+                                <div class="dropdown-divider"></div>
+                                <form action="/projects/project/<%= projects[cellCount1].id%>/permissions%>" method="get">
+                                    <button type="submit" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
+                                </form>
+                            <%}%>
+                        </div>
+                    </div>
+                </div>
+                <%cellCount1++%>
+            <%}%>
+        </div>
+        <div style="text-align:center;" class="row">
+            <%for(let l = 0; l < cellsInRow; l++){%>
+                <div class="col">
+                    <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount2].id%>">
+                        <i class="fa fa-archive fa-3x"></i>
+                    </a>
+                </div>
+                <%cellCount2++%>
+            <%}%>
+        </div>
+        <div style="text-align:center;" class="row">
+            <%for(let m = 0; m < cellsInRow; m++){%>
+                <div class="col">
+                    <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount3].id%>">
+                        <%= projects[cellCount3].name%>
+                    </a>
+                </div>
+                <%cellCount3++%>
+            <%}%>
+        </div>
+    <%}%>
+</div>
+<%- include('../include/foot.ejs')%>
