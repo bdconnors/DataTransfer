@@ -5,20 +5,37 @@ class UserController{
     constructor(model){
         this.model = model;
     }
-    async getAllUsers() {
-        return await this.model.getAll();
-    }
-    async verifyCredentials(email,password){
-        console.log(password);
-        console.log(email);
-        return await this.model.get('email',email).then(user=>{
-            if(bcrypt.compareSync(password,user[0].password)){
-                return user;
-            }else{
-                return false;
-            }
-        }).catch(err=>{throw err});
 
+    async getUser(field,value){
+        return await this.model.getUser(field,value).catch((err)=>{throw err});
+
+    }
+    async inviteNewUser(admin,firstname,lastname,email){
+        return await this.model.createUser(admin,firstname,lastname,email);
+
+    }
+    async newUserUpdate(authCode,password,phone){
+        let user = await this.model.getUser('authCode',authCode);
+        let hashPass = await bcrypt.hash(password,10);
+        return this.model.updateUser('id',user.id,{$unset:{authCode:''}})
+            .then(this.model.updateUser('id',user.id,{$set:{password:hashPass,phone:phone}}))
+            .then(()=>{return this.model.getUser('id',user.id)})
+            .catch((err)=>{throw err});
+    }
+    async getAllUsers() {
+        return await this.model.getAllUsers();
+    }
+
+    async verifyCredentials(email,password){
+        return await this.model.getUser('email',email)
+            .then(user => {
+                if(bcrypt.compareSync(password,user.password)){
+                    return user;
+                }else{
+                    return false;
+                }
+            })
+            .catch(()=>{return false});
     }
 }
 module.exports={UserController:UserController};

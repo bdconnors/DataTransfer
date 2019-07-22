@@ -1,8 +1,7 @@
-<% var projects = system.projects %>
-<% var user = system.user %>
-<%- include('../include/head.ejs',{title:'FileSchema System Home',scripts:false})%>
+<% var projects = user.projectPermissions %>
+<%- include('./include/head.ejs',{title:'FileSchema System Home',scripts:false})%>
 <body>
-<%- include('../include/menu.ejs',{system:system}) %>
+<%- include('./include/menu.ejs',{user:user,users:users}) %>
 
 <div id="welcomeHeader" style="padding:35px 50px; width:100%;">
     <h1> <i class="fa fa-user-circle-o " ></i> Welcome <%= user.firstname %></h1>
@@ -74,4 +73,4 @@
         </div>
     <%}%>
 </div>
-<%- include('../include/foot.ejs')%>
+<%- include('./include/foot.ejs')%>

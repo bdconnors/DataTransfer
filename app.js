@@ -51,26 +51,51 @@ const Projects = new ProjectsRepo(dbProjectAccess);
 const UsersRepo = require('./model/UsersRepo').UsersRepo;
 const Users = new UsersRepo(dbUserAccess);
 
+/** Controllers **/
+const UserController = require('./controller/UserController').UserController;
+const userControl = new UserController(Users);
+
+const ProjectController = require('./controller/ProjectController').ProjectController;
+const projectControl = new ProjectController(Projects);
+
+const SystemViewController = require('./controller/SystemViewController').SystemViewController;
+const sysView = new SystemViewController();
+
+const SystemActionController = require('./controller/SystemActionController').SystemActionController;
+const sysAct = new SystemActionController(userControl,projectControl);
+sysAct.subscribe(sysView);
+
+const SystemAuthController = require('./controller/SystemAuthController').SystemAuthController;
+const sysAuth = new SystemAuthController(userControl);
+sysAuth.subscribe(sysView);
+sysAuth.subscribe(sysAct);
+
 
 /** Routes **/
 
 app.get('/',(req,res)=>{
-  Projects.createProject('New Project').then((result)=>{res.send(result)}).catch((err)=>{res.send(err)});
+    res.redirect('/login');
 });
 
-/**app.get('/login',(req,res)=>{
+app.get('/login',(req,res)=>{
 
-    user.requestLogin(req,res);
+    sysAuth.getLogin(req,res);
 
 });
 
 app.post('/login',(req,res)=> {
 
-   user.logIn(req,res)
+   sysAuth.postLogin(req,res).catch((err=>{throw err}));
 
 });
 
-app.get('/logout',(req,res)=>{
+app.get('/dashboard',(req,res)=>{
+
+    sysAuth.getDashboard(req,res).catch((err)=>{throw err});
+
+});
+
+/**app.get('/logout',(req,res)=>{
 
     user.logOut(req,res);
 
@@ -82,11 +107,6 @@ app.get('/unauthorized',(req,res)=>{
 
 });
 
-app.get('/dashboard',(req,res)=>{
-
-    user.requestDashboard(req,res);
-
-});
 
 app.get('/users/invite',(req,res)=>{
     console.log(req);

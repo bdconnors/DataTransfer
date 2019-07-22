@@ -3,32 +3,36 @@ class UsersRepo {
 
     constructor(Users){
         this.Users = Users;
-        this.observers = [];
     }
 
     async createUser(admin,firstname,lastname,email){
-        let newUser = new this.Users({id:uuid(),admin:admin,firstname:firstname,lastnam:lastname,email:email});
+        let newUser = new this.Users({id:uuid(),admin:admin,firstname:firstname,lastnam:lastname,email:email,authCode: uuid()});
         await newUser.save();
         return newUser;
     }
-    async getUser(id){
-        return await this.Users.find({id:id});
+    async getUser(field,value){
+        let results = await this.Users.find(this.makeQuery(field,value));
+        if(results[0]){
+            return results[0];
+        }else{
+            return false;
+        }
     }
-    async updateUser(id,updateQuery){
-        return await this.Users.updateOne({id:id},updateQuery)
+    async updateUser(field,value,updateQuery){
+        return await this.Users.updateOne(this.makeQuery(field,value),updateQuery)
     }
-    async deleteUser(id){
+    async deleteUser(field,value){
 
-        return await this.Users.deleteOne({id:id});
+        return await this.Users.deleteOne(this.makeQuery(field,value));
     }
-    subscribe(obs){
-        this.observers.push(obs);
+    async getAllUsers(){
+        return await this.Users.find({});
     }
-
-    notifyAll(action,values){
-
-        this.observers.map(observer => observer.notify(action,values));
-
+    makeQuery(field,value){
+        let query = {};
+        query[field] = value;
+        console.log(query);
+        return query;
     }
 
 }

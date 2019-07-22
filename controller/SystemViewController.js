@@ -2,14 +2,19 @@ class SystemViewController{
 
     constructor(){}
 
-    load(authorization){
-        let path = authorization.path;
-        let variables = authorization.variables;
-        authorization.res.render('.'+path,variables);
+    load(authResponse){
+        authResponse.response.render('.'+authResponse.display,authResponse.variables);
+    }
+    redirect(authResponse){
+        authResponse.response.redirect(authResponse.display);
     }
 
-    notify(authorization){
-        this.load(authorization);
+    notify(authResponse){
+        if(authResponse.command === 'DISPLAY') {
+            this.load(authResponse);
+        }else if(authResponse.command === 'REDIRECT'){
+            this.redirect(authResponse);
+        }
     }
 
 }

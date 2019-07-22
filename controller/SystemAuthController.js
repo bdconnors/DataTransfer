@@ -1,4 +1,4 @@
-const Authorization= require('../model/Authorization').Authorization;
+const AuthResponse= require('../model/AuthResponse').AuthResponse;
 
 class SystemAuthController{
 
@@ -9,47 +9,84 @@ class SystemAuthController{
 
 
     getLogin(req,res){
+        let authResponse = this.make(req,res);
+        this.notifyAll(authResponse);
+    }
+    async postLogin(req,res){
+        let authResponse = this.make(req,res);
+        let verified = await this.userControl.verifyCredentials(req.body.email,req.body.password).catch((err)=>{throw err});
+        if(verified){
+            req.session.user = verified;
+            authResponse.command = 'REDIRECT';
+            authResponse.display = '/dashboard';
+            authResponse.variables.user = req.session.user;
+        }else{
+            authResponse.display = '/loginFail';
+            authResponse.command='DISPLAY';
+            authResponse.variables.email = req.body.email;
+            authResponse.variables.password = req.body.password;
+        }
+        this.notifyAll(authResponse);
+    }
+    async getDashboard(req,res){
+        let authResponse = this.make(req,res);
+        authResponse.command = "DISPLAY";
+         authResponse = await this.sessionAuth(authResponse,req).catch((err)=>{throw err});
+        this.notifyAll(authResponse);
+    }
+    async adminAuth(req,res){
 
-        let authorization = this.make(req,res);
-        authorization.authorized = true;
-        this.notifyAll(authorization);
 
     }
-    postLogin(req,res){
-        this.userControl.verifyCredentials(req.body.email,req.body.password).then(res=>{console.log(res)}).catch(err=>{throw err});
-    }
-
-    adminAuth(req,res){
-
-    }
-    sessionAuth(req,res){
-
+    async sessionAuth(authResponse,req){
+        if(req.session && req.session.user){
+            let dbUser = await this.userControl.getUser('id',req.session.user.id).catch((err)=>{throw err});
+            if(dbUser) {
+                if (req.session.user.id === dbUser.id) {
+                    req.session.user = dbUser;
+                    authResponse.variables.user = req.session.user;
+                    authResponse.variables.users = await this.userControl.getAllUsers();
+                } else {
+                    req.session.destroy();
+                    authResponse = this.badSession(authResponse);
+                }
+            }else{
+                authResponse = this.badSession(authResponse);
+            }
+        }else{
+            authResponse = this.badSession(authResponse);
+        }
+        return authResponse;
     }
     make(req,res){
 
-        let path = req.route.path;
-        let method = this.getMethodType(req);
+        let display = req.route.path;
+        let command = this.getCommandType(req);
 
-        return new Authorization(path, method, res);
+        return new AuthResponse(display, command, res);
     }
-    getMethodType(req){
-        let method;
+    getCommandType(req){
+        let command;
         if(req.route.methods.get){
-            method = 'GET';
+            command = 'DISPLAY';
         }else if(req.route.methods.post){
-            method = 'POST'
+            command = 'ACTION';
         }
-        return method;
+        return command;
     }
-
+    badSession(authResponse){
+        authResponse.command = 'REDIRECT';
+        authResponse.display = '/login';
+        return authResponse;
+    }
 
     subscribe(obs){
         this.observers.push(obs);
     }
 
-    notifyAll(authorization){
+    notifyAll(authResponse){
 
-        this.observers.map(observer => observer.notify(authorization));
+        this.observers.map(observer => observer.notify(authResponse));
 
     }
 

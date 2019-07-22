@@ -1,18 +1,25 @@
 class SystemActionController{
 
-    constructor(){
+    constructor(userControl,projectControl){
+        this.userControl = userControl;
+        this.projectControl = projectControl;
         this.observers = [];
     }
-    notify(userRequest){
+
+    notify(authResponse){
+
+        if(authResponse.command === 'ACTION'){
+
+        }
 
     }
     subscribe(obs){
         this.observers.push(obs);
     }
 
-    notifyAll(authorization){
+    notifyAll(authResponse){
 
-        this.observers.map(observer => observer.notify(authorization));
+        this.observers.map(observer => observer.notify(authResponse));
 
     }
 
