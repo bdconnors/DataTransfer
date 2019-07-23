@@ -6,24 +6,22 @@ module.exports.db = this.db;
 
 let Schema = this.db.Schema;
 
-let metaDataSchema = new Schema({
+let folderMetaDataSchema = new Schema({
+    author: String,
+    created: String,
+    modified: String,
+    accessed: String,
+    size: String
+});
+
+let fileMetaDataSchema = new Schema({
     author: String,
     created: String,
     modified: String,
     accessed: String,
     size: String,
-    ext: String,
-    mime: String
-});
-
-let entitySchema = new Schema({
-    id: String,
-    isFolder:Boolean,
-    name: String,
-    dir:String,
-    parent: String,
-    children:[String],
-    metadata:metaDataSchema
+    ext:String,
+    mime:String
 });
 
 let activitySchema = new Schema({
@@ -34,30 +32,48 @@ let activitySchema = new Schema({
     targetType: String
 });
 
-let projectPermissionSchema = new Schema({
+let fileSchema = new Schema({
+    id:String,
+    folderId:String,
+    folderName:String,
+    name:String,
+    metadata:fileMetaDataSchema
+});
+
+let folderSchema = new Schema({
     id: String,
     projectId:String,
-    view: Boolean,
-    edit: Boolean,
-    upload:Boolean
+    projectName:String,
+    name: String,
+    parent: String,
+    files:[fileSchema],
+    metadata:folderMetaDataSchema
 });
 
 
-let entityPermissionSchema = new Schema({
+let folderPermissionSchema = new Schema({
     id: String,
     projectId:String,
-    entityId:String,
-    view: Boolean,
-    edit: Boolean,
-    download:Boolean,
-    upload:Boolean,
+    projectName:String,
+    folderId:String,
+    folderName:String,
+    read: Boolean,
+    download: Boolean,
+    uploads:folderSchema
+});
+
+let projectPermissionSchema = new Schema({
+    id: String,
+    projectId:String,
+    folderPermissions:[folderPermissionSchema]
 });
 
 let projectSchema = new Schema( {
     id: String,
     name: String,
-    entities: [entitySchema]
+    folders: [folderSchema]
 });
+
 let Project = this.db.model('Project',projectSchema);
 module.exports.Project = Project;
 
@@ -69,11 +85,15 @@ let userSchema = new Schema({
     email: String,
     activity: [activitySchema],
     projectPermissions: [projectPermissionSchema],
-    entityPermissions: [entityPermissionSchema],
     password: String,
     phone: String,
     authCode:String
 
 });
+
+userSchema.methods.getFullName = function(){
+    return this.firstname+" "+this.lastname;
+};
+
 let user = this.db.model('User',userSchema);
 module.exports.User = user;

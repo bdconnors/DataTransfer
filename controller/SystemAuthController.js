@@ -28,16 +28,23 @@ class SystemAuthController{
         }
         this.notifyAll(authResponse);
     }
-    async getDashboard(req,res){
+     getLogout(req,res){
         let authResponse = this.make(req,res);
-        authResponse.command = "DISPLAY";
-         authResponse = await this.sessionAuth(authResponse,req).catch((err)=>{throw err});
+        req.session.destroy();
+        authResponse.command = 'REDIRECT';
+        authResponse.display='/login';
         this.notifyAll(authResponse);
     }
-    async adminAuth(req,res){
-
-
+    getUnauthorized(req,res){
+        let authResponse = this.make(req,res);
+        this.notifyAll(authResponse);
     }
+    async getDashboard(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.sessionAuth(authResponse,req).catch((err)=>{throw err});
+        this.notifyAll(authResponse);
+    }
+
     async sessionAuth(authResponse,req){
         if(req.session && req.session.user){
             let dbUser = await this.userControl.getUser('id',req.session.user.id).catch((err)=>{throw err});
@@ -45,7 +52,10 @@ class SystemAuthController{
                 if (req.session.user.id === dbUser.id) {
                     req.session.user = dbUser;
                     authResponse.variables.user = req.session.user;
-                    authResponse.variables.users = await this.userControl.getAllUsers();
+                    if(req.session.user.admin){
+                        authResponse.admin = true;
+                        authResponse.variables.users = await this.userControl.getAllUsers();
+                    }
                 } else {
                     req.session.destroy();
                     authResponse = this.badSession(authResponse);

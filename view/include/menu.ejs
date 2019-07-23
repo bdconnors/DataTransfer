@@ -11,37 +11,14 @@
 			</li>
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle" href="#"  id="projectsMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<i class="fa fa-archive"></i> ProjectsRepo
+					<i class="fa fa-archive"></i> My Projects
 				</a>
 				<div class="dropdown-menu" aria-labelledby="projectsMenu">
 					<%if(projects.length === 0){%>
-						<a class="dropdown-item" style="font-style:italic;">No ProjectsRepo</a>
+						<a class="dropdown-item" style="font-style:italic;">No Projects</a>
 					<%}%>
 					<%for(var i = 0; i < projects.length; i++){%>
 						<a class="dropdown-item" href="/projects/project/<%= projects[i].getId()%>"><i class="fa fa-archive"></i> <%= projects[i].getName() %></a>
-					<%}%>
-					<%if(user.admin){%>
-						<div class="dropdown-divider"></div>
-						<a class ="dropdown-item" href="/projects/newproject"><i class="fa fa-plus-square"></i> New Project</a>
-					<%}%>
-				</div>
-			</li>
-			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="usersMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<i class="fa fa-user"></i> UsersRepo
-				</a>
-				<div class="dropdown-menu" aria-labelledby="usersMenu">
-
-					<%for(var i=0; i < users.length; i++) {%>
-						<%if(!users[i].authCode){%>
-							<a href ="/users/user/<%= users[i].id%>" class ="dropdown-item" ><i class="fa fa-user-circle-o"></i> <%= users[i].firstname %> <%= users[i].lastname %> </a>
-						<%}%>
-					<%}%>
-
-					<%if(user.admin){%>
-						<div class="dropdown-divider"></div>
-						<a class ="dropdown-item" href="/users/invite"><i class="fa fa-envelope"></i> Invite User</a>
-						<a class ="dropdown-item" href="/users/delete"><i class="fa fa-minus"></i> Delete User</a>
 					<%}%>
 				</div>
 			</li>

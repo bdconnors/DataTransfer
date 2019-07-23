@@ -1,12 +1,14 @@
 <% var projects = user.projectPermissions %>
-<%- include('./include/head.ejs',{title:'FileSchema System Home',scripts:false})%>
+<%- include('./include/head.ejs',{title:'File System Home',scripts:false})%>
 <body>
-<%- include('./include/menu.ejs',{user:user,users:users}) %>
+<%- include('./include/menu.ejs') %>
 
 <div id="welcomeHeader" style="padding:35px 50px; width:100%;">
-    <h1> <i class="fa fa-user-circle-o " ></i> Welcome <%= user.firstname %></h1>
+    <h1> <i class="fa fa-user-circle-o " ></i> Welcome <%= user.firstname %> <%if(user.admin){%>(Admin)<%}%></h1>
 </div>
-<br>
+<%if(user.admin){%>
+    <%- include('./include/adminNav.ejs')%>
+<%}%>
 <% var totalCells = projects.length%>
 <% var fullRows = Math.floor(projects.length/3)%>
 <% var partialRowCount = projects.length % 3 %>

@@ -95,15 +95,15 @@ app.get('/dashboard',(req,res)=>{
 
 });
 
-/**app.get('/logout',(req,res)=>{
+app.get('/logout',(req,res)=>{
 
-    user.logOut(req,res);
+    sysAuth.getLogout(req,res).catch((err)=>{throw err});
 
 });
 
 app.get('/unauthorized',(req,res)=>{
 
-    sys.serveUnAuthorized(req,res);
+    sysAuth.getUnauthorized(req,res);
 
 });
 
@@ -120,7 +120,11 @@ app.post('/users/invite',(req,res)=>{
 
 });
 
-app.get('/users/authenticate',(req,res)=>{
+app.post('/projects/create',(req,res)=>{
+
+
+});
+/**app.get('/users/authenticate',(req,res)=>{
 
     user.requestNewUserAuth(req,res);
 });
@@ -148,18 +152,6 @@ app.get('/projects/project/:id',(req,res)=>{
     user.requestProject(req,res);
 
 });
-
-app.get('/projects/newproject',(req,res)=>{
-
-    user.requestCreateProjectForm(req,res);
-
-});
-
-app.post('/projects/newproject',(req,res)=>{
-
-    user.createProject(req,res);
-});
-
 
 /**app.get('/projects/project/:id/upload',(req,res)=>{
 

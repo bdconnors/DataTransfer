@@ -15,7 +15,7 @@
                 <br>
                 <label for="retype" class="align-left"><i class="fa fa-users"></i><b> User Permissions:</b></label>
                 <%if(users.length > 0){%>
-                <br><p style="font-style:italic;">No UsersRepo Found</p>
+                <br><p style="font-style:italic;">No Users Found</p>
                 <%}%>
                 <% for(var i = 0; i < users.length; i++) {%>
                     <% if(users[i].admin !== true && users[i].id !== user.id && !users[i].authCode){%>
