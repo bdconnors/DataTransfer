@@ -12,18 +12,37 @@ class SystemActionController{
         let email = authResponse.request.body.email;
         this.userControl.inviteNewUser(admin,firstname,lastname,email)
             .then((user)=>{
-                authResponse.variables.email = {action:'INVITE USER',user:user};
+                authResponse.display = '/users/inviteSuccess';
+                authResponse.variables.email = {action:'INVITED',user:user};
                 this.notifyAll(authResponse);
             })
             .catch(err=>{throw err});
     }
-    notify(authResponse){
-        if(authResponse.command === 'ACTION'){
-            if(authResponse.display === '/users/invite'){
-                this.inviteNewUser(authResponse).catch((err)=>{throw err});
-            }
+    async updateNewUser(authResponse){
+        let authCode = authResponse.request.query.authCode;
+        let phone = authResponse.request.body.phone;
+        let password = authResponse.request.body.password;
+        this.userControl.updateNewUser(authCode,phone,password)
+            .then(user=>{
+                authResponse.display = '/users/authSuccess';
+                authResponse.variables.email = {action:'AUTHENTICATED',user:user};
+                this.notifyAll(authResponse);
+            })
+            .catch((err)=>{throw err});
+    }
+    performAction(authResponse){
+
+        if(authResponse.display === '/users/invite'){
+            this.inviteNewUser(authResponse).catch((err)=>{throw err});
+        }else if(authResponse.display === '/users/authenticate'){
+            this.updateNewUser(authResponse).catch((err)=>{throw err});
         }
 
+    }
+    notify(authResponse){
+        if(authResponse.command === 'ACTION'){
+            this.performAction(authResponse);
+        }
     }
     subscribe(obs){
         this.observers.push(obs);

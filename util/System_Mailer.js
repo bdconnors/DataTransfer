@@ -3,7 +3,7 @@ const Email = require('../model/Email').Email;
 
 class System_Mailer{
 
-    constructor(sysEmails){
+    constructor(sysEmails) {
 
         this.sysEmails = sysEmails;
 
@@ -11,7 +11,6 @@ class System_Mailer{
         this.email = process.env.SYSTEM_EMAIL;
         this.password = process.env.SYSTEM_EMAIL_PASSWORD;
         this.company = process.env.SYSTEM_EMAIL_COMPANY;
-        this.url = process.env.SYSTEM_HOST_URL;
 
         this.observers = [];
 
@@ -24,37 +23,48 @@ class System_Mailer{
         });
     }
 
-    invite(authResponse){
+    sendEmail(authResponse){
 
         let user = authResponse.variables.email.user;
-        console.log(user);
-        let to = user.email;
-        console.log(to);
-        let from = this.sysEmails.from(this.company,this.email);
-        let subject = this.sysEmails.inviteSubject(this.company);
-        let body = this.sysEmails.inviteBody(user,this.company,this.url);
-        let email = this.make(to,from,subject,subject,body);
-        console.log('before email');
+        let action = authResponse.variables.email.action;
+        let email = this.getEmail(user,action);
+
         this.transporter.sendMail(email).then(()=>{
-            console.log(authResponse.command);
             authResponse.command = 'DISPLAY';
-            console.log(authResponse.command);
-            authResponse.display = '/users/inviteSuccess';
             this.notifyAll(authResponse);
-        }).catch(err=>{throw err});
-
-
+        }).catch(err=>{
+            throw err
+        });
     }
 
-    make(from,to,subject,text,html){
-        return new Email(from,to,subject,text,html);
+    getEmail(user,action){
+
+        let to = user.email;
+        let url;
+        let subject;
+        let body;
+
+        if(action === 'INVITED'){
+            url = this.sysEmails.inviteURL(user.authCode);
+            subject = this.sysEmails.inviteSubject(this.company);
+            body = this.sysEmails.inviteBody(user,this.company,url);
+        }else if(action === 'AUTHENTICATED'){
+            url = this.sysEmails.authUrl();
+            subject =this.sysEmails.authSubject(this.company);
+            body = this.sysEmails.authBody(user,this.company,url);
+        }
+
+        return this.make(to,subject,body);
+    }
+
+    make(to,subject,body){
+        let from = this.sysEmails.from(this.company,this.email);
+        return new Email(to,from,subject,subject,body);
     }
 
     notify(authResponse){
         if(authResponse.variables.email){
-            if(authResponse.variables.email.action === 'INVITE USER') {
-                this.invite(authResponse);
-            }
+            this.sendEmail(authResponse);
         }
     }
 

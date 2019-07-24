@@ -15,7 +15,7 @@ class UserController{
         return await this.model.createUser(admin,firstname,lastname,email);
 
     }
-    async newUserUpdate(authCode,password,phone){
+    async updateNewUser(authCode,phone,password){
         let user = await this.model.getUser('authCode',authCode);
         let hashPass = await bcrypt.hash(password,10);
         return this.model.updateUser('id',user.id,{$unset:{authCode:''}})

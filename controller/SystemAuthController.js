@@ -57,6 +57,19 @@ class SystemAuthController{
         this.notifyAll(authResponse);
     }
 
+    async getAuthForm(req,res){
+        let authResponse = this.make(req,res);
+        console.log(authResponse.display);
+        console.log(authResponse.command);
+        authResponse = await this.checkAuthCode(authResponse);
+        this.notifyAll(authResponse);
+    };
+    async postAuthForm(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.checkAuthCode(authResponse);
+        this.notifyAll(authResponse);
+    }
+
     async sessionAuth(authResponse,req){
         if(req.session && req.session.user){
             let dbUser = await this.userControl.getUser('id',req.session.user.id).catch((err)=>{throw err});
@@ -87,6 +100,17 @@ class SystemAuthController{
             authResponse.command = '/redirect';
             authResponse.display = '/unauthorized';
         }
+    }
+    async checkAuthCode(authResponse) {
+        let authCode = authResponse.request.query.authCode;
+        let user = await this.userControl.getUser('authCode', authCode);
+        if (!user) {
+           authResponse.display ='/error/authUserNotFound';
+           authResponse.command = 'REDIRECT';
+        }else{
+            authResponse.variables.user = user;
+        }
+        return authResponse;
     }
     make(req,res){
 

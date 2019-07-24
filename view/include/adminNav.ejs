@@ -31,69 +31,98 @@
 <br>
 <script src="/scripts/adminNav.js"></script>
 <div id="createProj" style="display:none;width:80%;" class="container">
-			<form id="fileForm" role="form" method="post">
-				<div class="row">
-					<div style="display:table;margin-left:auto;margin-right:auto;" class="col-md-4">
-						<div id="currentUsers" class="card">
-							<h5 class="card-header"><i class="fa fa-archive"></i> Enter Project Name</h5>
-							<div class="card-body">
-								<label for="name"><i class="fa fa-pencil"></i> <b>Project Name:</b></label>
-						<input type="text" class="form-control" name="name" id="name" placeholder="Project Name">
-							</div>
-						</div>
-					</div>
-					<div  id="currentUsers" style="display:table;margin-left:auto;margin-right:auto;" class="col-md-4">
-					<div class="card">
-					<h5 class="card-header"><i class="fa fa-user-plus"></i> Add Current Users</h5>
+	<form id="fileForm" role="form" method="post">
+		<div class="row">
+			<div style = "text-align:center; display:none; margin-left:auto;margin-right:auto;" id="addUsersDiv" class="col-md-4">
+				<div style=" width:100%;" 	class="card">
+					<h5 style="color:#f8f9fa" class="card-header bg-secondary"><i class="fa fa-user-plus"></i> Add Users</h5>
 					<div class="card-body">
-						<div class="row">
-							<div style="display:table;margin-left:auto;margin-right:auto;" class="col-md-4">
-								<a id="curUserButton" onclick="showUserSelect()" class="btn btn-dark"><span style="color:#28a745"><i class="fa fa-plus"></i></span> <span style="color:#f8f9fa"><b>Add User</b></span></a>
-							</div>
+						<div style="display:table; margin-left:auto;margin-right:auto;" id="addInviteGroup" class="row">
+							<button type="button" onclick="hideAddUsers()" id="userAddBack" class="btn btn-outline-dark button"><i class="fa fa-arrow-left"></i> Back</button>
+							<button type="button" id="curUserButton" onclick="showUserSelect()" class="btn btn-outline-dark button"><i class="fa fa-plus"></i> Add</button>
+							<button type="button" id="" class="btn btn-outline-dark button"><i class="fa fa-envelope"></i> Invite</button>
 						</div>
-						<br>
-						<div class="row">
-							<div style="display:table;margin-left:auto;margin-right:auto;" class="col-md-4">
-						<div style="display:none;" id="userSelectDiv" >
-							<%var displayed = 0;%>
-							<label for="userSelect"><i class="fa fa-user"></i> <b>Select a User:</b></label>
-							<select onchange="selectUser(this)" id="userSelect">
+						<div style="display:none; margin-left:auto;margin-right:auto;" id="selectPermButtGroup" class="row">
+							<button type="button" onclick="backToInviteAdd()" id="userAddBack" class="btn btn-outline-dark button"><i class="fa fa-arrow-left"></i> Back</button>
+							<button type="button" onclick="resetCurrentUser()" id="resetUserAdd" class="btn btn-outline-dark button"><i class="fa fa-power-off"></i> Reset</button>
+							<button type="button" id="curUserButton" class="btn btn-outline-dark button"><i class="fa fa-plus"></i> Confirm</button>
+
+						</div>
+						<hr>
+						<div style = "text-align:center; margin-left:auto;margin-right:auto;" class="row">
+							<span style="font-style:italic"> No Users Added</span>
+						</div>
+						<hr>
+						<div style = "text-align:center; display:none; margin-left:auto;margin-right:auto;" class="row">
+							<label for="email"><i class="fa fa-envelope"></i> <b>E-mail:</b></label>
+							<input type="text" name="email" id="email" class="form-control" oninput="checkEmailInput(this)" placeholder="E-mail">
+						</div>
+						<div style = "text-align:center; display:none; margin-left:auto;margin-right:auto;" id="userSelectDiv" class="row">
+							<label><i class="fa fa-users"></i> <b>Select User: </b></label>
+							<br>
+							<select class="form-control"onchange="showPermSelect()" id="userSelect">
 								<%for(var i = 0; i < users.length; i++){%>
 									<%if(!users[i].admin && users[i].id !== user.id){%>
+										<option value="none" selected>None</option>
 										<option value="<%= users[i].id%>"> <%= users[i].getFullName()%></option>
-										<%displayed++%>
 									<%}%>
 								<%}%>
-								<%if(displayed === 0){%>
-									<option>No Users Found</option>
-								<%}%>
 							</select>
-							</div>
-							</div>
 						</div>
+						<br>
+						<div style = "text-align:left;display:none; margin-left:auto;margin-right:auto;" id="permSelectDiv" class="row">
+							<label><i class="fa fa-file"></i> <b>Data Access Level: </b></label>
+							<br>
+							<label id="viewLabel" for="view" style="color:green"><i class="fa fa-eye"></i><span style="font-size:12px; font-weight:bold; color:black;"> View </span></label>
+							<input onclick="checkPermission(this)" checked style="display:none" type="radio" name="userPerm" id="view" value="view">
+							<br>
+							<label id="downloadLabel" for="download" style="color:red"><i class="fa fa-download"> </i><span style="font-size:12px;  font-weight:bold; color:black;"> View & Download </span></label>
+							<input onclick="checkPermission(this)" style="display:none" type="radio" name="userPerm" id="download" value="download">
+						</div>
+						<br>
+						<div style="display:none;margin-left:auto;margin-right:auto; text-align:left;" class="row" id="folderSelectDiv">
+							<label><i class="fa fa-folder"></i> <b>Folder Permissions: </b></label>
+							<br>
+							<label id="ipLabel" for="ip" style="color:red"><i class="fa fa-folder-open"></i></label> <span style="font-size:12px; font-weight:bold;"> Intellectual Property</span>
+							<input style="display:none;" type="checkbox" id="ip" onclick="checkFolder(this)" name="userFolderPerms" value="ip">
+							<br>
+							<label id="regLabel" for="reg" style="color:red"><i class="fa fa-folder-open"></i></label> <span style="font-size:12px; font-weight:bold;"> Regulatory Affairs</span>
+							<input style="display:none;" type="checkbox" id="reg" onclick="checkFolder(this)" name="userFolderPerms" value="reg">
+							<br>
+							<label id="clinLabel" for="clin" style="color:red"><i class="fa fa-folder-open"></i></label> <span style="font-size:12px; font-weight:bold;"> Clinical Information</span>
+							<input style="display:none;" type="checkbox" id="clin" onclick="checkFolder(this)" name="userFolderPerms" value="clin">
+							<br>
+							<label id="markLabel" for="mark" style="color:red"><i class="fa fa-folder-open"></i></label> <span style="font-size:12px; font-weight:bold;"> Market Analysis</span>
+							<input style="display:none;" type="checkbox" id="mark" onclick="checkFolder(this)" name="userFolderPerms" value="mark">
+							<br>
+							<label id="busLabel" for="bus" style="color:red"><i class="fa fa-folder-open"></i></label> <span style="font-size:12px; font-weight:bold;"> Business Development</span>
+							<input style="display:none;" type="checkbox" id="bus" onclick="checkFolder(this)" name="userFolderPerms" value="bus">
+							<br>
+							<label id="miscLabel" for="misc" style="color:red"><i class="fa fa-folder-open"></i></label> <span style="font-size:12px; font-weight:bold;"> Misc.</span>
+							<input style="display:none;" type="checkbox" id="misc" onclick="checkFolder(this)" name="userFolderPerms" value="misc">
 						</div>
 					</div>
 				</div>
-					<div id="inviteUser" style="display:table;margin-left:auto;margin-right:auto;" class="col-md-4">
-						<div class="card">
-							<h5 class="card-header"><i class="fa fa-envelope"></i> Add New User</h5>
-							<div class="card-body">
-								<label for="email"><i class="fa fa-envelope"></i> <b>E-mail:</b></label>
-								<input type="text" name="email" id="email" class="form-control" oninput="checkEmailInput(this)" placeholder="E-mail">
-							</div>
+			</div>
+			<div style="display:table;margin-left:auto;margin-right:auto; text-align:left;" id="projectNameDiv" class="col-md-4">
+				<div class="card">
+					<h5 style="color:#f8f9fa" class="card-header bg-secondary"><i class="fa fa-archive"></i> Create Project</h5>
+					<div class="card-body">
+						<div style="display:table;margin-left:auto;margin-right:auto;" class="row">
+							<button type="button" id="" onclick="showAddUsers()" class="btn btn-outline-dark button"><i class="fa fa-user-plus"></i> Add User</button>
+							<button type="button" id="curUserButton"  class="btn btn-outline-dark button"><i class="fa fa-power-off"></i> Submit</button>
+						</div>
+						<div style="display:table;margin-left:auto;margin-right:auto;" class="row">
+							<label for="name"><i class="fa fa-pencil"></i> <b>Project Name:</b></label>
+							<input type="text" class="form-control" name="name" id="name" placeholder="Project Name">
+						</div>
+						<br>
 						</div>
 					</div>
 				</div>
-				<br>
-				<br>
-				<div id="currentUsersAdded" style="display:none"></div>
-				<div id="newUsersAdded" style="display:none"></div>
-				<div class="row">
-					<div style="display:table;margin-left:auto;margin-right:auto;" class="col-md-4">
-						<button type="submit" class="btn btn-dark btn-block" ><i class="fa fa-power-off"></i> <b>Create</b></button>
-					</div>
-				</div>
-			</form>
-	</div>
+			</div>
+	</form>
+</div>
+
 <br>
 <hr>

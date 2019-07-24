@@ -1,7 +1,3 @@
-function showUserSelect(){
-    document.getElementById('userSelectDiv').style.display = 'block';
-}
-
 $('#createProjButton').click(function () {
 
     let createProj = $('#createProj');
@@ -12,14 +8,89 @@ $('#createProjButton').click(function () {
         createProj.hide();
     }
 });
+function resetForm(){
 
-function selectUser(e){
-    let user = e.options[e.selectedIndex].value;
-    console.log(user);
+    document.getElementById('userSelect').value="none";
+    document.getElementById('permSelectDiv').style.display='none';
+    document.getElementById('folderSelectDiv').style.display='none';
 
 }
+function showPermSelect(){
+    document.getElementById('permSelectDiv').style.display='table';
+    document.getElementById('folderSelectDiv').style.display='table';
+    showResetAddUser();
+}
+function showInviteAddUser(){
+    document.getElementById('addInviteGroup').style.display='table';
+    document.getElementById('selectPermButtGroup').style.display='none';
+}
+function hideInviteAddUser(){
+    document.getElementById('addInviteGroup').style.display='none';
+    document.getElementById('selectPermButtGroup').style.display='table';
+}
+function showResetAddUser(){
+    document.getElementById('addInviteGroup').style.display='none';
+    document.getElementById('submitResetGroup').style.display='table';
+}
 
+function checkFolder(e){
+    let label = document.getElementById(e.id+'Label');
+    if(!e.checked){
+        label.style.color="red";
+    }else{
+        label.style.color="green";
+        console.log(e.checked);
+    }
 
+}
+function checkPermission(e){
+    let viewLabel = document.getElementById('viewLabel');
+    let downloadLabel = document.getElementById('downloadLabel');
+    if(e.value === 'view'){
+        downloadLabel.style.color='red';
+        viewLabel.style.color='green';
+
+    }else if(e.value ==='download'){
+        downloadLabel.style.color='green';
+        viewLabel.style.color='red';
+    }
+}
+function resetCurrentUser(){
+    document.getElementById('userSelect').value="none";
+    let folderPerms = document.getElementsByName('userFolderPerms');
+    folderPerms.forEach((perm)=>{
+        perm.checked = false;
+        let label = document.getElementById(perm.id+'Label');
+        label.style.color='red';
+    });
+    document.getElementById('view').checked=true;
+    document.getElementById('viewLabel').style.color='green';
+    document.getElementById('download').checked=false;
+    document.getElementById('downloadLabel').style.color='red';
+    document.getElementById('permSelectDiv').style.display='none';
+    document.getElementById('folderSelectDiv').style.display='none';
+}
+function showUserSelect(){
+    document.getElementById('userSelectDiv').style.display = 'table';
+    hideInviteAddUser();
+}
+function hideUserSelect(){
+    document.getElementById('userSelectDiv').style.display = 'none';
+    document.getElementById('selectPermButtGroup').style.display = 'none';
+}
+function showAddUsers(){
+    document.getElementById('projectNameDiv').style.display='none';
+    document.getElementById('addUsersDiv').style.display='table';
+}
+function hideAddUsers(){
+    document.getElementById('projectNameDiv').style.display='table';
+    document.getElementById('addUsersDiv').style.display='none';
+}
+function backToInviteAdd(){
+    resetCurrentUser();
+    hideUserSelect();
+    showInviteAddUser();
+}
 function validate(){
 
     let valid = false;
