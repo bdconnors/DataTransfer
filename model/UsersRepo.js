@@ -6,7 +6,8 @@ class UsersRepo {
     }
 
     async createUser(admin,firstname,lastname,email){
-        let newUser = new this.Users({id:uuid(),admin:admin,firstname:firstname,lastnam:lastname,email:email,authCode: uuid()});
+        console.log(lastname);
+        let newUser = new this.Users({id:uuid(),admin:admin,firstname:firstname,lastname:lastname,email:email,authCode: uuid()});
         await newUser.save();
         return newUser;
     }

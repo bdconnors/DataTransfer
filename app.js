@@ -61,9 +61,15 @@ const projectControl = new ProjectController(Projects);
 const SystemViewController = require('./controller/SystemViewController').SystemViewController;
 const sysView = new SystemViewController();
 
+const System_Mailer = require('./util/System_Mailer').System_Mailer;
+const sysEmails = require('./util/System_Emails');
+const sysMailer = new System_Mailer(sysEmails);
+sysMailer.subscribe(sysView);
+
 const SystemActionController = require('./controller/SystemActionController').SystemActionController;
 const sysAct = new SystemActionController(userControl,projectControl);
-sysAct.subscribe(sysView);
+sysAct.subscribe(sysMailer);
+
 
 const SystemAuthController = require('./controller/SystemAuthController').SystemAuthController;
 const sysAuth = new SystemAuthController(userControl);
@@ -97,7 +103,7 @@ app.get('/dashboard',(req,res)=>{
 
 app.get('/logout',(req,res)=>{
 
-    sysAuth.getLogout(req,res).catch((err)=>{throw err});
+    sysAuth.getLogout(req,res);
 
 });
 
@@ -109,14 +115,13 @@ app.get('/unauthorized',(req,res)=>{
 
 
 app.get('/users/invite',(req,res)=>{
-    console.log(req);
-    user.requestInviteForm(req,res);
+    sysAuth.getInvite(req,res).catch((err)=>{throw err});
 
 });
 
 app.post('/users/invite',(req,res)=>{
 
-    user.inviteUser(req,res);
+    sysAuth.postInvite(req,res);
 
 });
 

@@ -1,13 +1,25 @@
-function showCreateProject(){
-    document.getElementById('createProj').style.display = 'block';
+function showUserSelect(){
+    document.getElementById('userSelectDiv').style.display = 'block';
+}
+
+$('#createProjButton').click(function () {
+
+    let createProj = $('#createProj');
+
+    if(createProj.is(':hidden')){
+        createProj.show();
+    }else if(createProj.is(':visible')){
+        createProj.hide();
+    }
+});
+
+function selectUser(e){
+    let user = e.options[e.selectedIndex].value;
+    console.log(user);
 
 }
-function showUsers(){
-    document.getElementById('usersDiv').style.display = 'block';
-}
-function showInvite(){
-    document.getElementById('inviteUser').style.display = 'block';
-}
+
+
 function validate(){
 
     let valid = false;

@@ -11,6 +11,7 @@ class UserController{
 
     }
     async inviteNewUser(admin,firstname,lastname,email){
+        console.log(lastname);
         return await this.model.createUser(admin,firstname,lastname,email);
 
     }

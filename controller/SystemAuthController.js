@@ -33,7 +33,7 @@ class SystemAuthController{
         req.session.destroy();
         authResponse.command = 'REDIRECT';
         authResponse.display='/login';
-        this.notifyAll(authResponse);
+        this.notifyAll(authResponse,);
     }
     getUnauthorized(req,res){
         let authResponse = this.make(req,res);
@@ -42,6 +42,18 @@ class SystemAuthController{
     async getDashboard(req,res){
         let authResponse = this.make(req,res);
         authResponse = await this.sessionAuth(authResponse,req).catch((err)=>{throw err});
+        this.notifyAll(authResponse);
+    }
+    async getInvite(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.sessionAuth(authResponse,req);
+        authResponse = this.checkAdmin(authResponse);
+        this.notifyAll(authResponse);
+    }
+    async postInvite(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.sessionAuth(authResponse,req);
+        authResponse = this.checkAdmin(authResponse);
         this.notifyAll(authResponse);
     }
 
@@ -68,12 +80,20 @@ class SystemAuthController{
         }
         return authResponse;
     }
+    checkAdmin(authResponse){
+        if(authResponse.admin){
+            return authResponse;
+        }else{
+            authResponse.command = '/redirect';
+            authResponse.display = '/unauthorized';
+        }
+    }
     make(req,res){
 
         let display = req.route.path;
         let command = this.getCommandType(req);
-
-        return new AuthResponse(display, command, res);
+        console.log(req.body);
+        return new AuthResponse(display,command,req,res);
     }
     getCommandType(req){
         let command;

@@ -11,6 +11,7 @@ class SystemViewController{
 
     notify(authResponse){
         if(authResponse.command === 'DISPLAY') {
+            console.log(authResponse.display);
             this.load(authResponse);
         }else if(authResponse.command === 'REDIRECT'){
             this.redirect(authResponse);
