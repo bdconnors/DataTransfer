@@ -30,8 +30,7 @@ class System_Mailer{
         let email = this.getEmail(user,action);
 
         this.transporter.sendMail(email).then(()=>{
-            authResponse.command = 'DISPLAY';
-            this.notifyAll(authResponse);
+            authResponse.response.send(user);
         }).catch(err=>{
             throw err
         });

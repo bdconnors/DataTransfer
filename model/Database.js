@@ -52,19 +52,15 @@ let folderSchema = new Schema({
 
 
 let folderPermissionSchema = new Schema({
-    id: String,
-    projectId:String,
-    projectName:String,
     folderId:String,
     folderName:String,
-    read: Boolean,
-    download: Boolean,
-    uploads:folderSchema
+    view: Boolean,
+    download: Boolean
 });
 
 let projectPermissionSchema = new Schema({
-    id: String,
     projectId:String,
+    projectName:String,
     folderPermissions:[folderPermissionSchema]
 });
 

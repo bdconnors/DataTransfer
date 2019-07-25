@@ -5,9 +5,9 @@ class UsersRepo {
         this.Users = Users;
     }
 
-    async createUser(admin,firstname,lastname,email){
+    async createUser(firstname,lastname,email){
         console.log(lastname);
-        let newUser = new this.Users({id:uuid(),admin:admin,firstname:firstname,lastname:lastname,email:email,authCode: uuid()});
+        let newUser = new this.Users({id:uuid(),admin:false,firstname:firstname,lastname:lastname,email:email,authCode: uuid()});
         await newUser.save();
         return newUser;
     }
@@ -27,7 +27,10 @@ class UsersRepo {
         return await this.Users.deleteOne(this.makeQuery(field,value));
     }
     async getAllUsers(){
-        return await this.Users.find({});
+        return await this.Users.find({admin:false});
+    }
+    async getProjectUsers(id){
+        return await this.Users.find({projectPermissions: {id:id}});
     }
     makeQuery(field,value){
         let query = {};

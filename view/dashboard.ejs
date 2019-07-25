@@ -1,13 +1,16 @@
 <% var projects = user.projectPermissions %>
 <%- include('./include/head.ejs',{title:'File System Home',scripts:false})%>
+<%if(user.admin){%>
+    <%- include('./include/adminNav.ejs') %>
+<%}else{%>
+    <%- include('./include/menu.ejs') %>
+<%}%>
 <body>
-<%- include('./include/menu.ejs') %>
-
 <div id="welcomeHeader" style="padding:35px 50px; width:100%;">
     <h1> <i class="fa fa-user-circle-o " ></i> Welcome <%= user.firstname %> <%if(user.admin){%>(Admin)<%}%></h1>
 </div>
 <%if(user.admin){%>
-    <%- include('./include/adminNav.ejs')%>
+    <%- include('./include/modal.ejs')%>
 <%}%>
 <% var totalCells = projects.length%>
 <% var fullRows = Math.floor(projects.length/3)%>
@@ -17,7 +20,6 @@
 <% var cellCount2 = 0%>
 <% var cellCount3 = 0%>
 <div class="container">
-
     <%for(var i = 0; i < rows; i++){%>
         <%var cellsInRow = 3%>
         <%if(i === fullRows){
@@ -73,5 +75,6 @@
             <%}%>
         </div>
     <%}%>
+
 </div>
 <%- include('./include/foot.ejs')%>

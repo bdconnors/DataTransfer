@@ -7,7 +7,6 @@ class SystemAuthController{
         this.observers=[];
     }
 
-
     getLogin(req,res){
         let authResponse = this.make(req,res);
         this.notifyAll(authResponse);
@@ -46,27 +45,42 @@ class SystemAuthController{
     }
     async getInvite(req,res){
         let authResponse = this.make(req,res);
-        authResponse = await this.sessionAuth(authResponse,req);
-        authResponse = this.checkAdmin(authResponse);
+        authResponse = await this.checkAdmin(authResponse,req);
         this.notifyAll(authResponse);
     }
     async postInvite(req,res){
         let authResponse = this.make(req,res);
-        authResponse = await this.sessionAuth(authResponse,req);
-        authResponse = this.checkAdmin(authResponse);
+        authResponse = await this.checkAdmin(authResponse,req);
         this.notifyAll(authResponse);
     }
 
     async getAuthForm(req,res){
         let authResponse = this.make(req,res);
-        console.log(authResponse.display);
-        console.log(authResponse.command);
         authResponse = await this.checkAuthCode(authResponse);
         this.notifyAll(authResponse);
     };
     async postAuthForm(req,res){
         let authResponse = this.make(req,res);
         authResponse = await this.checkAuthCode(authResponse);
+        this.notifyAll(authResponse);
+    }
+    async postCreateProject(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.checkAdmin(authResponse,req);
+        console.log(authResponse.command);
+        console.log(authResponse.display);
+        this.notifyAll(authResponse);
+    }
+    async getAllUsers(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.checkAdmin(authResponse,req);
+        authResponse.command = 'ACTION';
+        this.notifyAll(authResponse);
+    }
+    async getProjectUsers(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.checkAdmin(authResponse,req);
+        authResponse.command = 'ACTION';
         this.notifyAll(authResponse);
     }
 
@@ -93,7 +107,8 @@ class SystemAuthController{
         }
         return authResponse;
     }
-    checkAdmin(authResponse){
+    async checkAdmin(authResponse,req){
+        authResponse = await this.sessionAuth(authResponse,req);
         if(authResponse.admin){
             return authResponse;
         }else{

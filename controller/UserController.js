@@ -10,9 +10,8 @@ class UserController{
         return await this.model.getUser(field,value).catch((err)=>{throw err});
 
     }
-    async inviteNewUser(admin,firstname,lastname,email){
-        console.log(lastname);
-        return await this.model.createUser(admin,firstname,lastname,email);
+    async inviteNewUser(firstname,lastname,email){
+        return await this.model.createUser(firstname,lastname,email);
 
     }
     async updateNewUser(authCode,phone,password){
@@ -26,7 +25,9 @@ class UserController{
     async getAllUsers() {
         return await this.model.getAllUsers();
     }
-
+    async getProjectUsers(id){
+        return await this.model.getProjectUsers(id);
+    }
     async verifyCredentials(email,password){
         return await this.model.getUser('email',email)
             .then(user => {

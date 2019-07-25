@@ -14,15 +14,24 @@
 #primaryH4{
     background-color: #343a40;
 }
+#modal{
+    width:100%;
 
-.align-left{
-    text-align:left;
 }
-.center-div{
-    display:table;
-    margin-left:auto;
-    margin-right:auto;
-
+#modalHeader{
+    padding:35px 50px;
+}
+.modal-header, h4, .close {
+    color:white !important;
+    text-align: center;
+    font-size: 30px;
+    background-color:#343a40;
+}
+.modal-footer {
+    background-color: #f9f9f9;
+}
+#modalBody{
+    padding:40px 50px;
 }
 .form-width{
     width:25%;
@@ -30,24 +39,37 @@
 .button-width{
     width:50%;
 }
+.center-modal{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+.center{
+    display:table;
+    margin-left:auto;
+    margin-right:auto;
+
+}
+.divTextLeft{
+    display: inline-block;
+    text-align:left;
+}
+.text-center{
+    text-align:center;
+}
+.text-right{
+    text-align:right;
+}
+.text-left{
+    text-align:left;
+}
 
 body{
     padding:0;
     margin:0;
 }
 
-.row-centered{
-    text-align:center;
-}
-.col-centered{
-    display:inline-block;
-    float:none;
-    text-align:left;
-    margin-right:-4px;
-}
-.pos{
-    position:relative;
-}
 .button{
     margin: 5px 5px 5px 5px;
     color:#343a40;

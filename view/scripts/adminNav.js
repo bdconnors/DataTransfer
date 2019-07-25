@@ -1,101 +1,347 @@
-$('#createProjButton').click(function () {
+class CreateProjectContent{
+    constructor(){}
 
-    let createProj = $('#createProj');
-
-    if(createProj.is(':hidden')){
-        createProj.show();
-    }else if(createProj.is(':visible')){
-        createProj.hide();
+    getCreateProjectHeader(){
+        return `<i class="fa fa-archive"></i>Create New Project`;
     }
-});
-function resetForm(){
-
-    document.getElementById('userSelect').value="none";
-    document.getElementById('permSelectDiv').style.display='none';
-    document.getElementById('folderSelectDiv').style.display='none';
-
-}
-function showPermSelect(){
-    document.getElementById('permSelectDiv').style.display='table';
-    document.getElementById('folderSelectDiv').style.display='table';
-    showResetAddUser();
-}
-function showInviteAddUser(){
-    document.getElementById('addInviteGroup').style.display='table';
-    document.getElementById('selectPermButtGroup').style.display='none';
-}
-function hideInviteAddUser(){
-    document.getElementById('addInviteGroup').style.display='none';
-    document.getElementById('selectPermButtGroup').style.display='table';
-}
-function showResetAddUser(){
-    document.getElementById('addInviteGroup').style.display='none';
-    document.getElementById('submitResetGroup').style.display='table';
-}
-
-function checkFolder(e){
-    let label = document.getElementById(e.id+'Label');
-    if(!e.checked){
-        label.style.color="red";
-    }else{
-        label.style.color="green";
-        console.log(e.checked);
+    getCreateProjectBody(){
+        return `
+                 <div class="text-left">
+                    <label for="name"><i class="fa fa-pencil"></i> <b>Project Name:</b></label>
+                 </div>
+                 <div class="text-center">
+                     <input type="text" class="form-control" name="name" id="createProjectName" placeholder="Project Name">
+                 </div>`;
     }
+    getCreateProjectFooter(){
+        return `<button type="button" onclick="modalFunctions.createProject()" class="btn btn-outline-dark btn-block button "><i class="fa fa-power-off"></i> Create</button>`;
+    }
+    getCreateProjectSuccessFooter(){
+        return `<button type="button" onclick="modalFunctions.hide()" class="btn btn-outline-dark btn-block button "><i class="fa fa-power-off"></i> Done</button>`;
+    }
+    getCreateProjectSuccessHeader(){
+        return `<i class="fa fa-archive"></i>New Project Created`;
+    }
+    getCreateProjectSuccessBody(project){
 
-}
-function checkPermission(e){
-    let viewLabel = document.getElementById('viewLabel');
-    let downloadLabel = document.getElementById('downloadLabel');
-    if(e.value === 'view'){
-        downloadLabel.style.color='red';
-        viewLabel.style.color='green';
-
-    }else if(e.value ==='download'){
-        downloadLabel.style.color='green';
-        viewLabel.style.color='red';
+        let template = `<button type="button" onclick="modalFunctions.showInviteUsers()" class="btn btn-outline-dark btn-block button "><i class="fa fa-user-plus"></i> Invite Users</button>
+                        <hr>
+                        <div style="font-size:16px;" class="text-left">
+                        <b>Project Name:</b>${project.name}
+                        <br>
+                        <b>Folders Created:</b>
+                        <br>`;
+                        project.folders.forEach(folder=>{
+                            template += `<i class="fa fa-folder-open"></i> ${folder.name}<br>`;
+                        });
+                 template += `</div>`;
+        return template;
     }
 }
-function resetCurrentUser(){
-    document.getElementById('userSelect').value="none";
-    let folderPerms = document.getElementsByName('userFolderPerms');
-    folderPerms.forEach((perm)=>{
-        perm.checked = false;
-        let label = document.getElementById(perm.id+'Label');
-        label.style.color='red';
-    });
-    document.getElementById('view').checked=true;
-    document.getElementById('viewLabel').style.color='green';
-    document.getElementById('download').checked=false;
-    document.getElementById('downloadLabel').style.color='red';
-    document.getElementById('permSelectDiv').style.display='none';
-    document.getElementById('folderSelectDiv').style.display='none';
+class AddUsersContent{
+    constructor(){}
+
+
+    getInviteUserHeader(){
+        return`<i class="fa fa-user-plus"> Add User`;
+    }
+    getInviteUserBody(users){
+        let template = `<div class="center" id="usersAddedStatus">`;
+        console.log(users.length === 0);
+                if(users.length === 0){
+                    console.log(users.length === 0);
+                    template += `<p style="font-style:italic">No Users Added</p>`
+                }else{
+                    users.forEach((user)=>{template+=`<input type = "hidden" id="${user.id}" value="${user.id}">
+                        <label for="<${user.id}">${user.getFullName()}</label>`;
+                    });
+                }
+                template+=`</div>
+                <hr>`;
+        return template;
+    }
+    getInviteUserFooter(){
+        return `<button type="button"  onclick="modalFunctions.showInviteNew()" class="btn btn-outline-dark btn-block button "><i class="fa fa-envelope"></i> Invite New</button>
+                <br>
+                <button type="button"  class="btn btn-outline-dark btn-block button "><i class="fa fa-user"></i> Invite Existing</button>`;
+    }
+    getInviteNewHeader(){
+        return`<i class="fa fa-envelope"> Invite New User`;
+    }
+    getInviteNewBody(){
+        return`
+            <button type="button"  onclick="modalFunctions.showSetNewUserPermissions()" class="btn btn-outline-dark btn-block button "><i class="fa fa-eye"></i> Set Permissions</button>
+            <hr>
+            <div class="form-group">
+                <p id="fnErr" style="color:red; display:none">*Please Enter a First Name</p>
+                <label for="firstname"><i class="fa fa-user"></i> First Name:</label>
+                <input type="text" onchange="checkFnInput(this)" class="form-control" style="font-style:italic" name="firstname" id="newUserFirstname" placeholder="ex: John">
+            </div>
+            <div class="form-group">
+                <p id="lnErr" style="color:red; display:none">*Please Enter a Last Name</p>
+                <label for="lastname"><i class="fa fa-user"></i> Last Name:</label>
+                <input type="text" onchange="checkLnInput(this)"class="form-control" style="font-style:italic" name="lastname" id="newUserLastname" placeholder="ex: Doe">
+            </div>
+            <div class="form-group">
+                <p id="emailErr" style="color:red; display:none">*Please Enter a Valid E-mail Address</p>
+                <label for="email"><i class="fa fa-envelope"></i> E-mail:</label>
+                <input type="text" onchange="checkEmailInput(this)" class="form-control" style="font-style:italic" name="email" id="newUserEmail" placeholder="ex: user@domain.net">
+            </div>`;
+    }
+    getInviteNewFooter(){
+
+        return `<button type="button" onclick="modalFunctions.backToInviteUsers()" class="btn btn-outline-dark btn-block button "><i class="fa fa-arrow-left"></i> Back</button>
+                <br>
+                <button type="button"  onclick="modalFunctions.inviteNewUser()" class="btn btn-outline-dark btn-block button "><i class="fa fa-envelope"></i> Invite</button>`;
+    }
+    getInviteNewSuccessHeader(){
+        return`<i class="fa fa-envelope"> Invite Sent`;
+    }
+    getInviteNewSuccessBody(user){
+        return `<h3>An Invitation E-mail has been sent to: </h3>
+                <br>
+                <p><b>Name:</b> ${user.getFullName()}</p>
+                <p><b>E-mail:</b><p> ${user.email}</p>`
+    }
+    getInviteNewSuccessFooter(){
+        return   `<button type="button" onclick="modalFunctions.backToInviteUsers()" class="btn btn-dark-outline btn-block" ><i class="fa fa-power-off"></i>Ok</button>`;
+    }
+    getPermissionsHeader(){
+        return`<i class="fa fa-eye"> New User Permissions`;
+    }
+    getPermissionsBody(project){
+        let folders = project.folders;
+        let template = `<div class="form-group">
+                    <input class = "form-control" type="radio" name="userPerm" id="view"><i class = "fa fa-eye"></i> View Data
+                    <br>
+                    <input class = "form-control" type="radio" name="userPerm" id="view"><i class = "fa fa-download"></i> View & Download Data
+                </div>
+                <div class="form-group">`;
+                    console.log(folders);
+                    folders.forEach(folder=>{
+
+                        template+= `<input type="checkbox" name="folderPerms" id="${folder.name}" value="${folder.id}"><i class="fa fa-folder-open"></i> ${folder.name}<br>`;
+                    });
+                template +=`</div>`;
+                return template;
+    }
+    getPermissionsFooter(){
+        return `<button type="button" onclick="modalFunctions.backToInviteNewUser()" class="btn btn-outline-dark btn-block button "><i class="fa fa-arrow-left"></i> Back</button>
+                <br>
+                <button type="button"  onclick="modalFunctions.setPermissions()" class="btn btn-outline-dark btn-block button "><i class="fa fa-eye"></i> Set</button>`;
+    }
 }
-function showUserSelect(){
-    document.getElementById('userSelectDiv').style.display = 'table';
-    hideInviteAddUser();
+class ModalFunctions{
+
+    constructor(modalID,modalHeaderId,modalBodyId,modalFooterId,createProjectContent,addUsersContent){
+        this.modalID = modalID;
+        this.modalHeaderId = modalHeaderId;
+        this.modalBodyId = modalBodyId;
+        this.modalFooterId = modalFooterId;
+        this.createProjectContent = createProjectContent;
+        this.addUsersContent = addUsersContent;
+    }
+
+    showCreateProject(){
+        let header = this.createProjectContent.getCreateProjectHeader();
+        let body = this.createProjectContent.getCreateProjectBody();
+        let footer = this.createProjectContent.getCreateProjectFooter();
+        this.show(header,body,footer);
+    }
+    async showInviteUsers(){
+        let header = this.addUsersContent.getInviteUserHeader();
+        let url ='/users/project';
+        let data ='id='+this.newProject;
+        let req = makeAjaxReq(url,'GET',data);
+        let users = await ajaxReq(req);
+        console.log(users);
+        let body = this.addUsersContent.getInviteUserBody(users);
+        let footer = this.addUsersContent.getInviteUserFooter();
+        this.clearModalContent();
+        this.insertModalContent(header,body,footer);
+    }
+    showInviteNew(){
+        this.curUserFolderPerms =[];
+        this.curUserPerm = 'view';
+        let header = this.addUsersContent.getInviteNewHeader();
+        let body = this.addUsersContent.getInviteNewBody();
+        let footer = this.addUsersContent.getInviteNewFooter();
+        this.clearModalContent();
+        this.insertModalContent(header,body,footer);
+    }
+    showInviteNewSuccess(user){
+
+        let header = this.addUsersContent.getInviteNewSuccessHeader();
+        let body = this.addUsersContent.getInviteNewSuccessBody(user);
+        let footer = this.addUsersContent.getInviteNewSuccessFooter();
+        this.clearModalContent();
+        this.insertModalContent(header,body,footer);
+    }
+    showCreateProjectSuccess(){
+        this.clearModalContent();
+        let header = this.createProjectContent.getCreateProjectSuccessHeader();
+        let body = this.createProjectContent.getCreateProjectSuccessBody(this.newProject);
+        let footer = this.createProjectContent.getCreateProjectSuccessFooter();
+        this.insertModalContent(header,body,footer);
+    }
+    async createProject(){
+        console.log('calling createProject');
+        let name = $('#createProjectName').val();
+        let data = 'name=' + name;
+        let project = await ajaxReq(makeAjaxReq('/projects/create','POST',data));
+        console.log(project);
+        if(project){
+            this.newProject = project;
+            this.showCreateProjectSuccess();
+        }
+    }
+    showSetNewUserPermissions(){
+        this.curNewUserFname = document.getElementById('newUserFirstname').value;
+        this.curNewUserLname  = document.getElementById('newUserLastname').value;
+        this.curNewUserEmail =  document.getElementById('newUserEmail').value;
+        let header = this.addUsersContent.getPermissionsHeader();
+        let body = this.addUsersContent.getPermissionsBody(this.newProject);
+        let footer = this.addUsersContent.getPermissionsFooter();
+        this.clearModalContent();
+        this.insertModalContent(header,body,footer);
+    }
+    setPermissions() {
+        let folderPerms = document.getElementsByName('folderPerms');
+
+        folderPerms.forEach(folderPerm=>{
+            if(folderPerm.checked) {
+                let id = folderPerm.value;
+                this.newProject.folders.forEach(folder => {
+                    console.log(folder.name);
+                    if (folder.id === id) {
+                        let name = folder.name;
+                        this.curUserFolderPerms.push({folderId: id, foldername: name});
+                    }
+                });
+            }
+        });
+        let perms = document.getElementsByName('userPerms');
+        perms.forEach(perm => {
+            if(perm.checked){
+                this.curUserPerm = perm.value;
+            }
+        });
+        this.backToInviteNewUser();
+
+    }
+    async inviteNewUser(){
+        let firstNameInp = document.getElementById('newUserFirstname');
+        let lastNameInp = document.getElementById('newUserLastname');
+        let emailInp =  document.getElementById('newUserEmail');
+        if(validated(firstNameInp,lastNameInp,emailInp)){
+            let data = {
+                firstname:firstNameInp.value,
+                lastname:lastNameInp.value,
+                email:emailInp.value,
+                projectPermissions:[]
+            };
+            let projectPermission = {
+                projectId:this.newProject.id,
+                projectName:this.newProject.name,
+                folderPermissions: []
+            };
+            let view;
+            let download;
+            if(this.curUserPerm === 'view'){
+                view = true;
+                download = false;
+            }else if(this.curUserPerm === 'download'){
+                view = true;
+                download = true;
+            }
+            this.curUserFolderPerms.forEach(perm=>{
+
+                projectPermission.folderPermissions.push({
+                    folderId:perm.folderId,
+                    foldername:perm.foldername,
+                    view:view,
+                    download:download});
+            });
+            data.projectPermissions.push(projectPermission);
+            let req = makeAjaxReq('/users/invite','POST',data);
+            let user = await ajaxReq(req);
+            console.log(user);
+            //if(user){
+                //this.showInviteNewSuccess(user);
+            //}
+        }
+    }
+    backToInviteNewUser(){
+        this.clearModalContent();
+        let header = this.addUsersContent.getInviteNewFooter();
+        let body = this.addUsersContent.getInviteNewBody();
+        let footer = this.addUsersContent.getInviteNewFooter();
+        this.insertModalContent(header,body,footer);
+        document.getElementById('newUserFirstname').value = this.curNewUserFname;
+        document.getElementById('newUserLastname').value = this.curNewUserLname;
+        document.getElementById('newUserEmail').value= this.curNewUserEmail;
+    }
+    backToInviteUsers(){
+        this.clearModalContent();
+        this.showInviteUsers().catch(err=>{console.log(err)});
+    }
+    show(header,body,footer){
+        this.insertModalContent(header,body,footer);
+        $(this.modalID).modal('show');
+    }
+    hide(){
+        $(this.modalID).modal('hide');
+        this.clearModalContent();
+    }
+    clearModalContent(){
+        $(this.modalHeaderId).empty();
+        $(this.modalBodyId).empty();
+        $(this.modalFooterId).empty();
+    }
+    insertModalContent(header,body,footer){
+        $(this.modalHeaderId).append(header);
+        $(this.modalBodyId).append(body);
+        $(this.modalFooterId).append(footer);
+    }
+
 }
-function hideUserSelect(){
-    document.getElementById('userSelectDiv').style.display = 'none';
-    document.getElementById('selectPermButtGroup').style.display = 'none';
+async function ajaxReq(request){
+    return await $.ajax(request);
 }
-function showAddUsers(){
-    document.getElementById('projectNameDiv').style.display='none';
-    document.getElementById('addUsersDiv').style.display='table';
+function makeAjaxReq(url,type,data) {
+
+    let req = {
+        url: url,
+        type: type,
+        success: function (data) {
+            return data
+        },
+        error: function (e) {
+            console.log(e);
+            return false;
+        }
+    };
+    if(data != null){
+        req.data = data;
+    }
+    return req;
 }
-function hideAddUsers(){
-    document.getElementById('projectNameDiv').style.display='table';
-    document.getElementById('addUsersDiv').style.display='none';
-}
-function backToInviteAdd(){
-    resetCurrentUser();
-    hideUserSelect();
-    showInviteAddUser();
-}
-function validate(){
+let addUsersContent = new AddUsersContent();
+let createProjectContent = new CreateProjectContent();
+let modalFunctions = new ModalFunctions(
+    '#modal',
+    '#modalTitle',
+    '#modalBody',
+    '#modalFooter',
+    createProjectContent,addUsersContent
+);
+
+
+function validated(firstNameInp,lastNameInp,emailInp){
 
     let valid = false;
 
-    let firstNameInp = document.getElementById('firstname');
+
     let firstname = firstNameInp.value;
 
     if(firstname === ''){
@@ -104,7 +350,7 @@ function validate(){
         fnErr.style.display = 'block';
     }
 
-    let lastNameInp = document.getElementById('lastname');
+
     let lastname = lastNameInp.value;
 
     if(lastname === ''){
@@ -113,7 +359,7 @@ function validate(){
         lnErr.style.display = 'block';
     }
 
-    let emailInp = document.getElementById('email');
+
     let email = emailInp.value;
 
     if(!/^[^\s@]+@[^\s@]+[^\s@]+$/.test(email)) {

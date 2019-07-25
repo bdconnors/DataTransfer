@@ -112,6 +112,15 @@ app.get('/unauthorized',(req,res)=>{
 
 });
 
+app.get('/users',(req,res)=>{
+    sysAuth.getAllUsers(req,res).catch((err)=>{throw err});
+
+});
+
+app.get('/users/project',(req,res)=>{
+    sysAuth.getProjectUsers(req,res).catch((err)=>{throw err});
+
+});
 
 app.get('/users/invite',(req,res)=>{
     sysAuth.getInvite(req,res).catch((err)=>{throw err});
@@ -119,13 +128,15 @@ app.get('/users/invite',(req,res)=>{
 });
 
 app.post('/users/invite',(req,res)=>{
-
-    sysAuth.postInvite(req,res).catch((err)=>{throw err});
+    console.log(req);
+    res.send(req.body);
+    //sysAuth.postInvite(req,res).catch((err)=>{throw err});
 
 });
 
 app.post('/projects/create',(req,res)=>{
 
+    sysAuth.postCreateProject(req,res).catch((err)=>{res.send(err)});
 
 });
 app.get('/users/authenticate',(req,res)=>{
