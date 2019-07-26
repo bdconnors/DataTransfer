@@ -1,16 +1,25 @@
-<div class="modal fade center-modal" id="modal" role="dialog">
-    <div class="modal-dialog">
-        <div  class="modal-content">
-            <div class="modal-header" style="padding:35px 50px;">
-                <h4 id="modalTitle" class="bg-dark center"></h4>
-                <button type="button" class="close " onclick="modalFunctions.hide()">&times;</button>
-            </div>
-            <div id="modalBody" class="modal-body" style="padding:40px 50px;">
-            </div>
-            <div id="modalFooter" class="modal-footer">
+<div class="container">
+    <div class="modal fade" id="modal">
+        <div class=".modal-dialog-centered modal-dialog modal-lg">
+            <div class="modal-content">
+                <div style="background-color:#343a40;  padding:35px 50px;"  class="modal-header text-center">
+                    <div class="center">
+                        <h4  style="background-color:#343a40; color:#f8f9fa;" id="modalHeader"></h4>
+                    </div>
+                    <div class="text-right">
+                        <button type="button" class="close" onclick="modalFunctions.hide()">&times;</button>
+                    </div>
+                </div>
+                <div style="padding:40px 50px;"  class="modal-body">
+                    <div class="button-width center" id="modalBody">
+                    </div>
+                </div>
+                <div style="padding:35px 50px;" class="modal-footer">
+                    <div id="modalFooter" class="button-width center">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 
