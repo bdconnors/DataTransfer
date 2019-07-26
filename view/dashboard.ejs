@@ -1,9 +1,9 @@
-<% var projects = user.projectPermissions %>
 <%- include('./include/head.ejs',{title:'File System Home',scripts:false})%>
 <%if(user.admin){%>
     <%- include('./include/adminNav.ejs') %>
 <%}else{%>
     <%- include('./include/menu.ejs') %>
+    <% var projects = user.projectPermissions %>
 <%}%>
 <body>
 <div id="welcomeHeader" style="padding:35px 50px; width:100%;">

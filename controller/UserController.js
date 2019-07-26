@@ -10,8 +10,8 @@ class UserController{
         return await this.model.getUser(field,value).catch((err)=>{throw err});
 
     }
-    async inviteNewUser(firstname,lastname,email){
-        return await this.model.createUser(firstname,lastname,email);
+    async inviteNewUser(firstname,lastname,email,projectPermissions){
+        return await this.model.createUser(firstname,lastname,email,projectPermissions);
 
     }
     async updateNewUser(authCode,phone,password){
@@ -23,10 +23,14 @@ class UserController{
             .catch((err)=>{throw err});
     }
     async getAllUsers() {
+        console.log('all users request');
         return await this.model.getAllUsers();
     }
     async getProjectUsers(id){
         return await this.model.getProjectUsers(id);
+    }
+    async removeProjectPermission(userid,projectid){
+        return await this.model.removeProjectPermission(userid,projectid);
     }
     async verifyCredentials(email,password){
         return await this.model.getUser('email',email)

@@ -3,6 +3,10 @@ class SystemViewController{
     constructor(){}
 
     load(authResponse){
+        if(authResponse.variables.projects){
+            console.log(authResponse.variables.projects);
+        }
+        console.log(authResponse.variables);
         authResponse.response.render('.'+authResponse.display,authResponse.variables);
     }
     redirect(authResponse){

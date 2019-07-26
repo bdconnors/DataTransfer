@@ -6,16 +6,16 @@ class SystemActionController{
         this.observers = [];
     }
     async inviteNewUser(authResponse){
-        let firstname = authResponse.request.query.firstname;
-        let lastname = authResponse.request.query.lastname;
-        let email = authResponse.request.query.email;
-        this.userControl.inviteNewUser(firstname,lastname,email)
-            .then((user)=>{
-                authResponse.display = '/users/inviteSuccess';
-                authResponse.variables.email = {action:'INVITED',user:user};
-                this.notifyAll(authResponse);
-            })
-            .catch(err=>{throw err});
+        let userObj = authResponse.request.body;
+        let firstName = userObj.firstname;
+        let lastName = userObj.lastname;
+        let email = userObj.email;
+        let projPermissions = userObj.projectPermissions;
+        projPermissions = await this.projectControl.newUserFolders(firstName,lastName,projPermissions);
+        let user = await this.userControl.inviteNewUser(firstName,lastName,email,projPermissions);
+        authResponse.variables.email = {action:'INVITED',user:user};
+        this.notifyAll(authResponse);
+
     }
     async updateNewUser(authResponse){
         let authCode = authResponse.request.query.authCode;
@@ -30,7 +30,7 @@ class SystemActionController{
             .catch((err)=>{throw err});
     }
     async getAllUsers(authResponse){
-
+        console.log('all users request');
         let users = await this.userControl.getAllUsers();
         authResponse.response.send(users);
 
@@ -46,12 +46,17 @@ class SystemActionController{
     async createNewProject(authResponse){
         let name = authResponse.request.body.name;
         this.projectControl.createNewProject(name).then((project)=>{
-            console.log(project);
             authResponse.response.send(project);
         }).catch(err=>{
-            console.log(err);
             authResponse.response.send(err);
         });
+    }
+    async removeUserProjectPermission(authResponse){
+        let projectId = authResponse.request.body.projectId;
+        let userId = authResponse.request.body.id;
+        this.userControl.removeProjectPermission(userId,projectId).then(project=>{
+            authResponse.response.send(project);
+        }).catch((err)=>{throw err});
     }
     performAction(authResponse){
 
@@ -65,6 +70,9 @@ class SystemActionController{
             this.getAllUsers(authResponse).catch((err)=>{throw err});
         }else if(authResponse.display === '/users/project'){
             this.getProjectUsers(authResponse).catch((err)=>{throw err});
+        }else if(authResponse.display === '/users/project/permissions/remove'){
+            console.log('observe notified');
+            this.removeUserProjectPermission(authResponse).catch((err)=>{throw err});
         }
 
     }

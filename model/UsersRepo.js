@@ -5,9 +5,8 @@ class UsersRepo {
         this.Users = Users;
     }
 
-    async createUser(firstname,lastname,email){
-        console.log(lastname);
-        let newUser = new this.Users({id:uuid(),admin:false,firstname:firstname,lastname:lastname,email:email,authCode: uuid()});
+    async createUser(firstname,lastname,email,projectPermissions){
+        let newUser = new this.Users({id:uuid(),admin:false,firstname:firstname,lastname:lastname,email:email,projectPermissions:projectPermissions,authCode: uuid()});
         await newUser.save();
         return newUser;
     }
@@ -26,18 +25,20 @@ class UsersRepo {
 
         return await this.Users.deleteOne(this.makeQuery(field,value));
     }
+    async removeProjectPermission(userid,projectid){
+        return await this.Users.updateOne({id:userid},{ $pull: { 'projectPermissions':{projectId:projectid}}});
+    }
     async getAllUsers(){
-        return await this.Users.find({admin:false});
+        let users = await this.Users.find({admin:false});
+        return users;
     }
     async getProjectUsers(id){
-        return await this.Users.find({projectPermissions: {id:id}});
+        return await this.Users.find({"projectPermissions.projectId":id});
     }
     makeQuery(field,value){
         let query = {};
         query[field] = value;
-        console.log(query);
         return query;
     }
-
 }
 module.exports = {UsersRepo:UsersRepo};

@@ -18,7 +18,7 @@ class CreateProjectContent{
     }
     getCreateProjectSuccessFooter(){
         return `<button type="button" onclick="modalFunctions.showInviteUsers()" class="btn btn-outline-dark btn-block button "><i class="fa fa-user-plus"></i> Invite Users</button>
-                <button type="button" onclick="modalFunctions.hide()" class="btn btn-outline-dark btn-block button "><i class="fa fa-power-off"></i> Done</button>`;
+                <button type="button" onclick="modalFunctions.done()" class="btn btn-outline-dark btn-block button "><i class="fa fa-power-off"></i> Done</button>`;
     }
     getCreateProjectSuccessHeader(){
         return `<i class="fa fa-archive"></i>New Project Created`;
@@ -44,31 +44,45 @@ class AddUsersContent{
     getInviteUserHeader(){
         return`<i class="fa fa-user-plus"> Add User`;
     }
-    getInviteUserBody(users){
-        let template = `<div class="center" id="usersAddedStatus">`;
-        console.log(users.length === 0);
+    getInviteUserBody(users,project){
+        let template = `<div class="center text-center" id="usersAddedStatus">
+                <h5><i class="fa fa-user-circle"></i> Users Added To Project</h5>
+                <div class="center text-center">`;
                 if(users.length === 0){
                     console.log(users.length === 0);
                     template += `<p style="font-style:italic">No Users Added</p>`
                 }else{
-                    users.forEach((user)=>{template+=`<input type = "hidden" id="${user.id}" value="${user.id}">
-                        <label for="<${user.id}">${user.getFullName()}</label>`;
+
+                    users.forEach((user)=>{template+=`<b>${user.firstname} ${user.lastname}</b>
+                        <input type="button" value ="Remove" onclick="modalFunctions.removeUserPermission(this)" name="${project.id}" id="${user.id}" style="font-size:14px;" class="btn btn-danger button"></button>`;
                     });
                 }
-                template+=`</div>
-                <hr>`;
+                template+=`</div></div>`;
         return template;
     }
     getInviteUserFooter(){
         return `<button type="button"  onclick="modalFunctions.showSetNewUserPermissions()" class="btn btn-outline-dark btn-block button "><i class="fa fa-envelope"></i> Invite New</button>
                 <br>
-                <button type="button"  class="btn btn-outline-dark btn-block button "><i class="fa fa-user"></i> Invite Existing</button>`;
+                <button type="button"  class="btn btn-outline-dark btn-block button"><i class="fa fa-user"></i> Invite Existing</button>`;
     }
     getInviteNewHeader(){
         return`<i class="fa fa-envelope"> Invite New User`;
     }
     getInviteNewBody(){
-        return`
+        return`<div id="loadingSpinner" class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm modal-dialog-centered">
+                    <div class="modal-content">
+                        <div style="padding:35px 50px;" class="center modal-header">
+                            <h6>Sending Invite</h6>
+                        </div>
+                        <div style="padding:40px 50px;" class="modal-body center text-center">
+                            <span class="sr-only">Sending Invite</span>
+                            <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+                        </div>
+                         <div style="padding:35px 50px;" class="modal-footer"></div>
+                    </div>
+                </div>
+            </div>
             <div class="form-group">
                 <p id="fnErr" style="color:red; display:none">*Please Enter a First Name</p>
                 <label for="firstname"><i class="fa fa-user"></i> First Name:</label>
@@ -97,11 +111,12 @@ class AddUsersContent{
     getInviteNewSuccessBody(user){
         return `<h3>An Invitation E-mail has been sent to: </h3>
                 <br>
-                <p><b>Name:</b> ${user.getFullName()}</p>
-                <p><b>E-mail:</b><p> ${user.email}</p>`
+                <p><b>Name:</b> ${user.firstname} ${user.lastname}</p>
+                <p><b>E-mail:</b> ${user.email}</p>`
     }
     getInviteNewSuccessFooter(){
-        return   `<button type="button" onclick="modalFunctions.backToInviteUsers()" class="btn btn-dark-outline btn-block" ><i class="fa fa-power-off"></i>Ok</button>`;
+        return   `<button type="button" onclick="modalFunctions.backToInviteUsers()" class="btn btn-outline-dark btn-block" ><i class="fa fa-user-plus"></i>Add Another User</button>
+                  <button type="button" onclick="modalFunctions.done()" class="btn btn-outline-dark btn-block" ><i class="fa fa-power-off"></i>Done</button>`;
     }
     getPermissionsHeader(){
         return`<i class="fa fa-eye"> New User Permissions`;
@@ -113,10 +128,10 @@ class AddUsersContent{
                         <div id="userPermsDiv" class="col center">
                     <h5><b><i class = "fa fa-file"></i> Data Access Level:</b></h5>
                     <label for="view"><span style="color:green; font-size:20px;" id="viewLabel" ><i class = "fa fa-eye"></i></span> <b>View Data</b></label>
-                    <input style="display: none" onclick="permissionClick()" class = "form-control" type="radio" name="userPerms" checked id="view">
+                    <input style="display: none" onclick="permissionClick()" class = "form-control" type="radio" name="userPerms"value="view" checked id="view">
                     <br>
                     <label for="download"><span style="color:red; font-size:20px;" id="downloadLabel" ><i class = "fa fa-download"></i></span> <b>View & Download Data</b></label>
-                    <input style="display:none" onclick="permissionClick()" class = "form-control" type="radio" name="userPerms" id="download">
+                    <input style="display:none" onclick="permissionClick()" class = "form-control" type="radio" name="userPerms" value="download" id="download">
                 </div>
                 <br>
                 <div id="folderPermsDiv" class="col center">
@@ -184,11 +199,11 @@ class ModalFunctions{
     async showInviteUsers(){
         let header = this.addUsersContent.getInviteUserHeader();
         let url ='/users/project';
-        let data ='id='+this.newProject;
+        let data ='id='+this.newProject.id;
         let req = makeAjaxReq(url,'GET',data);
         let users = await ajaxReq(req);
         console.log(users);
-        let body = this.addUsersContent.getInviteUserBody(users);
+        let body = this.addUsersContent.getInviteUserBody(users,this.newProject);
         let footer = this.addUsersContent.getInviteUserFooter();
         this.clearModalContent();
         this.insertModalContent(header,body,footer);
@@ -244,7 +259,10 @@ class ModalFunctions{
             }
         });
         let userPerms = document.getElementsByName('userPerms');
+        console.log(userPerms);
         userPerms.forEach(perm=>{
+            console.log('check perm checked');
+            console.log(perm.checked);
             if(perm.checked){
                 this.curUserPerm = perm.value;
             }
@@ -268,39 +286,58 @@ class ModalFunctions{
                 folderPermissions: []
             };
 
-            let view;
-            let download;
-
-            if(this.curUserPerm === 'view'){
-                view = true;
-                download = false;
-            }else if(this.curUserPerm === 'download'){
-                view = true;
-                download = true;
-            }
 
             this.curUserFolderPerms.forEach(perm=>{
-                projectPermission.folderPermissions.push({
+                let view;
+                let download;
+
+                if(this.curUserPerm === 'view'){
+                    view = true;
+                    download = false;
+                }else if(this.curUserPerm === 'download'){
+                    view = true;
+                    download = true;
+                }
+
+                let folderPerm = {
                     folderId:perm.folderId,
                     folderName:perm.folderName,
                     view:view,
                     download:download
-                });
+                };
+                console.log(folderPerm.view);
+                console.log(folderPerm.download);
+                projectPermission.folderPermissions.push(folderPerm);
             });
 
             data.projectPermissions.push(projectPermission);
 
             let req = makeAjaxReq('/users/invite','POST',data);
+            $('#loadingSpinner').modal('show');
             let user = await ajaxReq(req);
-            console.log(user);
-            //if(user){
-                //this.showInviteNewSuccess(user);
-            //}
+            if(user){
+                $('#loadingSpinner').modal('hide');
+                this.showInviteNewSuccess(user);
+            }
         }
     }
-    backToInviteUsers(){
+    async removeUserPermission(elem){
+        console.log('button called remove function');
+        let userId = elem.id;
+        let projectId = elem.name;
+        let data = {id:userId,projectId:projectId};
+        let req = makeAjaxReq('/users/project/permissions/remove','POST',data);
+        let response = await ajaxReq(req);
+        if(response.nModified === 1){
+            await this.backToInviteUsers();
+        }
+    }
+    async backToInviteUsers(){
         this.clearModalContent();
-        this.showInviteUsers().catch(err=>{console.log(err)});
+        await this.showInviteUsers();
+    }
+    done(){
+        location.reload();
     }
     backToNewUserPermissions(){
         this.clearModalContent();

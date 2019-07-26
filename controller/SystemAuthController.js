@@ -2,8 +2,9 @@ const AuthResponse= require('../model/AuthResponse').AuthResponse;
 
 class SystemAuthController{
 
-    constructor(userControl){
+    constructor(userControl,projectControl){
         this.userControl = userControl;
+        this.projectControl = projectControl;
         this.observers=[];
     }
 
@@ -53,7 +54,14 @@ class SystemAuthController{
         authResponse = await this.checkAdmin(authResponse,req);
         this.notifyAll(authResponse);
     }
-
+    async postRemoveProjectPermission(req,res){
+        console.log('hit auth');
+        let authResponse = this.make(req,res);
+        authResponse = await this.checkAdmin(authResponse,req);
+        console.log(authResponse.display);
+        console.log(authResponse.command);
+        this.notifyAll(authResponse);
+    }
     async getAuthForm(req,res){
         let authResponse = this.make(req,res);
         authResponse = await this.checkAuthCode(authResponse);
@@ -67,8 +75,6 @@ class SystemAuthController{
     async postCreateProject(req,res){
         let authResponse = this.make(req,res);
         authResponse = await this.checkAdmin(authResponse,req);
-        console.log(authResponse.command);
-        console.log(authResponse.display);
         this.notifyAll(authResponse);
     }
     async getAllUsers(req,res){
@@ -94,6 +100,7 @@ class SystemAuthController{
                     if(req.session.user.admin){
                         authResponse.admin = true;
                         authResponse.variables.users = await this.userControl.getAllUsers();
+                        authResponse.variables.projects = await this.projectControl.getAllProjects();
                     }
                 } else {
                     req.session.destroy();
@@ -131,7 +138,6 @@ class SystemAuthController{
 
         let display = req.route.path;
         let command = this.getCommandType(req);
-        console.log(req.body);
         return new AuthResponse(display,command,req,res);
     }
     getCommandType(req){

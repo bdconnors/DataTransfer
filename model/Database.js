@@ -6,68 +6,32 @@ module.exports.db = this.db;
 
 let Schema = this.db.Schema;
 
-let folderMetaDataSchema = new Schema({
-    author: String,
-    created: String,
-    modified: String,
-    accessed: String,
-    size: String
-});
-
-let fileMetaDataSchema = new Schema({
-    author: String,
-    created: String,
-    modified: String,
-    accessed: String,
-    size: String,
-    ext:String,
-    mime:String
-});
-
-let activitySchema = new Schema({
-    id: String,
-    date: String,
-    action: String,
-    target: String,
-    targetType: String
-});
-
-let fileSchema = new Schema({
-    id:String,
-    folderId:String,
-    folderName:String,
-    name:String,
-    metadata:fileMetaDataSchema
-});
-
-let folderSchema = new Schema({
-    id: String,
-    projectId:String,
-    projectName:String,
-    name: String,
-    parent: String,
-    files:[fileSchema],
-    metadata:folderMetaDataSchema
-});
-
-
-let folderPermissionSchema = new Schema({
-    folderId:String,
-    folderName:String,
-    view: Boolean,
-    download: Boolean
-});
-
-let projectPermissionSchema = new Schema({
-    projectId:String,
-    projectName:String,
-    folderPermissions:[folderPermissionSchema]
-});
-
 let projectSchema = new Schema( {
     id: String,
     name: String,
-    folders: [folderSchema]
+    folders: [{
+        id: String,
+        projectId:String,
+        projectName:String,
+        name: String,
+        parent: String,
+        files:[{
+            id:String,
+            folderId:String,
+            folderName:String,
+            name:String,
+            metadata:{
+                author: String,
+                created: String,
+                modified: String,
+                accessed: String,
+                size: String,
+                ext:String,
+                mime:String
+            }
+        }],
+        metadata:{author:String,created: String,modified: String,accessed: String,size: String}
+    }]
 });
 
 let Project = this.db.model('Project',projectSchema);
@@ -79,8 +43,12 @@ let userSchema = new Schema({
     firstname: String,
     lastname: String,
     email: String,
-    activity: [activitySchema],
-    projectPermissions: [projectPermissionSchema],
+    activity: [{id: String,date:String,action:String,target:String,targetType:String}],
+    projectPermissions: [{
+        projectId:String,
+        projectName:String,
+        folderPermissions:[{folderId:String,folderName:String,view: Boolean,download: Boolean}]
+    }],
     password: String,
     phone: String,
     authCode:String

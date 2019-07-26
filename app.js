@@ -71,7 +71,7 @@ const sysAct = new SystemActionController(userControl,projectControl);
 sysAct.subscribe(sysMailer);
 
 const SystemAuthController = require('./controller/SystemAuthController').SystemAuthController;
-const sysAuth = new SystemAuthController(userControl);
+const sysAuth = new SystemAuthController(userControl,projectControl);
 sysAuth.subscribe(sysView);
 sysAuth.subscribe(sysAct);
 
@@ -122,15 +122,19 @@ app.get('/users/project',(req,res)=>{
 
 });
 
+app.post('/users/project/permissions/remove',(req,res)=>{
+    sysAuth.postRemoveProjectPermission(req,res).catch(err=>{throw err});
+
+});
+
 app.get('/users/invite',(req,res)=>{
     sysAuth.getInvite(req,res).catch((err)=>{throw err});
 
 });
 
 app.post('/users/invite',(req,res)=>{
-    console.log(req);
-    res.send(req.body);
-    //sysAuth.postInvite(req,res).catch((err)=>{throw err});
+
+    sysAuth.postInvite(req,res).catch((err)=>{throw err});
 
 });
 

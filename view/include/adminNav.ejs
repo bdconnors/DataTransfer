@@ -6,24 +6,38 @@
 	</button>
     <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2" id="adminDropDown">
 		<ul class="navbar-nav">
-			<li class="nav-item">
-				<a class="nav-link" id="createProjButton" onclick="modalFunctions.showCreateProject()"  href="#"><i class="fa fa-archive"></i> Create New Project<span class="sr-only"></span></a>
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#"  id="projectsMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<i class="fa fa-archive"></i> My Projects
+				</a>
+				<div class="dropdown-menu" aria-labelledby="projectsMenu">
+					<%if(projects.length === 0){
+						console.log(projects);
+						console.log(projects.length);
+					%>
+						<a class="dropdown-item text-center" style="font-style:italic;">No Projects Found</a>
+					<%}%>
+					<%for(var i = 0; i < projects.length; i++){%>
+						<a class="dropdown-item" href="#>"><i class="fa fa-archive"></i> <%= projects[i].name %></a>
+					<%}%>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" id="createProjButton" onclick="modalFunctions.showCreateProject()"  href="#"><i class="fa fa-plus"></i> Create New Project<span class="sr-only"></span></a>
+				</div>
 			</li>
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle" href="#" id="usersMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<i class="fa fa-user"></i> Users
 				</a>
 				<div class="dropdown-menu" aria-labelledby="usersMenu">
-					<%if(user.admin){%>
+					<%if(users.length === 0){%>
+						<a class="dropdown-item text-center" style="font-style:italic;">No Users Found</a>
+					<%}%>
 					<%for(var i=0; i < users.length; i++) {%>
-					<%if(!users[i].authCode){%>
-						<a href ="/users/user/<%= users[i].id%>" class ="dropdown-item" ><i class="fa fa-user-circle-o"></i> <%= users[i].firstname %> <%= users[i].lastname %> </a>
+							<a href ="/users/user/<%= users[i].id%>" class ="dropdown-item" ><i class="fa fa-user-circle-o"></i> <%= users[i].firstname %> <%= users[i].lastname %> </a>
 					<%}%>
-					<%}%>
-					<div class="dropdown-divider"></div>
-					<a class ="dropdown-item" href="/users/invite"><i class="fa fa-envelope"></i> Invite User</a>
-					<a class ="dropdown-item" href="/users/delete"><i class="fa fa-minus"></i> Delete User</a>
-					<%}%>
+						<div class="dropdown-divider"></div>
+						<a class ="dropdown-item" href="/users/invite"><i class="fa fa-envelope"></i> Invite User</a>
+						<a class ="dropdown-item" href="/users/delete"><i class="fa fa-minus"></i> Delete User</a>
 				</div>
 			</li>
 		</ul>
