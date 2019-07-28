@@ -1,17 +1,17 @@
-<%- include('../include/head.ejs',{title:'New Project',scripts:'add.js'})%>
+<%- include('../include/head.ejs',{title:'New ProjectContent',scripts:'add.js'})%>
 <body>
 <%- include('../include/menu.ejs',{system:system}) %>
 <% var user = system.user%>
 <% var users = system.users%>
 <div class= "bg-dark" id = "header"  style="padding:35px 50px;">
-    <h4 class= "bg-dark" ><i class="fa fa-archive fa-lg" ></i>  New Project</h4>
+    <h4 class= "bg-dark" ><i class="fa fa-archive fa-lg" ></i>  New ProjectContent</h4>
 </div>
 <div class="content">
     <div class="body" style="padding:40px 50px;">
         <div class="center-div form-width">
         <form id="fileForm" role="form" method="post">
-            <label for="name" class="align-left"><i class="fa fa-archive"></i> <b>Project Name:</b></label>
-                <input type="text" class="form-control" name="name" id="name" placeholder="Project Name">
+            <label for="name" class="align-left"><i class="fa fa-archive"></i> <b>ProjectContent Name:</b></label>
+                <input type="text" class="form-control" name="name" id="name" placeholder="ProjectContent Name">
                 <br>
                 <label for="retype" class="align-left"><i class="fa fa-users"></i><b> User Permissions:</b></label>
                 <%if(users.length > 0){%>

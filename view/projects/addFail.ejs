@@ -1,18 +1,18 @@
-<%- include('../include/head.ejs',{title:'New Project',scripts:'add.js'})%>
+<%- include('../include/head.ejs',{title:'New ProjectContent',scripts:'add.js'})%>
 <body>
 <%- include('../include/menu.ejs',{system:system}) %>
 <% var user = system.getUserInfo()%>
 <% var users = system.getAllUsers()%>
 <div class="content">
         <div class= "bg-dark" id = "header"  style="padding:35px 50px;">
-            <h4 class= "bg-dark" ><i class="fa fa-archive fa-lg" ></i>  New Project</h4>
+            <h4 class= "bg-dark" ><i class="fa fa-archive fa-lg" ></i>  New ProjectContent</h4>
         </div>
     <div class="body" style="padding:40px 50px;">
         <div class="center-div form-width">
         <form id="fileForm" role="form" method="post">
-                <p id="err" style="color:red; visibility:visible; font-size:12px;">*That Project Name Already Exists</p>
-                <label for="name" class="align-left"><span class="glyphicon glyphicon-folder-open"></span> Project Name</label>
-                <input style="background-color:pink" type="text" class="form-control" oninput="checkInput(this) "name="name" id="name" value="<%= name%>" placeholder="Project Name">
+                <p id="err" style="color:red; visibility:visible; font-size:12px;">*That ProjectContent Name Already Exists</p>
+                <label for="name" class="align-left"><span class="glyphicon glyphicon-folder-open"></span> ProjectContent Name</label>
+                <input style="background-color:pink" type="text" class="form-control" oninput="checkInput(this) "name="name" id="name" value="<%= name%>" placeholder="ProjectContent Name">
                 <br>
                 <%if(users.length > 0){%>
                 <label for="retype" class="align-left"><span class="glyphicon glyphicon-cog"></span> User Permissions</label>

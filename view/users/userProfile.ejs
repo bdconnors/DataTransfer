@@ -38,7 +38,7 @@
         <%for(var i = 0; i < projects.length; i++){%>
             <div class="col">
             <div class="card">
-                <h5 class="card-header"><i class="fa fa-archive"></i> Project <%= projects[i].name%></h5>
+                <h5 class="card-header"><i class="fa fa-archive"></i> ProjectContent <%= projects[i].name%></h5>
                 <div class="card-body">
                     <h5 class="card-title">Permissions</h5>
                         <% if(user.admin){%>
@@ -48,8 +48,8 @@
                                 - View Assigned Folders and Files
                             <%}%>
                             <% if(projects[i].write){%>
-                                - Upload Files to Project Folder
-                                - Delete and Edit Project Files/Folders
+                                - Upload Files to ProjectContent Folder
+                                - Delete and Edit ProjectContent Files/Folders
                             <%}%>
 
                         <%}%>
