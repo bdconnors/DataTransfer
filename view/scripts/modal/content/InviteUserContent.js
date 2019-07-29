@@ -31,7 +31,7 @@ class InviteUserContent extends ModalContent {
 
     getFooter() {
         return `<button type="button"  id="new" onclick="modal.display('set permissions',this)" class="btn btn-outline-dark btn-block button "><i class="fa fa-envelope"></i> Invite New</button>
-                <button type="button"   id="existing" onclick="modal.display('set permissions',this)" class="btn btn-outline-dark btn-block button"><i class="fa fa-user"></i> Invite Existing</button>
+                <button type="button"  id="existing" onclick="modal.display('set permissions',this)" class="btn btn-outline-dark btn-block button"><i class="fa fa-user"></i> Invite Existing</button>
                 <button type="button"  onclick="modal.hide()" class="btn btn-outline-dark btn-block button "><i class="fa fa-power-off"></i> Done</button>`;
 }
 }

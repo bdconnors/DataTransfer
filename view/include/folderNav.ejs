@@ -21,8 +21,8 @@
                     </a>
                     <%
                         var deletePath = "/projects/project/"+project.id+"/folders/delete?id="+folder.id;
-                        var renamePath = "/projects/project/"+project.id+"/folders/folder/"+folder.id+"/rename";
-                        var permissionsPath = "/projects/project/"+project.id+"/folders/folder/"+folder.id+"/permissions";
+                        var renamePath = "/projects/project/"+project.id+"/folders/folders/"+folder.id+"/rename";
+                        var permissionsPath = "/projects/project/"+project.id+"/folders/folders/"+folder.id+"/permissions";
                     %>
                     <div class="dropdown-menu" aria-labelledby="usersMenu">
                         <form action = "<%= renamePath%>" method="get">

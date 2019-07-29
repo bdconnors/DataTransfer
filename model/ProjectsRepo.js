@@ -11,11 +11,25 @@ class ProjectsRepo {
         return await project.save();
     }
     async getProject(id){
-        let results = await this.Projects.find({id:id});
-        return results[0];
+        return await this.Projects.findOne({id:id},{_id:0});
+
+    }
+    async getFolder(projectid,folderid) {
+        let results = await this.Projects.findOne({id: projectid}, {folders: {$elemMatch: {id: folderid}}}, {_id: 0});
+        return results.folders[0];
+
+    }
+    async createNewFolder(project,foldername,author){
+        let authorName = author.firstname+' '+author.lastname;
+        let folder = this.makeFolder(project.id,project.name,foldername,authorName);
+        let update = await this.Projects.updateOne({id:project.id},{$push:{folders:folder}});
+        if(update.nModified === 1){
+            update = await this.getFolder(project.id,folder.id);
+        }
+        return update;
     }
     async getAllProjects(){
-        return await this.Projects.find({});
+        return await this.Projects.find({},{_id:0});
     }
     async newUserFolders(firstname,lastname,permissions){
         for(let i = 0; i < permissions.length; i++){
@@ -31,9 +45,8 @@ class ProjectsRepo {
 
     }
     async existingUserFolder(firstname,lastname,permission){
-        console.log(permission);
+
         let project = await this.getProject(permission.projectId);
-        console.log(project);
         let userFolderName = firstname+" "+lastname+"'s "+project.name+" Uploads";
         let userFolder = this.makeFolder(project.id,project.name,userFolderName,'System');
         permission.folderPermissions.push({folderId:userFolder.id,folderName:userFolder.name,view:true,download:true});

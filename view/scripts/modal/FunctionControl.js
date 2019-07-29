@@ -1,11 +1,13 @@
 class FunctionControl{
 
-    constructor(project,invite,newUser,existing,permissions){
+    constructor(project,invite,newUser,existing,permissions,newFolderFunc,folderAddUsers){
         this.project = project;
         this.invite = invite;
         this.newUser = newUser;
         this.existing = existing;
         this.permissions = permissions;
+        this.newFolderFunc = newFolderFunc;
+        this.folderAddUsers = folderAddUsers;
     }
 
 
@@ -64,6 +66,18 @@ class FunctionControl{
             }else{
                 response.display ='invite users';
             }
+        }else if(action === 'new folder'){
+            this.newFolder = await this.newFolderFunc.createNewFolder();
+            console.log(this.newFolder);
+            this.existingUsers = await this.invite.getInvitedUsers(this.newFolder.projectId);
+            this.newFolderUsers = await this.newFolderFunc.getUsers(this.newFolder.projectId,this.newFolder.folderId);
+            response = this.newFolder;
+            response.display='new folder success';
+        }else if( action === 'folder add user'){
+            this.user = await this.folderAddUsers.addUser();
+            this.newFolderUsers = await this.newFolderFunc.getUsers(this.newFolder.projectId,this.newFolder.folderId);
+            response = this.user;
+            response.display="folder add user success";
         }
         return response;
     }

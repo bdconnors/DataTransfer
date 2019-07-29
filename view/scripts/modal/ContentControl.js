@@ -1,10 +1,12 @@
 class ContentControl{
-    constructor(project,invite,newUser,existingUser,permission){
+    constructor(project,invite,newUser,existingUser,permission,newFolder,folderAddUsers){
         this.project = project;
         this.invite = invite;
         this.newUser = newUser;
         this.existingUser = existingUser;
         this.permission = permission;
+        this.newFolder = newFolder;
+        this.folderAddUsers = folderAddUsers;
     }
 
     show(content,element){
@@ -29,6 +31,16 @@ class ContentControl{
             template = this.existingUser.get('invite');
         }else if(content === 'existing user success'){
             template = this.existingUser.get('success');
+        }else if(content === 'new folder'){
+            template = this.newFolder.get('create');
+        }else if(content === 'new folder success'){
+            template = this.newFolder.get('success');
+        }else if(content === 'folder add user'){
+            template = this.folderAddUsers.get('add');
+        }else if(content === 'folder select user'){
+            template = this.folderAddUsers.get('select');
+        }else if(content === 'folder add user success'){
+            template = this.folderAddUsers.get('success');
         }
         $modalContent.append(template);
         $('#modal').modal({backdrop: 'static', keyboard: false});

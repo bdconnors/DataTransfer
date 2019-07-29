@@ -26,25 +26,34 @@
             cellsInRow = partialRowCount;
         }%>
         <div style="text-align:center;" class="row">
-            <%for(var k = 0; k < cellsInRow; k++){%>
+            <%for(var k = 0; k < cellsInRow; k++){
+                var id;
+            %>
+            <%if(!user.admin){
+                id = projects[cellCount1].id;
+            }else{
+
+                id = projects[cellCount1].projectId;
+
+            }%>
                 <div class="col">
                     <div class="dropdown">
                         <button style = "background-color:transparent; font-size:16px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
                             <i class="fa fa-cog"></i> Options
                         </button>
                         <div class="dropdown-menu" aria-labelledby="projSettings">
-                            <form action="/projects/project/<%= projects[cellCount1].id%>" method="get">
+                            <form action="/projects/project/<%= id%>" method="get">
                                 <button class="dropdown-item" type="submit"><i class="fa fa-eye"></i> View</button>
                             </form>
-                            <%if(user.admin){%>
-                                <form action="/projects/project/<%= projects[cellCount1].id%>/rename%>" method="get">
+                            <% if(user.admin){ %>
+                                <form action="/projects/project/<%= id%>/rename%>" method="get">
                                     <button type="submit" class="dropdown-item"><i class="fa fa-pencil"></i> Rename</button>
                                 </form>
-                                <form action="/projects/project/<%= projects[cellCount1].id%>/delete%>" method="post">
+                                <form action="/projects/project/<%= id%>/delete%>" method="post">
                                     <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i> Delete</button>
                                 </form>
                                 <div class="dropdown-divider"></div>
-                                <form action="/projects/project/<%= projects[cellCount1].id%>/permissions%>" method="get">
+                                <form action="/projects/project/<%= id%>/permissions%>" method="get">
                                     <button type="submit" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
                                 </form>
                             <%}%>
@@ -55,9 +64,19 @@
             <%}%>
         </div>
         <div style="text-align:center;" class="row">
-            <%for(let l = 0; l < cellsInRow; l++){%>
+            <%for(let l = 0; l < cellsInRow; l++){
+                var id1;
+            %>
+
+                <%if(user.admin){
+                    id1 = projects[cellCount2].id;
+                }else{
+
+                    id1 = projects[cellCount2].projectId;
+
+                }%>
                 <div class="col">
-                    <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount2].id%>">
+                    <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= id1 %>">
                         <i class="fa fa-archive fa-3x"></i>
                     </a>
                 </div>
@@ -65,11 +84,21 @@
             <%}%>
         </div>
         <div style="text-align:center;" class="row">
-            <%for(let m = 0; m < cellsInRow; m++){%>
+            <%for(let m = 0; m < cellsInRow; m++){
+                var id2;
+                var name;
+            %>
+                <%if(user.admin){
+                    id2 = projects[cellCount3].id;
+                    name = projects[cellCount3].name;
+                }else{
+
+                    id2 = projects[cellCount3].projectId;
+                    name = projects[cellCount3].projectName;
+                    console.log(id2);
+                }%>
                 <div class="col">
-                    <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= projects[cellCount3].id%>">
-                        <%= projects[cellCount3].name%>
-                    </a>
+                    Project <%= name%>
                 </div>
                 <%cellCount3++%>
             <%}%>

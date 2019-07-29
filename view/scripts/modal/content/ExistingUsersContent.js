@@ -69,7 +69,7 @@ class ExistingUsersContent extends ModalContent{
                 <p><b>E-mail:</b> ${modal.functionControl.user.email}</p>`
     }
     getSuccessFooter(){
-        return   `<button type="button" onclick="modal.perform('invite users')" class="btn btn-outline-dark btn-block" ><i class="fa fa-user-plus"></i>Add Another User</button>
-                  <button type="button" onclick="modal.hide()" class="btn btn-outline-dark btn-block" ><i class="fa fa-power-off"></i>Done</button>`;
+        return `<button type="button" onclick="modal.perform('invite users')" class="btn btn-outline-dark btn-block" ><i class="fa fa-user-plus"></i>Add Another User</button>
+                <button type="button" onclick="modal.hide()" class="btn btn-outline-dark btn-block" ><i class="fa fa-power-off"></i>Done</button>`;
     }
 }

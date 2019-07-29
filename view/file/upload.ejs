@@ -2,7 +2,7 @@
 <body>
 <%- include('../include/menu.ejs',{system:system})%>
 <% if(folder){%>
-    <%- include('../include/folderNav.ejs',{system:system,project:project,folder:folder}) %>
+    <%- include('../include/folderNav.ejs',{system:system,project:project,folders:folders}) %>
 <%}else{%>
     <%- include('../include/projectNav.ejs',{system:system,project:project})%>
 <%}%>

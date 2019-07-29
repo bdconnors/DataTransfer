@@ -6,6 +6,7 @@ class PermissionsContent extends ModalContent{
         let header = this.getHeader();
         let body = this.getBody();
         let footer = this.getFooter(type);
+
         return super.make(header,body,footer);
     }
     getHeader() {
@@ -42,6 +43,5 @@ class PermissionsContent extends ModalContent{
                 <br>
                 <button type="button"  id="${type}" onclick="modal.perform('set permissions',this)" class="btn btn-outline-dark btn-block button "><i class="fa fa-eye"></i> Set</button>`;
     }
-
 
 }

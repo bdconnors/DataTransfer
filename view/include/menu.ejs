@@ -17,8 +17,18 @@
 					<%if(projects.length === 0){%>
 						<a class="dropdown-item" style="font-style:italic;">No Projects</a>
 					<%}%>
-					<%for(var i = 0; i < projects.length; i++){%>
-						<a class="dropdown-item" href="/projects/project/<%= projects[i].getId()%>"><i class="fa fa-archive"></i> <%= projects[i].getName() %></a>
+					<%for(var i = 0; i < projects.length; i++){
+						var name;
+						var id;
+					%>
+						<%if(user.admin){
+							name = projects[i].name;
+							id = projects[i].id;
+						}else{
+							name = projects[i].projectName;
+							id = projects[i].projectId;
+						}%>
+						<a class="dropdown-item" href="/projects/project/<%= id%>"><i class="fa fa-archive"></i> <%= name %></a>
 					<%}%>
 				</div>
 			</li>

@@ -15,6 +15,7 @@ class SystemAuthController{
     async postLogin(req,res){
         let authResponse = this.make(req,res);
         let verified = await this.userControl.verifyCredentials(req.body.email,req.body.password).catch((err)=>{throw err});
+
         if(verified){
             req.session.user = verified;
             authResponse.command = 'REDIRECT';
@@ -61,7 +62,6 @@ class SystemAuthController{
     }
     async postAddProjectPermission(req,res){
         let authResponse = this.make(req,res);
-        console.log('inside auth control add project perm');
         authResponse = await this.checkAdmin(authResponse,req);
         this.notifyAll(authResponse);
     }
@@ -97,6 +97,80 @@ class SystemAuthController{
         authResponse = await this.checkAdmin(authResponse,req);
         authResponse.command = 'ACTION';
         this.notifyAll(authResponse);
+    }
+    async getProjectPage(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.sessionAuth(authResponse,req);
+        authResponse = await this.projectAuth(authResponse,req);
+        this.notifyAll(authResponse);
+    }
+    async getFolderPage(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.sessionAuth(authResponse,req);
+        authResponse = await this.folderAuth(authResponse,req);
+        this.notifyAll(authResponse);
+    }
+    async postNewFolder(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.checkAdmin(authResponse,req);
+        this.notifyAll(authResponse);
+    }
+    async postAddFolderPermission(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.checkAdmin(authResponse,req);
+        this.notifyAll(authResponse);
+    }
+    async getFolderUsers(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.checkAdmin(authResponse,req);
+        authResponse.command = 'ACTION';
+        this.notifyAll(authResponse)
+    }
+    async folderAuth(authResponse,req){
+
+        let user = req.session.user;
+        let authorized = false;
+        let projectId = req.params.id;
+        let folderId = req.params.folderid;
+        if(user.admin){
+            authorized = true;
+        }else{
+            let projectPermission = await this.userControl.getProjectPermission(user.id,projectId);
+            projectPermission.folderPermissions.forEach(perm=>{
+                if(perm.folderId === folderId){
+                    authorized = true;
+                }
+            });
+
+        }
+        if(authorized){
+            authResponse.variables.folder = await this.projectControl.getFolder(projectId,folderId);
+            authResponse.display = "/projects/folders/folder";
+        }
+        else{
+            authResponse.display ='/unauthorized';
+        }
+        return authResponse
+    }
+    async projectAuth(authResponse,req){
+        let projectId = req.params.id;
+        let authorized = false;
+        if(authResponse.variables.user.admin){
+            authResponse.variables.project = await this.projectControl.getProject(projectId);
+            authResponse.display = '/projects/project';
+            authorized = true;
+        }else{
+            let permission = await this.userControl.getProjectPermission(req.session.user.id,projectId);
+            authResponse.variables.project = permission;
+            if(permission){
+                authResponse.display = '/projects/project';
+                authorized = true;
+            }
+        }
+        if(!authorized){
+            authResponse.display = '/unauthorized';
+        }
+        return authResponse;
     }
     async sessionAuth(authResponse,req){
         if(req.session && req.session.user){
