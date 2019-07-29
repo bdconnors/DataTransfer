@@ -7,11 +7,14 @@ class ProjectController{
         return await this.model.createProject(name,'System');
     }
     async getAllProjects(){
-        console.log('all projects request');
         return await this.model.getAllProjects();
     }
     async newUserFolders(firstname,lastname,permissions){
         return await this.model.newUserFolders(firstname,lastname,permissions);
     }
+    async existingUserFolder(firstname,lastname,permission){
+        return await this.model.existingUserFolder(firstname,lastname,permission);
+    }
+
 }
 module.exports={ProjectController:ProjectController};

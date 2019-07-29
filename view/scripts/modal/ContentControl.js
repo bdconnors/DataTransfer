@@ -1,12 +1,13 @@
 class ContentControl{
-    constructor(project,invite,newUser,permission){
+    constructor(project,invite,newUser,existingUser,permission){
         this.project = project;
         this.invite = invite;
         this.newUser = newUser;
+        this.existingUser = existingUser;
         this.permission = permission;
     }
 
-    show(content){
+    show(content,element){
 
         let template;
         let $modalContent = $('#modalContent');
@@ -22,12 +23,15 @@ class ContentControl{
             template = this.newUser.get('invite');
         }else if(content === 'new user success'){
             template = this.newUser.get('success');
-        }else if(content === 'permissions new user'){
-            template = this.permission.get('new');
+        }else if(content === 'set permissions'){
+            template = this.permission.get(element.id);
+        }else if(content === 'invite existing user'){
+            template = this.existingUser.get('invite');
+        }else if(content === 'existing user success'){
+            template = this.existingUser.get('success');
         }
-
         $modalContent.append(template);
-        $('#modal').modal('show');
+        $('#modal').modal({backdrop: 'static', keyboard: false});
     }
 
 }

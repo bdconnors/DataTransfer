@@ -14,7 +14,6 @@ class Server {
                 return data
             },
             error: (e)=> {
-                console.log(e);
                 return false;
             }
         };

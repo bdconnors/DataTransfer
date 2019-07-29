@@ -55,7 +55,7 @@ class NewUserContent extends ModalContent{
     }
     getFooter(){
 
-        return `<button type="button" onclick="" class="btn btn-outline-dark btn-block button "><i class="fa fa-arrow-left"></i> Back</button>
+        return `<button type="button" id="new" onclick="modal.display('set permissions',this)" class="btn btn-outline-dark btn-block button "><i class="fa fa-arrow-left"></i> Back</button>
                 <br>
                 <button type="button"  onclick="modal.perform('invite new user')" class="btn btn-outline-dark btn-block button "><i class="fa fa-envelope"></i> Invite</button>`;
     }
@@ -70,7 +70,7 @@ class NewUserContent extends ModalContent{
                 <p><b>E-mail:</b> ${modal.functionControl.user.email}</p>`
     }
     getSuccessFooter(){
-        return   `<button type="button" onclick="" class="btn btn-outline-dark btn-block" ><i class="fa fa-user-plus"></i>Add Another User</button>
+        return   `<button type="button" onclick="modal.perform('invite users')" class="btn btn-outline-dark btn-block" ><i class="fa fa-user-plus"></i>Add Another User</button>
                   <button type="button" onclick="modal.hide()" class="btn btn-outline-dark btn-block" ><i class="fa fa-power-off"></i>Done</button>`;
     }
 

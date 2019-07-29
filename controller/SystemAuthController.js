@@ -55,11 +55,14 @@ class SystemAuthController{
         this.notifyAll(authResponse);
     }
     async postRemoveProjectPermission(req,res){
-        console.log('hit auth');
         let authResponse = this.make(req,res);
         authResponse = await this.checkAdmin(authResponse,req);
-        console.log(authResponse.display);
-        console.log(authResponse.command);
+        this.notifyAll(authResponse);
+    }
+    async postAddProjectPermission(req,res){
+        let authResponse = this.make(req,res);
+        console.log('inside auth control add project perm');
+        authResponse = await this.checkAdmin(authResponse,req);
         this.notifyAll(authResponse);
     }
     async getAuthForm(req,res){
@@ -77,6 +80,12 @@ class SystemAuthController{
         authResponse = await this.checkAdmin(authResponse,req);
         this.notifyAll(authResponse);
     }
+    async getUser(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.checkAdmin(authResponse,req);
+        authResponse.command = 'ACTION';
+        this.notifyAll(authResponse);
+    }
     async getAllUsers(req,res){
         let authResponse = this.make(req,res);
         authResponse = await this.checkAdmin(authResponse,req);
@@ -89,7 +98,6 @@ class SystemAuthController{
         authResponse.command = 'ACTION';
         this.notifyAll(authResponse);
     }
-
     async sessionAuth(authResponse,req){
         if(req.session && req.session.user){
             let dbUser = await this.userControl.getUser('id',req.session.user.id).catch((err)=>{throw err});

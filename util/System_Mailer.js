@@ -23,34 +23,39 @@ class System_Mailer{
         });
     }
 
-    sendEmail(authResponse){
+    async sendEmail(authResponse){
 
-        let user = authResponse.variables.email.user;
-        let action = authResponse.variables.email.action;
-        let email = this.getEmail(user,action);
-
-        this.transporter.sendMail(email).then(()=>{
-            authResponse.response.send(user);
+        let email = this.getEmail(authResponse.variables.email,authResponse.variables.email.action);
+        let lastEmail = authResponse.variables.email.lastEmail;
+        await this.transporter.sendMail(email).then(()=>{
+            console.log('inside send mail');
+            if(lastEmail) {
+                console.log('inside last email');
+                authResponse.response.send(authResponse.variables.email.user);
+            }
         }).catch(err=>{
             throw err
         });
     }
 
-    getEmail(user,action){
+    getEmail(variables,action){
 
-        let to = user.email;
+        let to = variables.user.email;
         let url;
         let subject;
         let body;
 
         if(action === 'INVITED'){
-            url = this.sysEmails.inviteURL(user.authCode);
+            url = this.sysEmails.inviteURL(variables.user.authCode);
             subject = this.sysEmails.inviteSubject(this.company);
-            body = this.sysEmails.inviteBody(user,this.company,url);
+            body = this.sysEmails.inviteBody( variables.user,this.company,url);
         }else if(action === 'AUTHENTICATED'){
             url = this.sysEmails.authUrl();
             subject =this.sysEmails.authSubject(this.company);
-            body = this.sysEmails.authBody(user,this.company,url);
+            body = this.sysEmails.authBody(variables.user,this.company,url);
+        }else if(action === 'PROJECT ADD'){
+            subject = this.sysEmails.projectAddSubject(variables.permission);
+            body = this.sysEmails.projectAddBody(variables.user,variables.permission,this.company);
         }
 
         return this.make(to,subject,body);

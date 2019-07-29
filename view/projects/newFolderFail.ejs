@@ -21,8 +21,6 @@
                 %>
                     <%for(var j = 0; j < curUser.projects.length; j++){
                         var curProject = curUser.projects[j];
-                        console.log(curUser.projects);
-                        console.log
                     %>
                         <%if(curProject.id === project.id){%>
                             <% if(users[i].getAdmin() !== true && system.user.getId() !== users[i].getId() && !users[i].authCode){%>

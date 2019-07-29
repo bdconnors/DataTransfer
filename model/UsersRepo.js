@@ -19,7 +19,12 @@ class UsersRepo {
         }
     }
     async updateUser(field,value,updateQuery){
-        return await this.Users.updateOne(this.makeQuery(field,value),updateQuery)
+        let update = await this.Users.updateOne(this.makeQuery(field,value),updateQuery);
+        if(update.nModified === 1){
+            console.log('inside update.nModified === 1');
+            update = await this.getUser('id',value);
+        }
+        return update;
     }
     async deleteUser(field,value){
 

@@ -11,12 +11,32 @@ class SystemActionController{
         let lastName = userObj.lastname;
         let email = userObj.email;
         let projPermissions = userObj.projectPermissions;
-        projPermissions = await this.projectControl.newUserFolders(firstName,lastName,projPermissions);
         let user = await this.userControl.inviteNewUser(firstName,lastName,email,projPermissions);
-        authResponse.variables.email = {action:'INVITED',user:user};
+        authResponse.variables.email = {action:'INVITED',user:user,lastEmail:false};
         this.notifyAll(authResponse);
+        projPermissions = await this.projectControl.newUserFolders(firstName,lastName,projPermissions);
+        for(let i = 0; i < projPermissions.length; i++){
+            let lastEmail = false;
+            if(i === projPermissions.length-1){
+                lastEmail = true;
+            }
+            authResponse.variables.email = {action:'PROJECT ADD',user:user,permission:projPermissions[i],lastEmail:lastEmail};
+            this.notifyAll(authResponse);
+        }
 
     }
+    async inviteExistingUser(authResponse){
+        let userId = authResponse.request.body.userId;
+        let permission = authResponse.request.body.permission;
+        let user = await this.userControl.getUser('id', userId);
+        console.log(permission);
+        permission = await this.projectControl.existingUserFolder(user.firstname,user.lastname,permission);
+        user.projectPermissions.push(permission);
+        user = await this.userControl.updateUser('id',user.id,{$set:{projectPermissions:user.projectPermissions}});
+        authResponse.variables.email = {action:'PROJECT ADD',user:user,permission:permission,lastEmail:true};
+        this.notifyAll(authResponse);
+    }
+
     async updateNewUser(authResponse){
         let authCode = authResponse.request.query.authCode;
         let phone = authResponse.request.body.phone;
@@ -24,13 +44,12 @@ class SystemActionController{
         this.userControl.updateNewUser(authCode,phone,password)
             .then(user=>{
                 authResponse.display = '/users/authSuccess';
-                authResponse.variables.email = {action:'AUTHENTICATED',user:user};
+                authResponse.variables.email = {action:'AUTHENTICATED',user:user,lastEmail:true};
                 this.notifyAll(authResponse);
             })
             .catch((err)=>{throw err});
     }
     async getAllUsers(authResponse){
-        console.log('all users request');
         let users = await this.userControl.getAllUsers();
         authResponse.response.send(users);
 
@@ -42,7 +61,13 @@ class SystemActionController{
             authResponse.response.send(projectUsers);
         }
     }
-
+    async getUser(authResponse){
+        if(authResponse.request.query.id){
+            let userId = authResponse.request.query.id;
+            let user = await this.userControl.getUser('id',userId);
+            authResponse.response.send(user);
+        }
+    }
     async createNewProject(authResponse){
         let name = authResponse.request.body.name;
         this.projectControl.createNewProject(name).then((project)=>{
@@ -71,8 +96,11 @@ class SystemActionController{
         }else if(authResponse.display === '/users/project'){
             this.getProjectUsers(authResponse).catch((err)=>{throw err});
         }else if(authResponse.display === '/users/project/permissions/remove'){
-            console.log('observe notified');
             this.removeUserProjectPermission(authResponse).catch((err)=>{throw err});
+        }else if(authResponse.display === '/users/user'){
+            this.getUser(authResponse).catch(err=>{throw err});
+        }else if(authResponse.display === '/users/project/permissions/add'){
+            this.inviteExistingUser(authResponse).catch(err=>{throw err});
         }
 
     }

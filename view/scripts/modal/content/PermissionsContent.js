@@ -5,16 +5,11 @@ class PermissionsContent extends ModalContent{
     get(type){
         let header = this.getHeader();
         let body = this.getBody();
-        let footer;
-        if(type === 'new'){
-            footer = this.getNewFooter();
-        }else if(type === 'existing'){
-
-        }
+        let footer = this.getFooter(type);
         return super.make(header,body,footer);
     }
     getHeader() {
-        return `<i class="fa fa-eye"></i> New User Permissions`;
+        return `<i class="fa fa-eye"></i> Set User Invitation Permissions`;
     }
 
     getBody() {
@@ -24,7 +19,7 @@ class PermissionsContent extends ModalContent{
                         <div id="userPermsDiv" class="col center">
                     <h5><b><i class = "fa fa-file"></i> Data Access Level:</b></h5>
                     <label for="view"><span style="color:green; font-size:20px;" id="viewLabel" ><i class = "fa fa-eye"></i></span> <b>View Data</b></label>
-                    <input style="display: none" onclick="modal.perform('permission click')" class = "form-control" type="radio" name="userPerms"value="view" checked id="view">
+                    <input style="display: none" onclick="modal.perform('permission click')" class = "form-control" type="radio" name="userPerms" value="view" checked id="view">
                     <br>
                     <label for="download"><span style="color:red; font-size:20px;" id="downloadLabel" ><i class = "fa fa-download"></i></span> <b>View & Download Data</b></label>
                     <input style="display:none" onclick="modal.perform('permission click')" class = "form-control" type="radio" name="userPerms" value="download" id="download">
@@ -42,10 +37,11 @@ class PermissionsContent extends ModalContent{
         return template;
     }
 
-    getNewFooter() {
-        return `<button type="button" onclick="" class="btn btn-outline-dark btn-block button "><i class="fa fa-arrow-left"></i> Back</button>
+    getFooter(type) {
+        return `<button type="button" onclick="modal.perform('invite users')" class="btn btn-outline-dark btn-block button "><i class="fa fa-arrow-left"></i> Back</button>
                 <br>
-                <button type="button"  onclick="modal.perform('set permissions')" class="btn btn-outline-dark btn-block button "><i class="fa fa-eye"></i> Set</button>`;
+                <button type="button"  id="${type}" onclick="modal.perform('set permissions',this)" class="btn btn-outline-dark btn-block button "><i class="fa fa-eye"></i> Set</button>`;
     }
+
 
 }

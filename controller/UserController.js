@@ -14,6 +14,9 @@ class UserController{
         return await this.model.createUser(firstname,lastname,email,projectPermissions);
 
     }
+    async updateUser(field,value,updateQuery){
+        return await this.model.updateUser(field,value,updateQuery);
+    }
     async updateNewUser(authCode,phone,password){
         let user = await this.model.getUser('authCode',authCode);
         let hashPass = await bcrypt.hash(password,10);
@@ -22,8 +25,16 @@ class UserController{
             .then(()=>{return this.model.getUser('id',user.id)})
             .catch((err)=>{throw err});
     }
+    async addProjectPermission(userid,permission){
+        console.log('inside user control');
+        console.log(userid);
+        console.log(permission);
+        let response =  await this.model.addProjectPermission(userid,permission);
+        console.log(response);
+        return response;
+
+    }
     async getAllUsers() {
-        console.log('all users request');
         return await this.model.getAllUsers();
     }
     async getProjectUsers(id){

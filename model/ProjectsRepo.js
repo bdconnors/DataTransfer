@@ -30,6 +30,17 @@ class ProjectsRepo {
         return permissions;
 
     }
+    async existingUserFolder(firstname,lastname,permission){
+        console.log(permission);
+        let project = await this.getProject(permission.projectId);
+        console.log(project);
+        let userFolderName = firstname+" "+lastname+"'s "+project.name+" Uploads";
+        let userFolder = this.makeFolder(project.id,project.name,userFolderName,'System');
+        permission.folderPermissions.push({folderId:userFolder.id,folderName:userFolder.name,view:true,download:true});
+        project.folders.push(userFolder);
+        await this.Projects.updateOne({id:project.id},{$set:{folders:project.folders}});
+        return permission;
+    }
     make(name,author){
         let projectId = uuid();
         let folders = [];

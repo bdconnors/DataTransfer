@@ -4,8 +4,8 @@ class Modal{
         this.functionControl = functionControl;
     }
 
-    display(content){
-        this.contentControl.show(content);
+    display(content,element){
+        this.contentControl.show(content,element);
     }
     async perform(action,element){
         this.processResponse(await this.functionControl.perform(action,element));
@@ -16,7 +16,6 @@ class Modal{
             this.display(response.display);
         }
     }
-
     hide(){
         let $modalContent = $('#modalContent');
         $modalContent.empty();

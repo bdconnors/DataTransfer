@@ -2,7 +2,7 @@ class NewUserFunctions{
     constructor(){}
     async sendInvite(project,folderPermissions){
         let $loading = $('#loadingSpinner');
-        $loading.modal('show');
+        $loading.modal({backdrop: 'static', keyboard: false});
         let userObject = await this.createUserObject(project,folderPermissions);
         console.log(userObject);
         let response = await server.send(server.make('/users/invite','POST',userObject));

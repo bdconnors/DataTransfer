@@ -22,7 +22,7 @@ class InviteUserContent extends ModalContent {
 
             modal.functionControl.invitedUsers.forEach((user) => {
                 template += `<b>${user.firstname} ${user.lastname}</b>
-                        <input type="button" value ="Remove" onclick="" name="${modal.functionControl.project.id}" id="${user.id}" style="font-size:14px;" class="btn btn-danger button"></button>`;
+                        <input type="button" value ="Remove" onclick="modal.perform('remove permission',this)" name="${modal.functionControl.project.id}" id="${user.id}" style="font-size:14px;" class="btn btn-danger button"></button>`;
             });
         }
         template += `</div></div>`;
@@ -30,8 +30,8 @@ class InviteUserContent extends ModalContent {
     }
 
     getFooter() {
-        return `<button type="button"  onclick="modal.display('permissions new user')" class="btn btn-outline-dark btn-block button "><i class="fa fa-envelope"></i> Invite New</button>
-                <br>
-                <button type="button"  class="btn btn-outline-dark btn-block button"><i class="fa fa-user"></i> Invite Existing</button>`;
-    }
+        return `<button type="button"  id="new" onclick="modal.display('set permissions',this)" class="btn btn-outline-dark btn-block button "><i class="fa fa-envelope"></i> Invite New</button>
+                <button type="button"   id="existing" onclick="modal.display('set permissions',this)" class="btn btn-outline-dark btn-block button"><i class="fa fa-user"></i> Invite Existing</button>
+                <button type="button"  onclick="modal.hide()" class="btn btn-outline-dark btn-block button "><i class="fa fa-power-off"></i> Done</button>`;
+}
 }

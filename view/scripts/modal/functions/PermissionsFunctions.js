@@ -15,7 +15,7 @@ class PermissionsFunctions{
         return folderPerms;
     }
     getDataAccessPerm(){
-        let dataPerm = {view:true,download:true};
+        let dataPerm = {view:true,download:false};
         let dataPermInputs = document.getElementsByName('userPerms');
         dataPermInputs.forEach(perm => {
             if(perm.checked){
@@ -26,6 +26,15 @@ class PermissionsFunctions{
             }
         });
         return dataPerm;
+    }
+    async getExistingUsers(){
+        return await server.send(server.make('/users','GET'))
+    }
+    async removePermission(element){
+        let projectId = element.name;
+        let userId = element.id;
+        return await server.send(server.make('/users/project/permissions/remove','POST',{id:userId,projectId:projectId}));
+
     }
     permissionClick(){
         let view = document.getElementById('view').checked;

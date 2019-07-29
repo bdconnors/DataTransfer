@@ -116,6 +116,10 @@ app.get('/users',(req,res)=>{
     sysAuth.getAllUsers(req,res).catch((err)=>{throw err});
 
 });
+app.get('/users/user',(req,res)=>{
+
+    sysAuth.getUser(req,res).catch(err=>{throw err});
+});
 
 app.get('/users/project',(req,res)=>{
     sysAuth.getProjectUsers(req,res).catch((err)=>{throw err});
@@ -124,6 +128,12 @@ app.get('/users/project',(req,res)=>{
 
 app.post('/users/project/permissions/remove',(req,res)=>{
     sysAuth.postRemoveProjectPermission(req,res).catch(err=>{throw err});
+
+});
+
+app.post('/users/project/permissions/add',(req,res)=>{
+    console.log('inside app post project permission');
+    sysAuth.postAddProjectPermission(req,res).catch(err=>{throw err});
 
 });
 
