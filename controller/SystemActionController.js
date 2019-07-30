@@ -52,6 +52,7 @@ class SystemActionController{
             })
             .catch((err)=>{throw err});
     }
+
     async getAllUsers(authResponse){
         let users = await this.userControl.getAllUsers();
         authResponse.response.send(users);
@@ -292,10 +293,7 @@ class SystemActionController{
             this.deleteFile(authResponse).catch((err)=>{throw err});
         }else if(authResponse.display === '/projects/project/:id/rename'){
             this.renameProject(authResponse).catch(err=>{throw err});
-        }else if(authResponse.display === '/projects/project/:id/folders/folder/:folderid/rename'){
-            this.renameFolder(authResponse).catch(err=>{throw err});
         }
-
 
     }
     notify(authResponse){

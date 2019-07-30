@@ -11,7 +11,7 @@ module.exports.inviteSubject = function(company){
 module.exports.inviteBody = function(user,company,inviteUrl){
     let template = `<p>Dear ${user.firstname},</p>
     <p><b>Please Follow The Link Below To Create Your ${company} Account:</b></p>
-    <p>Account Creation Link: <a href='${inviteUrl}'>Create Account</a>></p>
+    <p>Account Creation Link: <a href='${inviteUrl}'>Create Account</a></p>
     <p>Thanks, </p>
     <p>${company} Team</p>
     <br>

@@ -37,6 +37,9 @@ class UserController{
     async deleteFolder(projectid,folderid){
         return await this.model.deleteFolder(projectid,folderid);
     }
+    async deleteUser(userid){
+        return await this.model.deleteUser(userid);
+    }
     async removeFolderPermission(userid,projectid,folderid){
         return await this.model.removeFolderPermission(userid,projectid,folderid);
     }

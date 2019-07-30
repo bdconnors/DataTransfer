@@ -69,6 +69,9 @@ class UsersRepo {
     async getProjectUsers(id){
         return await this.Users.find({"projectPermissions.projectId":id},{_id:0});
     }
+    async deleteUser(userid){
+        return await this.Users.deleteOne({id:userid});
+    }
     async logActivity(userid,activity){
         return await this.Users.updateOne({id:userid},{$push:{activity:activity}});
     }

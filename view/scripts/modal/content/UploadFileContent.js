@@ -29,7 +29,7 @@ class UploadFileContent extends ModalContent{
                     <label for="name"><i class="fa fa-pencil"></i> <b>Select a File:</b></label>
                  </div>
                  <div class="text-center">
-                     <input type="file" class="form-control" name="fileName" id="fileInput" placeholder="Project Name">
+                     <input type="file" class="form-control" name="fileName" accept="image/jpg, image/gif" id="fileInput" placeholder="Project Name">
                  </div>`;
     }
     getFooter(){

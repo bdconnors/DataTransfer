@@ -131,6 +131,11 @@ app.get('/users/:id/profile',(req,res)=>{
     sysAuth.getUserProfile(req,res).catch(err=>{throw err});
 });
 
+app.post('/users/:id/delete',(req,res)=>{
+
+  sysAuth.postDeleteUser(req,res).catch((err)=>{throw err});
+});
+
 app.get('/users/project',(req,res)=>{
     sysAuth.getProjectUsers(req,res).catch((err)=>{throw err});
 
@@ -219,12 +224,6 @@ app.post('/projects/project/:id/folders/folder/:folderid/delete',(req,res)=>{
 
 });
 
-
-app.post('/projects/project/:id/folders/new',(req,res)=>{
-
-    sysAuth.postNewFolder(req,res).catch((err)=>{throw err});
-
-});
 
 app.post('/projects/folders/upload',(req,res)=>{
 

@@ -80,6 +80,19 @@ class SystemAuthController{
         authResponse = await this.checkAdmin(authResponse,req);
         this.notifyAll(authResponse);
     }
+    async postDeleteUser(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.checkAdmin(authResponse,req);
+        if(authResponse.admin){
+            this.userControl.deleteUser(req.params.id).then(()=>{
+                authResponse.command = 'REDIRECT';
+                authResponse.display = '/dashboard';
+                this.notifyAll(authResponse);
+            }).catch(err=>{throw err});
+        }else{
+            this.notifyAll(authResponse);
+        }
+    }
     async postRenameFolder(req,res){
         let authResponse = this.make(req,res);
         authResponse = await this.checkAdmin(authResponse,req);

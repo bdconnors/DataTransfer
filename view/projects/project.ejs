@@ -12,6 +12,7 @@
         folders = project.folders;
         projectName = project.name;
     }else{
+        console.log(project)
         folders = project.folderPermissions;
         projectName = project.projectName;
     }
@@ -52,22 +53,18 @@
                                 }
                             %>
                                 <div class="col">
+                                    <% if(user.admin){ %>
                                     <div class="dropdown">
                                         <button style = "background-color:transparent; font-size:12px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
                                         <i class="fa fa-cog"></i> Options
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="projSettings">
-                                            <form action = ./<%= id%>/folders/folder/<%= id%> method="get">
-                                                    <button class="dropdown-item" type="submit"><i class="fa fa-folder-open"></i> Open</button>
-                                            </form>
-                                            <% if(user.admin){ %>
-
-                                                <form action="" method="get">
-                                                    <button type="submit" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
+                                                <form action="/projects/project/<%=projectId%>/folders/folder/<%=id%>/delete" method="post">
+                                                    <button type="submit" class="dropdown-item"><i class="fa fa-minus"></i> Delete</button>
                                                 </form>
-                                            <%}%>
                                         </div>
                                     </div>
+                                    <%}%>
                                 </div>
                                 <%cellCount1++%>
                             <%}%>
