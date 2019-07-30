@@ -30,14 +30,13 @@ class UsersRepo {
         return await this.Users.deleteOne(this.makeQuery(field,value));
     }
     async addFolderPermission(userid,folder,perms){
+        console.log(perms);
         let view = perms.view;
         let download = perms.download;
         let folderPermission = {folderId:folder.id,folderName:folder.name,view:view,download:download};
         let update = await this.Users.updateOne({"id":userid,"projectPermissions.projectId":folder.projectId},{"$push":{"projectPermissions.$.folderPermissions":folderPermission}});
         if(update.nModified === 1){
-
             update = await this.getUser('id',userid);
-            console.log(update);
         }
         return update;
     }
@@ -51,12 +50,27 @@ class UsersRepo {
     async removeProjectPermission(userid,projectid){
         return await this.Users.updateOne({id:userid},{$pull:{'projectPermissions':{projectId:projectid}}});
     }
+    async removeFolderPermission(userid,projectid,folderid){
+        return await this.Users.update({"id":userid,"projectPermissions.projectId":projectid},{"$pull":{"projectPermissions.$.folderPermissions":{folderId:folderid}}});
+    }
     async getAllUsers(){
         return await this.Users.find({admin:false});
 
     }
+    async deleteFolder(projectid,folderid){
+        return await this.Users.updateMany({"projectPermissions.projectId":projectid},{$pull:{"projectPermissions.$.folderPermissions":{folderId:folderid}}});
+    }
+    async deleteProject(projectid){
+        return await this.Users.updateMany({"projectPermissions.projectId":projectid},{$pull:{projectPermissions:{id:projectid}}});
+    }
+    async renameProject(projectid,newname){
+        return await this.Users.updateMany({'projectPermissions.projectId':projectid},{$set:{projectName:newname}});
+    }
     async getProjectUsers(id){
         return await this.Users.find({"projectPermissions.projectId":id},{_id:0});
+    }
+    async logActivity(userid,activity){
+        return await this.Users.updateOne({id:userid},{$push:{activity:activity}});
     }
     makeQuery(field,value){
         let query = {};

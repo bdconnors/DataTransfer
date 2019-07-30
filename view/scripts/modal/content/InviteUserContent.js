@@ -22,7 +22,7 @@ class InviteUserContent extends ModalContent {
 
             modal.functionControl.invitedUsers.forEach((user) => {
                 template += `<b>${user.firstname} ${user.lastname}</b>
-                        <input type="button" value ="Remove" onclick="modal.perform('remove permission',this)" name="${modal.functionControl.project.id}" id="${user.id}" style="font-size:14px;" class="btn btn-danger button"></button>`;
+                        <input type="button" value ="Remove" onclick="modal.perform('remove permission',this)" name="${modal.functionControl.project.id}" id="${user.id}" style="font-size:14px;" class="btn btn-danger button"></button><br>`;
             });
         }
         template += `</div></div>`;

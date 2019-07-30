@@ -5,7 +5,6 @@ class Server {
     async send(request) {
         return await $.ajax(request);
     }
-
     make(url, type, data) {
         let req = {
             url: url,
@@ -17,9 +16,10 @@ class Server {
                 return false;
             }
         };
-        if (data != null) {
+        if (data !== null) {
             req.data = data;
         }
+
         return req;
     }
 }

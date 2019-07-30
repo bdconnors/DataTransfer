@@ -19,5 +19,8 @@ class FolderAddUsersFunctions{
         });
         return perm;
     }
+    async removeUserPermission(userid,projectid,folderid){
+        return await server.send(server.make('/users/folders/permissions/remove','POST',{userid:userid,projectid:projectid,folderid:folderid}));
+    }
 
 }

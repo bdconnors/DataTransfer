@@ -34,6 +34,12 @@ class UserController{
     async getFolderUsers(projectid,folderid){
         return await this.model.getFolderUsers(projectid,folderid);
     }
+    async deleteFolder(projectid,folderid){
+        return await this.model.deleteFolder(projectid,folderid);
+    }
+    async removeFolderPermission(userid,projectid,folderid){
+        return await this.model.removeFolderPermission(userid,projectid,folderid);
+    }
     async getProjectUsers(id){
         return await this.model.getProjectUsers(id);
     }
@@ -43,6 +49,12 @@ class UserController{
     }
     async removeProjectPermission(userid,projectid){
         return await this.model.removeProjectPermission(userid,projectid);
+    }
+    async renameProject(projectId,newname){
+        return await this.model.renameProject(projectId,newname);
+    }
+    async deleteProject(projectId){
+        return await this.model.deleteProject(projectId);
     }
     async verifyCredentials(email,password){
         return await this.model.getUser('email',email)
@@ -54,6 +66,19 @@ class UserController{
                 }
             })
             .catch(()=>{return false});
+    }
+    async logActivity(authResponse){
+        let user = authResponse.variables.activity.user;
+        let userId = user.id;
+        delete authResponse.variables.activity.user;
+        let activity = authResponse.variables.activity;
+        await this.model.logActivity(userId,activity);
+    }
+
+    notify(authResponse){
+        if(authResponse.variables.activity){
+            this.logActivity(authResponse);
+        }
     }
 }
 module.exports={UserController:UserController};

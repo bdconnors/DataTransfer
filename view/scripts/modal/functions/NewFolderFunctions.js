@@ -17,6 +17,7 @@ class NewFolderFunctions{
     }
     async getUsers(projectId,folderId){
         console.log('inside get folder users');
+        console.log(folderId);
         return await server.send(server.make('/users/folders','GET',{projectId:projectId,folderId:folderId})).catch(err=>{console.log(err)});
     }
 }

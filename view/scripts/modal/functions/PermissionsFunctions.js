@@ -27,6 +27,9 @@ class PermissionsFunctions{
         });
         return dataPerm;
     }
+    async getProject(projectid){
+        return await server.send(server.make())
+    }
     async getExistingUsers(){
         return await server.send(server.make('/users','GET'))
     }

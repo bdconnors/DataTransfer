@@ -1,8 +1,8 @@
-<%- include('../include/head.ejs',{title:'My ProjectsRepo',scripts:false})%>
+<%- include('../include/head.ejs',{title:'User Profile',scripts:false})%>
 <body>
-<%- include('../include/menu.ejs',{system:system}) %>
+<%- include('../include/adminNav.ejs') %>
 <div class="bg-dark" id="header" style="padding:35px 50px; width:100%;">
-    <h1 class="bg-dark" ><i class="fa fa-user-circle-o fa-2x"></i> <%= user.getFullName()%></h1>
+    <h1 class="bg-dark" ><i class="fa fa-user-circle-o fa-2x"></i> <%= user.firstname%> <%=user.lastname%></h1>
 </div>
 <% var projects = user.projectPermissions%>
 <br>
@@ -31,34 +31,19 @@
             </div>
         </div>
     </div>
-        <div class="card">
-            <h5 class="card-header"><i class="fa fa-archive"></i> ProjectsRepo</h5>
-            <div class="card-body">
-        <div class="row">
-        <%for(var i = 0; i < projects.length; i++){%>
-            <div class="col">
+        <div>
             <div class="card">
-                <h5 class="card-header"><i class="fa fa-archive"></i> ProjectContent <%= projects[i].name%></h5>
+                <h5 class="card-header"><i class="fa fa-eye"></i> Activity</h5>
                 <div class="card-body">
-                    <h5 class="card-title">Permissions</h5>
-                        <% if(user.admin){%>
-                            - Administrative(View,Edit,Upload and Delete);
-                        <%}else{%>
-                            <% if(projects[i].read){%>
-                                - View Assigned Folders and Files
-                            <%}%>
-                            <% if(projects[i].write){%>
-                                - Upload Files to ProjectContent Folder
-                                - Delete and Edit ProjectContent Files/Folders
-                            <%}%>
-
-                        <%}%>
+                    <%for(var l = 0; l < user.activity.length; l++){
+                        var curActivity = user.activity[l];
+                    %>
+                        <div class="row">
+                            <p><b><%= curActivity.date%>:</b> <%= curActivity.action%> <%= curActivity.targetType%> <%= curActivity.target%></p>
+                        </div>
+                    <%}%>
                 </div>
             </div>
-            </div>
-        <%}%>
-        </div>
-        </div>
         </div>
     </div>
     </div>

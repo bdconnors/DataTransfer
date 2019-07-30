@@ -26,12 +26,14 @@ class System_Mailer{
     async sendEmail(authResponse){
 
         let email = this.getEmail(authResponse.variables.email,authResponse.variables.email.action);
-        let lastEmail = authResponse.variables.email.lastEmail;
         await this.transporter.sendMail(email).then(()=>{
-            console.log('inside send mail');
-            if(lastEmail) {
-                console.log('inside last email');
+            if(authResponse.variables.email.action === 'INVITED'){
                 authResponse.response.send(authResponse.variables.email.user);
+            }else if(authResponse.variables.email.action === 'AUTHENTICATED'){
+                authResponse.display = '/users/authSuccess';
+                authResponse.command = 'DISPLAY';
+                authResponse.variables.user = authResponse.variables.email.user;
+                this.notifyAll(authResponse)
             }
         }).catch(err=>{
             throw err
@@ -48,7 +50,7 @@ class System_Mailer{
         if(action === 'INVITED'){
             url = this.sysEmails.inviteURL(variables.user.authCode);
             subject = this.sysEmails.inviteSubject(this.company);
-            body = this.sysEmails.inviteBody( variables.user,this.company,url);
+            body = this.sysEmails.inviteBody(variables.user,this.company,url);
         }else if(action === 'AUTHENTICATED'){
             url = this.sysEmails.authUrl();
             subject =this.sysEmails.authSubject(this.company);

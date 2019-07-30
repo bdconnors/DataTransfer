@@ -3,17 +3,17 @@
             <div class="content">
                 <div id = "primaryHeader"  style="padding:35px 50px;">
                     <h4 id="primaryH4"><i class="fa fa-address-card fa-2x" ></i> </span> Account Creation </h4>
-                    <h3><%= email.user.getFullName()%></h3>
+                    <h3><%= user.firstname%> <%= user.lastname%></h3>
                 </div>
                 <div class="body" style="padding:40px 50px;">
                     <div class="form-group">
-                        <div class = "center-div form-width">
+                        <div class = "center form-width">
                         <form action="/dashboard" method="get">
                             <label>Account Created for <%= email.user.getFullName()%></label>
-                            <p>Name: <%= email.user.name%></p>
-                            <p>E-mail: <%= email.user.email%></p>
+                            <p>Name: <%= user.firstname%> <%= user.lastname%></p>
+                            <p>E-mail: <%= user.email%></p>
                             <p style="font-size:12px;">** Please store your password in a secure location **</p>
-                            <div class="center-div button-width">
+                            <div class="center button-width">
                             <button type="submit" class="btn btn-dark btn-block" ><span class="glyphicon glyphicon-off"></span> Dashboard</button>
                             </div>
                         </form>

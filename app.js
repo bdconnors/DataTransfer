@@ -63,6 +63,7 @@ const sysView = new SystemViewController();
 
 const File_System = require('./controller/File_System').File_System;
 const sysStorage = new File_System();
+sysStorage.subscribe(sysView);
 
 const System_Mailer = require('./controller/System_Mailer').System_Mailer;
 const sysEmails = require('./model/System_Emails');
@@ -73,6 +74,7 @@ const SystemActionController = require('./controller/SystemActionController').Sy
 const sysAct = new SystemActionController(userControl,projectControl);
 sysAct.subscribe(sysMailer);
 sysAct.subscribe(sysStorage);
+sysAct.subscribe(userControl);
 
 const SystemAuthController = require('./controller/SystemAuthController').SystemAuthController;
 const sysAuth = new SystemAuthController(userControl,projectControl);
@@ -124,6 +126,10 @@ app.get('/users/user',(req,res)=>{
 
     sysAuth.getUser(req,res).catch(err=>{throw err});
 });
+app.get('/users/:id/profile',(req,res)=>{
+
+    sysAuth.getUserProfile(req,res).catch(err=>{throw err});
+});
 
 app.get('/users/project',(req,res)=>{
     sysAuth.getProjectUsers(req,res).catch((err)=>{throw err});
@@ -136,7 +142,6 @@ app.post('/users/project/permissions/remove',(req,res)=>{
 });
 
 app.post('/users/project/permissions/add',(req,res)=>{
-    console.log('inside app post project permission');
     sysAuth.postAddProjectPermission(req,res).catch(err=>{throw err});
 
 });
@@ -146,8 +151,12 @@ app.post('/users/folders/permissions/add',(req,res)=>{
     sysAuth.postAddFolderPermission(req,res).catch(err=>{throw err});
 
 });
+app.post('/users/folders/permissions/remove',(req,res)=>{
+
+    sysAuth.postRemoveFolderPermission(req,res).catch(err=>{throw err});
+
+});
 app.get('/users/folders',(req,res)=>{
-    console.log('in app.js');
     sysAuth.getFolderUsers(req,res).catch(err=>{throw err});
 
 });
@@ -169,15 +178,62 @@ app.get('/projects/project/:id',(req,res)=>{
 
 });
 
+app.post('/projects/project/:id/delete',(req,res)=>{
+
+    sysAuth.postDeleteProject(req,res).catch(err=>{throw err});
+
+});
+
 app.get('/projects/project/:id/folders/folder/:folderid',(req,res)=>{
-    console.log('inside app.js');
     sysAuth.getFolderPage(req,res).catch(err=>{throw err});
 
 });
 
+app.post('/projects/project/:id/rename',(req,res)=>{
+
+    sysAuth.postRenameProject(req,res).catch(err=>{throw err});
+});
+
+app.get('/projects/project/:id/folders/folder/:folderid/file/:filename',(req,res)=>{
+
+    sysAuth.getViewFile(req,res).catch((err)=>{throw err});
+
+});
+
+
+app.get('/projects/project/:id/folders/folder/:folderid/file/:filename/attachment',(req,res)=>{
+
+    sysAuth.getDownloadFile(req,res).catch((err)=>{throw err});
+
+});
+
+app.post('/projects/project/:id/folders/folder/:folderid/file/:filename/delete',(req,res)=>{
+
+    sysAuth.postDeleteFile(req,res).catch((err)=>{throw err});
+
+});
+
+app.post('/projects/project/:id/folders/folder/:folderid/delete',(req,res)=>{
+
+    sysAuth.postDeleteFolder(req,res).catch((err)=>{throw err});
+
+});
+
+
 app.post('/projects/project/:id/folders/new',(req,res)=>{
 
     sysAuth.postNewFolder(req,res).catch((err)=>{throw err});
+
+});
+
+app.post('/projects/folders/upload',(req,res)=>{
+
+    sysAuth.postUploadFile(req,res).catch((err)=>{throw err});
+
+});
+app.post('/projects/folders/download',(req,res)=>{
+
+    res.send(req.body);
 
 });
 

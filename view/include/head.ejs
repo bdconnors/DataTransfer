@@ -15,9 +15,11 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="/scripts/Server.js"></script>
     <% if(user){ %>
-        <% if(user.admin){ %>
-            <%- include('./adminScripts.ejs')%>
-        <% } %>
+         <% if(user.admin){ %>
+                <%- include('./adminScripts.ejs')%>
+            <% } else{%>
+                <%- include('./fileScripts.ejs')%>
+            <%}%>
     <% } %>
     <% if(scripts){ %>
         <script src="/scripts/<%= scripts %>"></script>

@@ -15,7 +15,9 @@ class ProjectsRepo {
 
     }
     async getFolder(projectid,folderid) {
+        console.log(projectid,folderid);
         let results = await this.Projects.findOne({id: projectid}, {folders: {$elemMatch: {id: folderid}}}, {_id: 0});
+        console.log(results);
         return results.folders[0];
 
     }
@@ -31,38 +33,84 @@ class ProjectsRepo {
     async getAllProjects(){
         return await this.Projects.find({},{_id:0});
     }
-    async newUserFolders(firstname,lastname,permissions){
-        for(let i = 0; i < permissions.length; i++){
-            let curProjPerm = permissions[i];
-            let project = await this.getProject(curProjPerm.projectId);
-            let userFolderName = firstname+" "+lastname+"'s "+project.name+" Uploads";
-            let userFolder = this.makeFolder(project.id,project.name,userFolderName,'System');
-            curProjPerm.folderPermissions.push({folderId:userFolder.id,folderName:userFolder.name,view:true,download:true});
-            project.folders.push(userFolder);
-            await this.Projects.updateOne({id:project.id},{$set:{folders:project.folders}});
+    async newUserFolder(user){
+        let project = user.projectPermissions[0];
+        let folderName = user.firstname+" "+user.lastname+"'s Uploads";
+        let userFolder = this.makeFolder(project.projectId,project.projectName,folderName,'System',user.id);
+        let results = await this.Projects.updateOne({id:project.projectId},{$push:{folders:userFolder}});
+        if(results.nModified === 1){
+            results = userFolder;
         }
-        return permissions;
-
+        return results;
     }
-    async existingUserFolder(firstname,lastname,permission){
+    async existingUserFolder(user,permission){
 
         let project = await this.getProject(permission.projectId);
-        let userFolderName = firstname+" "+lastname+"'s "+project.name+" Uploads";
-        let userFolder = this.makeFolder(project.id,project.name,userFolderName,'System');
+        let userFolderName = user.firstname+" "+user.lastname+"'s Uploads";
+        let userFolder = this.makeFolder(project.id,project.name,userFolderName,'System',user.id);
         permission.folderPermissions.push({folderId:userFolder.id,folderName:userFolder.name,view:true,download:true});
         project.folders.push(userFolder);
         await this.Projects.updateOne({id:project.id},{$set:{folders:project.folders}});
         return permission;
     }
+    async addFile(folder,file){
+        let fileRecord = this.makeFile(folder.id,folder.name,file.name,file.author,file.size,file.ext,file.mime);
+        return await this.Projects.updateOne({"id":folder.projectId,"folders.id":folder.id},{"$push":{"folders.$.files":fileRecord}});
+    }
+    async renameProject(projectid,newname){
+        let project = await this.getProject(projectid);
+        let update = await this.Projects.updateOne({id:projectid},{$set:{name:newname}});
+        if(update.nModified === 1){
+            update = project;
+        }
+        return update;
+    }
+    async renameFolder(projectid,folderid,newname){
+        let folder = await this.getFolder(projectid,folderid);
+        let update = await this.Projects.updateOne({'folders.id':folderid},{$set:{'folders.$.name':newname}});
+        return folder;
+    }
+    async deleteFolder(projectid,folderid){
+        return await this.Projects.updateOne({id:projectid},{$pull:{folders:{id:folderid}}});
+    }
+    async deleteProject(projectid){
+        return await this.Projects.deleteOne({id:projectid});
+    }
+    async deleteFile(projectid,folderid,filename){
+        return await this.Projects.updateOne({id:projectid,"folders.id":folderid},{$pull:{"folders.$.files":{name:filename}}});
+    }
     make(name,author){
         let projectId = uuid();
         let folders = [];
         this.defaultFolders.forEach(folder=>{
-            folders.push(this.makeFolder(projectId,name,folder,author));
+            folders.push(this.makeFolder(projectId,name,folder,author,false));
         });
         return new this.Projects({id:projectId,name:name,folders:folders});
     }
-    makeFolder(projectId,projectName,name,author){
+    makeFile(folderid,foldername,fileName,author,size,ext,mime){
+        return {
+            id:uuid(),
+            folderId:folderid,
+            folderName:foldername,
+            name:fileName,
+            metadata:{
+                author: author,
+                created: new Date(),
+                modified: '',
+                accessed: '',
+                size: size,
+                ext:ext,
+                mime:mime
+            }
+        }
+    }
+    makeFolder(projectId,projectName,name,author,userId){
+        let userFolder = 'System';
+
+        if(userId){
+            userFolder = userId;
+        }
+
         return{
             id:uuid(),
             projectId:projectId,
@@ -74,7 +122,8 @@ class ProjectsRepo {
                 author:author,
                 created:new Date(),
                 modified:'',
-                accessed:''
+                accessed:'',
+                userFolder:userFolder
             }
         };
     }

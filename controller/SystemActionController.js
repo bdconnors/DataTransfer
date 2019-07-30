@@ -1,3 +1,6 @@
+const mimeType = require('mime-types');
+const path = require('path');
+
 class SystemActionController{
 
     constructor(userControl,projectControl){
@@ -12,21 +15,14 @@ class SystemActionController{
         let email = userObj.email;
         let projPermissions = userObj.projectPermissions;
         let user = await this.userControl.inviteNewUser(firstName,lastName,email,projPermissions);
-        authResponse.variables.storage = {user:user,permissions:projPermissions, action: 'NEW USER FOLDERS'};
+        let newUserFolder = await this.projectControl.newUserFolder(user);
+        let perms = {view:true,download:true};
+        user = await this.userControl.addFolderPermission(user.id,newUserFolder,perms);
+        authResponse.variables.storage = {folder:newUserFolder, action: 'NEW USER FOLDER'};
         this.notifyAll(authResponse);
         delete authResponse.variables.storage;
-        authResponse.variables.email = {action:'INVITED',user:user,lastEmail:false};
+        authResponse.variables.email = {action:'INVITED',user:user};
         this.notifyAll(authResponse);
-        projPermissions = await this.projectControl.newUserFolders(firstName,lastName,projPermissions);
-        for(let i = 0; i < projPermissions.length; i++){
-            let lastEmail = false;
-            if(i === projPermissions.length-1){
-                lastEmail = true;
-            }
-            authResponse.variables.email = {action:'PROJECT ADD',user:user,permission:projPermissions[i],lastEmail:lastEmail};
-            this.notifyAll(authResponse);
-        }
-
     }
     async inviteExistingUser(authResponse){
         let userId = authResponse.request.body.userId;
@@ -35,7 +31,7 @@ class SystemActionController{
         authResponse.variables.storage = {user:user,permissions:permission, action: 'EXISTING USER FOLDER'};
         this.notifyAll(authResponse);
         delete authResponse.variables.storage;
-        permission = await this.projectControl.existingUserFolder(user.firstname,user.lastname,permission);
+        permission = await this.projectControl.existingUserFolder(user,permission);
         user.projectPermissions.push(permission);
         user = await this.userControl.updateUser('id',user.id,{$set:{projectPermissions:user.projectPermissions}});
         authResponse.variables.email = {action:'PROJECT ADD',user:user,permission:permission,lastEmail:true};
@@ -48,9 +44,11 @@ class SystemActionController{
         let password = authResponse.request.body.password;
         this.userControl.updateNewUser(authCode,phone,password)
             .then(user=>{
-                authResponse.display = '/users/authSuccess';
                 authResponse.variables.email = {action:'AUTHENTICATED',user:user,lastEmail:true};
                 this.notifyAll(authResponse);
+                authResponse.display = '/users/authSuccess';
+                authResponse.command = 'DISPLAY';
+                authResponse.variables.user = user;
             })
             .catch((err)=>{throw err});
     }
@@ -123,14 +121,138 @@ class SystemActionController{
         let userId = authResponse.request.body.userId;
         let perms = authResponse.request.body.perms;
         let user = await this.userControl.addFolderPermission(userId,folder,perms);
-        console.log(user);
         authResponse.response.send(user);
 
     }
     async getFolderUsers(authResponse){
-        let projectId = authResponse.request.body.projectId;
-        let folderId = authResponse.request.body.folderId;
-        authResponse.response.send(await this.userControl.getFolderUsers(projectId,folderId));
+        let projectId = authResponse.request.query.projectId;
+        let folderId = authResponse.request.query.folderId;
+        let folderUsers = await this.userControl.getFolderUsers(projectId,folderId);
+        authResponse.response.send(folderUsers);
+    }
+    async removeFolderPermission(authResponse){
+        let userid = authResponse.request.body.userid;
+        let projectid = authResponse.request.body.projectid;
+        let folderid = authResponse.request.body.folderid;
+        let response = await this.userControl.removeFolderPermission(userid,projectid,folderid);
+        authResponse.response.send(response);
+    }
+    async streamFile(authResponse){
+        let projectId = authResponse.request.params.id;
+        console.log(projectId);
+        let folderId = authResponse.request.params.folderid;
+        console.log(folderId);
+        let fileName = authResponse.request.params.filename;
+        console.log(fileName);
+        let folder = await this.projectControl.getFolder(projectId,folderId);
+        console.log(folder);
+        authResponse.variables.storage.action = 'STREAM FILE';
+        authResponse.variables.storage.file = fileName;
+        authResponse.variables.storage.path = folder.projectName+'/'+folder.name+'/'+fileName;
+        this.notifyAll(authResponse);
+        let activity = authResponse.variables.activity = {};
+        activity.user = authResponse.request.session.user;
+        activity.date = new Date();
+        if(authResponse.variables.storage.disposition ==='attachment'){
+            activity.action = 'downloaded';
+        }else if(authResponse.variables.storage.disposition ==='inline'){
+            activity.action = 'viewed';
+        }
+        activity.target = fileName;
+        activity.targetType= 'file';
+        delete authResponse.variables.storage;
+        this.notifyAll(authResponse);
+    }
+    async deleteProject(authResponse){
+        let projectId = authResponse.request.params.id;
+        this.projectControl.getProject(projectId).then(project=>{
+            console.log('inside delete project action');
+            console.log(project);
+            this.projectControl.deleteProject(projectId).then(()=>{
+                console.log('inside delete project db ref');
+                this.userControl.deleteProject(projectId).then(()=>{
+                    console.log('inside delete project permissions');
+                    authResponse.variables.storage = {};
+                    authResponse.variables.storage.project = project;
+                    authResponse.variables.storage.action = 'DELETE PROJECT';
+                    this.notifyAll(authResponse);
+                })
+            })
+        }).catch(err=>{throw err});
+    }
+    async renameProject(authResponse){
+        let projectId = authResponse.request.params.id;
+        let newName = authResponse.request.body.newname;
+        this.projectControl.renameProject(projectId,newName).then((project)=>{
+            this.userControl.renameProject(projectId,newName).then(()=>{
+                authResponse.variables.storage ={};
+                authResponse.variables.storage.project = project;
+                authResponse.variables.storage.newName = newName;
+                authResponse.variables.storage.action = 'RENAME PROJECT';
+                this.notifyAll(authResponse);
+            })
+        }).catch(err=>{throw err});
+    }
+    async deleteFolder(authResponse){
+        let folderId = authResponse.request.params.folderid;
+        let projectId = authResponse.request.params.id;
+        this.projectControl.getFolder(projectId,folderId).then(folder=>{
+            this.projectControl.deleteFolder(projectId,folderId).then(()=>{
+                this.userControl.deleteFolder(projectId,folderId).then(()=>{
+                        authResponse.variables.storage ={};
+                        authResponse.variables.storage.action ="DELETE FOLDER";
+                        authResponse.variables.storage.folder = folder;
+                        this.notifyAll(authResponse);
+                })
+            })
+        }).catch((err=>{throw err}));
+    }
+    async deleteFile(authResponse) {
+        let projectId = authResponse.request.params.id;
+        let folderId = authResponse.request.params.folderid;
+        let fileName = authResponse.request.params.filename;
+        this.projectControl.getFolder(projectId, folderId).then(folder => {
+            this.projectControl.deleteFile(projectId,folderId,fileName).then(()=>{
+                authResponse.variables.storage = {};
+                authResponse.variables.storage.action ='DELETE FILE';
+                authResponse.variables.storage.folder = folder;
+                authResponse.variables.storage.file = fileName;
+                this.notifyAll(authResponse);
+            });
+        }).catch(err => {
+            throw err
+        });
+    }
+    async uploadFile(authResponse){
+        let untrimmedData = authResponse.request.body.data.split(',');
+        let data = untrimmedData[1];
+        let fileName = authResponse.request.body.name;
+        let size = authResponse.request.body.size;
+        let folder = authResponse.variables.folder;
+        let filepath = folder.projectName+'/'+folder.name+'/'+fileName;
+        let ext = path.extname(fileName);
+        let mime = mimeType.lookup(ext);
+        console.log(authResponse.variables);
+        authResponse.variables.storage = {};
+        console.log(authResponse.variables.storage);
+        authResponse.variables.storage.action ='WRITE FILE';
+        console.log(authResponse.variables.storage.action);
+        authResponse.variables.storage.path = filepath;
+        authResponse.variables.storage.data = data;
+        this.notifyAll(authResponse);
+        let user = authResponse.request.session.user;
+        let author = user.firstname+' '+user.lastname;
+        let file = {name:fileName,ext:ext,mime:mime,size:size,author:author};
+        let response = await this.projectControl.addFile(folder,file);
+        let activity = authResponse.variables.activity = {};
+        activity.user = user;
+        activity.date = new Date();
+        activity.action = 'uploaded';
+        activity.target = fileName;
+        activity.targetType= 'file';
+        delete authResponse.variables.storage;
+        this.notifyAll(authResponse);
+        authResponse.response.send(response);
     }
     performAction(authResponse){
 
@@ -156,6 +278,22 @@ class SystemActionController{
             this.addUserFolderPermission(authResponse).catch((err) => {throw err});
         }else if(authResponse.display === '/users/folders'){
             this.getFolderUsers(authResponse).catch(err=>{throw err});
+        }else if(authResponse.display === '/users/folders/permissions/remove'){
+            this.removeFolderPermission(authResponse).catch(err=>{throw err});
+        }else if(authResponse.display === '/projects/folders/upload'){
+            this.uploadFile(authResponse).catch(err=>{throw err});
+        }else if(authResponse.display === '/projects/project/:id/folders/folder/:folderid/file/:filename'){
+            this.streamFile(authResponse).catch(err=>{throw err});
+        }else if(authResponse.display ==='/projects/project/:id/folders/folder/:folderid/delete'){
+            this.deleteFolder(authResponse).catch(err=>{throw err});
+        }else if(authResponse.display === '/projects/project/:id/delete'){
+            this.deleteProject(authResponse).catch(err=>{throw err});
+        }else if(authResponse.display === '/projects/project/:id/folders/folder/:folderid/file/:filename/delete'){
+            this.deleteFile(authResponse).catch((err)=>{throw err});
+        }else if(authResponse.display === '/projects/project/:id/rename'){
+            this.renameProject(authResponse).catch(err=>{throw err});
+        }else if(authResponse.display === '/projects/project/:id/folders/folder/:folderid/rename'){
+            this.renameFolder(authResponse).catch(err=>{throw err});
         }
 
 

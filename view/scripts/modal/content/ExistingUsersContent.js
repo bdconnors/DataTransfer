@@ -44,10 +44,21 @@ class ExistingUsersContent extends ModalContent{
                     if(modal.functionControl.existingUsers.length === 0){
                         template +=`<option value="none" style="font-style:italic">No Users Found</option>`;
                     }else {
+                        let displayCount = 0;
                         modal.functionControl.existingUsers.forEach(user => {
-                            console.log(user);
-                            template += `<option id="${user.id}" value="${user.id}">${user.firstname} ${user.lastname}</option>`;
+                            let alreadyAMember = false;
+                            user.projectPermissions.forEach(perm=>{
+                                    if(perm.projectId === modal.functionControl.project.id){alreadyAMember = true;}
+
+                                });
+                            if(!alreadyAMember){
+                                template += `<option id="${user.id}" value="${user.id}">${user.firstname} ${user.lastname}</option>`;
+                                displayCount++;
+                            }
                         });
+                        if(displayCount === 0){
+                            template +=`<option value="none" style="font-style:italic">No Users Found</option>`;
+                        }
                     }
                 template +=`</select></div></div>`;
                     return template;

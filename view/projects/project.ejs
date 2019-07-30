@@ -41,11 +41,14 @@
                         <div style="text-align:center;" class="row">
                             <%for(var k = 0; k < cellsInRow; k++){
                                 var id;
+                                var projectId;
 
                                 if(user.admin){
                                     id = folders[cellCount1].id;
+                                    projectId = project.id;
                                 }else{
                                     id = folders[cellCount1].folderId;
+                                    projectId = project.id;
                                 }
                             %>
                                 <div class="col">
@@ -58,13 +61,7 @@
                                                     <button class="dropdown-item" type="submit"><i class="fa fa-folder-open"></i> Open</button>
                                             </form>
                                             <% if(user.admin){ %>
-                                                <form action = "" method="get">
-                                                    <button class="dropdown-item" type="submit"><i class="fa fa-pencil"></i> Rename</button>
-                                                </form>
-                                                <form action="" method="post">
-                                                    <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i>  Delete</button>
-                                                </form>
-                                                <div class="dropdown-divider"></div>
+
                                                 <form action="" method="get">
                                                     <button type="submit" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
                                                 </form>
@@ -77,22 +74,22 @@
                         </div>
                         <div style="text-align:center;" class="row">
                             <%for(let l = 0; l < cellsInRow; l++){
-                                var projectId;
+                                var projectId1;
                                 var id1;
 
                                 if(user.admin){
-                                    projectId = project.id;
+                                    projectId1 = project.id;
                                     id1 = folders[cellCount2].id;
                                 }else{
 
-                                    projectId = project.projectId;
+                                    projectId1 = project.projectId;
                                     id1 = folders[cellCount2].folderId;
 
 
                                 }
                             %>
                                 <div class="col">
-                                    <a style = "text-decoration: none; color:#343a40;" href="./<%= projectId%>/folders/folder/<%= id%>">
+                                    <a style = "text-decoration: none; color:#343a40;" href="./<%= projectId1%>/folders/folder/<%= id1%>">
                                         <i class="fa fa-folder-open fa-3x"></i>
                                     </a>
                                 </div>
@@ -102,16 +99,16 @@
                         </div>
                         <div style="text-align:center;" class="row">
                             <%for(let m = 0; m < cellsInRow; m++){
-                                var projectId1;
+                                var projectId2;
                                 var id2;
                                 var name;
                                 if(user.admin){
-                                    projectId1 = project.id;
+                                    projectId2 = project.id;
                                     id2 = folders[cellCount3].id;
                                     name = folders[cellCount3].name;
                                 }else{
 
-                                    projectId1 = project.projectId;
+                                    projectId2 = project.projectId;
                                     id2 = folders[cellCount3].folderId;
                                     name = folders[cellCount3].folderName;
 

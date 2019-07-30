@@ -102,7 +102,7 @@ class FolderAddUsersContent extends ModalContent{
 
             modal.functionControl.newFolderUsers.forEach((user) => {
                 template += `<b>${user.firstname} ${user.lastname}</b>
-                        <input type="button" value ="Remove" onclick="" style="font-size:14px;" class="btn btn-danger button"></button>`;
+                        <input type="button" value ="Remove" id="${user.id}" onclick="modal.perform('folder remove permission',this)" style="font-size:14px;" class="btn btn-danger button"></button>`;
             });
         }
         template += `</div></div>`;

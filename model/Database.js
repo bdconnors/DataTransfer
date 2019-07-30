@@ -30,7 +30,7 @@ let projectSchema = new Schema( {
                 mime:String
             }
         }],
-        metadata:{author:String,created: String,modified: String,accessed: String,size: String}
+        metadata:{author:String,created: String,modified: String,accessed: String,size: String,userFolder:String}
     }]
 });
 
@@ -43,7 +43,7 @@ let userSchema = new Schema({
     firstname: String,
     lastname: String,
     email: String,
-    activity: [{id: String,date:String,action:String,target:String,targetType:String}],
+    activity: [{date:String,action:String,target:String,targetType:String}],
     projectPermissions: [{
         projectId:String,
         projectName:String,

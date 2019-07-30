@@ -5,8 +5,9 @@
 <%}else{%>
     <%- include('../../include/menu.ejs') %>
 <%}%>
-<div class="bg-secondary" id = "header"  style="padding:35px 50px;">
-    <h4 class="bg-secondary" ><i class="fa fa-folder fa-lg" ></i>  <%= folder.name%></h4>
+<%- include('../../include/folderNav.ejs')%>
+<div class="bg-dark" id = "header"  style="padding:35px 50px;">
+    <h4 class="bg-dark" ><i class="fa fa-folder fa-lg" ></i>  <%= folder.name%></h4>
 </div>
 <br>
 <% if(user.admin){%>
@@ -20,6 +21,9 @@
 <% var cellCount1 = 0%>
 <% var cellCount2 = 0%>
 <% var cellCount3 = 0%>
+<%if(folder.metadata.userFolder === user.id){%>
+    <%- include('../../include/modal.ejs')%>
+<%}%>
 <div class="container">
 
     <%for(var i = 0; i < rows; i++){%>
@@ -40,25 +44,22 @@
                                 <button class="dropdown-item" type="submit"><i class="fa fa-eye"></i> View</button>
                             </form>
                             <% if(user.admin){ %>
-                                <form action = "" method="get">
-                                    <input type="hidden" name="folder" id = "folder" value="">
+                                <form action = "./<%=folder.id%>/file/<%=files[cellCount1].name%>/attachment" method="get">
                                     <button class="dropdown-item" type="submit"><i class="fa fa-download"></i> Download</button>
                                 </form>
                             <%}else{%>
                                 <%if(permission.download){%>
                                     <form action = "" method="get">
-                                        <input type="hidden" name="folder" id = "folder" value="">
                                         <button class="dropdown-item" type="submit"><i class="fa fa-download"></i> Download</button>
                                     </form>
                                 <%}%>
                             <%}%>
-                            <%if(user.admin){%>
-                                <form action = "" method="get">
-                                    <input type="hidden" name="folder" id = "folder" value="">
-                                    <button class="dropdown-item" type="submit"><i class="fa fa-pencil"></i> Rename</button>
-                                </form>
-                                <form action="" method="post">
-                                    <input type="hidden" name="folder" id = "folder" value="">
+                            <%if(user.admin){
+                                var obj = {projectId:folder.projectId,folderId:folder.id,name:files[cellCount1].name,type:'File'}
+                                var json = JSON.stringify(obj);
+                            %>
+
+                                <form action="/projects/project/<%= folder.projectId%>/folders/folder/<%= folder.id%>/file/<%= files[cellCount1].name%>/delete" method="post">
                                     <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i>  Delete</button>
                                 </form>
                             <%}%>
@@ -71,11 +72,12 @@
         <div style="text-align:center;" class="row">
             <%for(let l = 0; l < cellsInRow; l++){
                 var file = files[cellCount2]
+                var ext = files[cellCount2].metadata.ext;
             %>
             <div class="col">
 
 
-                <a style = "text-decoration: none; color:#343a40;" >
+                <a style = "text-decoration: none; color:#343a40;" href="./<%=folder.id%>/file/<%=files[cellCount2].name%>">
                     <%if(ext === '.pdf'){%>
                         <i class="fa fa-file-pdf-o fa-3x"></i>
                     <%}else if(ext  === '.docx'|| ext === '.doc'){%>
@@ -96,15 +98,15 @@
                         <i class="fa fa-file-file-o fa-3x"></i>
                     <%}%>
                 </a>
+            </div>
                     <%cellCount2++%>
                 <%}%>
-            </div>
 
         </div>
         <div style="text-align:center;" class="row">
             <%for(let m = 0; m < cellsInRow; m++){%>
                 <div class="col">
-                    <a style = "text-decoration: none; color:#343a40;" href="">
+                    <a style = "text-decoration: none; color:#343a40;" href="./<%=folder.id%>/file/<%=files[cellCount3].name%>">
                         <%= files[cellCount3].name%>
                     </a>
                 </div>

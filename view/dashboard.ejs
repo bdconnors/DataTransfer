@@ -9,9 +9,6 @@
 <div id="welcomeHeader" style="padding:35px 50px; width:100%;">
     <h1> <i class="fa fa-user-circle-o " ></i> Welcome <%= user.firstname %> <%if(user.admin){%>(Admin)<%}%></h1>
 </div>
-<%if(user.admin){%>
-    <%- include('./include/modal.ejs')%>
-<%}%>
 <% var totalCells = projects.length%>
 <% var fullRows = Math.floor(projects.length/3)%>
 <% var partialRowCount = projects.length % 3 %>
@@ -29,10 +26,10 @@
             <%for(var k = 0; k < cellsInRow; k++){
                 var id;
             %>
-            <%if(!user.admin){
+            <%if(user.admin){
                 id = projects[cellCount1].id;
+                console.log(id);
             }else{
-
                 id = projects[cellCount1].projectId;
 
             }%>
@@ -45,17 +42,18 @@
                             <form action="/projects/project/<%= id%>" method="get">
                                 <button class="dropdown-item" type="submit"><i class="fa fa-eye"></i> View</button>
                             </form>
-                            <% if(user.admin){ %>
-                                <form action="/projects/project/<%= id%>/rename%>" method="get">
-                                    <button type="submit" class="dropdown-item"><i class="fa fa-pencil"></i> Rename</button>
-                                </form>
+                            <% if(user.admin){
+                                var renameJson = JSON.stringify({projectId: id,name:projects[cellCount1].name,type:'Project'});
+                            %>
+                                <button type="button" onclick="modal.display('rename',<%=renameJson%>)" class="dropdown-item"><i class="fa fa-pencil"></i> Rename</button>
                                 <form action="/projects/project/<%= id%>/delete%>" method="post">
                                     <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i> Delete</button>
                                 </form>
                                 <div class="dropdown-divider"></div>
-                                <form action="/projects/project/<%= id%>/permissions%>" method="get">
-                                    <button type="submit" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
-                                </form>
+                                <% var obj = projects[cellCount1]
+                                    var jsonProject = JSON.stringify(obj);
+                                %>
+                                <button type="button" onclick="modal.perform('edit project perm',<%=jsonProject%>)" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
                             <%}%>
                         </div>
                     </div>

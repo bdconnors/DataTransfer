@@ -10,6 +10,9 @@ class ProjectController{
         return await this.model.getProject(id);
     }
     async getFolder(projectid,folderid){
+        console.log('inside controller get folder');
+        console.log(projectid);
+        console.log(folderid);
         return await this.model.getFolder(projectid,folderid);
     }
     async createNewFolder(project,name,author){
@@ -18,11 +21,29 @@ class ProjectController{
     async getAllProjects(){
         return await this.model.getAllProjects();
     }
-    async newUserFolders(firstname,lastname,permissions){
-        return await this.model.newUserFolders(firstname,lastname,permissions);
+    async addFile(folder,file){
+        return await this.model.addFile(folder,file);
     }
-    async existingUserFolder(firstname,lastname,permission){
-        return await this.model.existingUserFolder(firstname,lastname,permission);
+    async deleteFile(projectid,folderid,filename){
+        return await this.model.deleteFile(projectid,folderid,filename);
+    }
+    async deleteFolder(projectId,folderId){
+        return await this.model.deleteFolder(projectId,folderId);
+    }
+    async deleteProject(projectId){
+        return await this.model.deleteProject(projectId);
+    }
+    async renameProject(projectId,newname){
+        return await this.model.renameProject(projectId,newname);
+    }
+    async newUserFolder(user){
+        return await this.model.newUserFolder(user);
+    }
+    async existingUserFolder(user,permission){
+        return await this.model.existingUserFolder(user,permission);
+    }
+    async renameFolder(projectid,folderid,newname){
+        return await this.model.renameFolder(projectid,folderid,newname);
     }
 
 
