@@ -36,7 +36,7 @@ class System_Mailer{
                 this.notifyAll(authResponse)
             }
         }).catch(err=>{
-            throw err
+            console.log(err)
         });
     }
 

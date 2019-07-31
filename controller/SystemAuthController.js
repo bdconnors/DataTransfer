@@ -25,7 +25,7 @@ class SystemAuthController{
     }
     async authorizeLogin(req,res){
         let authResponse = this.make(req,res);
-        let verified = await this.userControl.verifyCredentials(req.body.email,req.body.password).catch((err)=>{throw err});
+        let verified = await this.userControl.verifyCredentials(req.body.email,req.body.password).catch((err)=>{console.log(err)});
 
         if(verified){
             req.session.user = verified;
@@ -118,7 +118,7 @@ class SystemAuthController{
                 authResponse.command = 'REDIRECT';
                 authResponse.display = '/dashboard';
                 this.notifyAll(authResponse);
-            }).catch(err=>{throw err});
+            }).catch(err=>{console.log(err)});
         }else{
             this.notifyAll(authResponse);
         }
@@ -219,7 +219,7 @@ class SystemAuthController{
     }
     async sessionAuth(authResponse,req){
         if(req.session && req.session.user){
-            let dbUser = await this.userControl.getUser('id',req.session.user.id).catch((err)=>{throw err});
+            let dbUser = await this.userControl.getUser('id',req.session.user.id).catch((err)=>{console.log(err)});
             if(dbUser) {
                 if (req.session.user.id === dbUser.id) {
                     req.session.user = dbUser;

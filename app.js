@@ -90,7 +90,7 @@ app.get('/login',(req,res)=>{
     sysAuth.displayLogin(req,res);
 });
 app.post('/login',(req,res)=> {
-   sysAuth.authorizeLogin(req,res).catch((err=>{throw err}));
+   sysAuth.authorizeLogin(req,res).catch((err=>{console.log(err)}));
 });
 app.get('/logout',(req,res)=>{
     sysAuth.logout(req,res);
@@ -99,89 +99,89 @@ app.get('/unauthorized',(req,res)=>{
     sysAuth.displayUnauthorized(req,res);
 });
 app.get('/dashboard',(req,res)=>{
-    sysAuth.authorizeSession(req,res).catch((err)=>{throw err});
+    sysAuth.authorizeSession(req,res).catch((err)=>{console.log(err)});
 });
 app.get('/projects/project/:id',(req,res)=>{
-    sysAuth.authorizeProjectView(req,res).catch(err=>{throw err});
+    sysAuth.authorizeProjectView(req,res).catch(err=>{console.log(err)});
 });
 app.get('/projects/project/:id/folders/folder/:folderid',(req,res)=>{
-    sysAuth.authorizeFolderView(req,res).catch(err=>{throw err});
+    sysAuth.authorizeFolderView(req,res).catch(err=>{console.log(err)});
 });
 app.post('/projects/folders/upload',(req,res)=>{
-    sysAuth.authorizeUpload(req,res).catch((err)=>{throw err});
+    sysAuth.authorizeUpload(req,res).catch((err)=>{console.log(err)});
 });
 app.get('/projects/project/:id/folders/folder/:folderid/file/:filename',(req,res)=>{
-    sysAuth.authorizeFileView(req,res).catch((err)=>{throw err});
+    sysAuth.authorizeFileView(req,res).catch((err)=>{console.log(err)});
 });
 app.get('/projects/project/:id/folders/folder/:folderid/file/:filename/attachment',(req,res)=>{
-    sysAuth.authorizeFileDownload(req,res).catch((err)=>{throw err});
+    sysAuth.authorizeFileDownload(req,res).catch((err)=>{console.log(err)});
 });
 
 /** AJAX end points **/
 app.get('/users/project',(req,res)=>{
-    sysAuth.authorizeAJAX(req,res).catch((err)=>{throw err});
+    sysAuth.authorizeAJAX(req,res).catch((err)=>{console.log(err)});
 });
 app.get('/users',(req,res)=>{
-    sysAuth.authorizeAJAX(req,res).catch((err)=>{throw err});
+    sysAuth.authorizeAJAX(req,res).catch((err)=>{console.log(err)});
 });
 app.get('/users/user',(req,res)=>{
-    sysAuth.authorizeAJAX(req,res).catch((err)=>{throw err});
+    sysAuth.authorizeAJAX(req,res).catch((err)=>{console.log(err)});
 });
 app.get('/users/folders',(req,res)=>{
-    sysAuth.authorizeAJAX(req,res).catch((err)=>{throw err});
+    sysAuth.authorizeAJAX(req,res).catch((err)=>{console.log(err)});
 });
 app.get('/users/:email/exists',(req,res)=>{
-    sysAuth.authorizeAJAX(req,res).catch((err)=>{throw err});
+    sysAuth.authorizeAJAX(req,res).catch((err)=>{console.log(err)});
 });
 app.get('/projects/project/:id/folders/folder/:folderid/file/:filename/exists',(req,res)=>{
-    sysAuth.authorizeAJAX(req,res).catch((err)=>{throw err});
+    sysAuth.authorizeAJAX(req,res).catch((err)=>{console.log(err)});
 });
 
 /** New User Authorization **/
 app.get('/users/authenticate',(req,res)=>{
-    sysAuth.authorizeNewUser(req,res).catch((err)=>{throw err});
+    sysAuth.authorizeNewUser(req,res).catch((err)=>{console.log(err)});
 });
 app.post('/users/authenticate',(req,res)=>{
-    sysAuth.authorizeNewUser(req,res).catch((err)=>{throw err});
+    sysAuth.authorizeNewUser(req,res).catch((err)=>{console.log(err)});
 });
 
 /** Administrator Authorization Required Actions **/
 app.get('/users/:id/profile',(req,res)=>{
-    sysAuth.authorizeProfileView(req,res).catch(err=>{throw err});
+    sysAuth.authorizeProfileView(req,res).catch(err=>{console.log(err)});
 });
 app.post('/users/:id/delete',(req,res)=>{
-    sysAuth.authorizeDeleteAccount(req,res).catch((err)=>{throw err});
+    sysAuth.authorizeDeleteAccount(req,res).catch((err)=>{console.log(err)});
 });
 app.post('/users/project/permissions/remove',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{throw err});
+    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
 });
 app.post('/users/project/permissions/add',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{throw err});
+    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
 });
 app.post('/users/folders/permissions/add',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{throw err});
+    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
 });
 app.post('/users/folders/permissions/remove',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{throw err});
+    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
 });
 app.get('/users/invite',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{throw err});
+    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
 });
 app.post('/users/invite',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{throw err});
+    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
 });
 app.post('/projects/project/:id/rename',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{throw err});
+    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
 });
 app.post('/projects/project/:id/folders/folder/:folderid/file/:filename/delete',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{throw err});
+    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
 });
 app.post('/projects/project/:id/folders/folder/:folderid/delete',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{throw err});
+    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
 });
 app.post('/projects/project/:id/delete',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{throw err});
+    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
 });
 app.post('/projects/create',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{throw err});
+    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
 });

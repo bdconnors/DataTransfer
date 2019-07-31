@@ -49,7 +49,7 @@ class SystemActionController{
                 authResponse.display = '/users/authSuccess';
                 authResponse.command = 'DISPLAY';
                 authResponse.variables.user = user;
-            }).catch((err)=>{throw err});
+            }).catch((err)=>{console.log(err)});
     }
     async getAllUsers(authResponse){
         let users = await this.userControl.getAllUsers();
@@ -107,7 +107,7 @@ class SystemActionController{
         let userId = authResponse.request.body.id;
         this.userControl.removeProjectPermission(userId,projectId).then(project=>{
             authResponse.response.send(project);
-        }).catch((err)=>{throw err});
+        }).catch((err)=>{console.log(err)});
     }
     async addUserFolderPermission(authResponse){
         let folder = authResponse.request.body.folder;
@@ -163,7 +163,7 @@ class SystemActionController{
                     this.notifyAll(authResponse);
                 })
             })
-        }).catch(err=>{throw err});
+        }).catch(err=>{console.log(err)});
     }
     async renameProject(authResponse){
         let projectId = authResponse.request.params.id;
@@ -176,7 +176,7 @@ class SystemActionController{
                 authResponse.variables.storage.action = 'RENAME PROJECT';
                 this.notifyAll(authResponse);
             })
-        }).catch(err=>{throw err});
+        }).catch(err=>{console.log(err)});
     }
     async deleteFolder(authResponse){
         let folderId = authResponse.request.params.folderid;
@@ -190,7 +190,7 @@ class SystemActionController{
                         this.notifyAll(authResponse);
                 })
             })
-        }).catch((err=>{throw err}));
+        }).catch((err=>{console.log(err)}));
     }
     async deleteFile(authResponse) {
         let projectId = authResponse.request.params.id;
@@ -205,7 +205,7 @@ class SystemActionController{
                 this.notifyAll(authResponse);
             });
         }).catch(err => {
-            throw err
+            console.log(err)
         });
     }
     async uploadFile(authResponse){
@@ -248,45 +248,45 @@ class SystemActionController{
     }
     performAction(authResponse){
         if(authResponse.display === '/users/invite'){
-            this.inviteNewUser(authResponse).catch((err)=>{throw err});
+            this.inviteNewUser(authResponse).catch((err)=>{console.log(err)});
         }else if(authResponse.display === '/users/authenticate'){
-            this.updateNewUser(authResponse).catch((err)=>{throw err});
+            this.updateNewUser(authResponse).catch((err)=>{console.log(err)});
         }else if(authResponse.display === '/projects/create'){
-            this.createNewProject(authResponse).catch((err)=>{throw err});
+            this.createNewProject(authResponse).catch((err)=>{console.log(err)});
         }else if(authResponse.display === '/users'){
-            this.getAllUsers(authResponse).catch((err)=>{throw err});
+            this.getAllUsers(authResponse).catch((err)=>{console.log(err)});
         }else if(authResponse.display === '/users/project'){
-            this.getProjectUsers(authResponse).catch((err)=>{throw err});
+            this.getProjectUsers(authResponse).catch((err)=>{console.log(err)});
         }else if(authResponse.display === '/users/project/permissions/remove'){
-            this.removeUserProjectPermission(authResponse).catch((err)=>{throw err});
+            this.removeUserProjectPermission(authResponse).catch((err)=>{console.log(err)});
         }else if(authResponse.display === '/users/user'){
-            this.getUser(authResponse).catch(err=>{throw err});
+            this.getUser(authResponse).catch(err=>{console.log(err)});
         }else if(authResponse.display === '/users/project/permissions/add'){
-            this.inviteExistingUser(authResponse).catch(err=>{throw err});
+            this.inviteExistingUser(authResponse).catch(err=>{console.log(err)});
         }else if(authResponse.display === '/projects/project/:id/folders/new'){
-            this.createNewProjectFolder(authResponse).catch(err=>{throw err})
+            this.createNewProjectFolder(authResponse).catch(err=>{console.log(err)})
         }else if(authResponse.display === '/users/folders/permissions/add') {
-            this.addUserFolderPermission(authResponse).catch((err) => {throw err});
+            this.addUserFolderPermission(authResponse).catch((err) => {console.log(err)});
         }else if(authResponse.display === '/users/folders'){
-            this.getFolderUsers(authResponse).catch(err=>{throw err});
+            this.getFolderUsers(authResponse).catch(err=>{console.log(err)});
         }else if(authResponse.display === '/users/folders/permissions/remove'){
-            this.removeFolderPermission(authResponse).catch(err=>{throw err});
+            this.removeFolderPermission(authResponse).catch(err=>{console.log(err)});
         }else if(authResponse.display === '/projects/folders/upload'){
-            this.uploadFile(authResponse).catch(err=>{throw err});
+            this.uploadFile(authResponse).catch(err=>{console.log(err)});
         }else if(authResponse.display === '/projects/project/:id/folders/folder/:folderid/file/:filename'){
-            this.streamFile(authResponse).catch(err=>{throw err});
+            this.streamFile(authResponse).catch(err=>{console.log(err)});
         }else if(authResponse.display ==='/projects/project/:id/folders/folder/:folderid/delete'){
-            this.deleteFolder(authResponse).catch(err=>{throw err});
+            this.deleteFolder(authResponse).catch(err=>{console.log(err)});
         }else if(authResponse.display === '/projects/project/:id/delete'){
-            this.deleteProject(authResponse).catch(err=>{throw err});
+            this.deleteProject(authResponse).catch(err=>{console.log(err)});
         }else if(authResponse.display === '/projects/project/:id/folders/folder/:folderid/file/:filename/delete'){
-            this.deleteFile(authResponse).catch((err)=>{throw err});
+            this.deleteFile(authResponse).catch((err)=>{console.log(err)});
         }else if(authResponse.display === '/projects/project/:id/rename'){
-            this.renameProject(authResponse).catch(err=>{throw err});
+            this.renameProject(authResponse).catch(err=>{console.log(err)});
         }else if(authResponse.display === '/users/:email/exists'){
-            this.userExists(authResponse).catch(err=>{throw err});
+            this.userExists(authResponse).catch(err=>{console.log(err)});
         }else if(authResponse.display === '/projects/project/:id/folders/folder/:folderid/file/:filename/exists'){
-            this.fileExists(authResponse).catch((err)=>{throw err});
+            this.fileExists(authResponse).catch((err)=>{console.log(err)});
         }
     }
     notify(authResponse){

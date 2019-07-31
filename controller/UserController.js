@@ -7,7 +7,7 @@ class UserController{
     }
 
     async getUser(field,value){
-        return await this.model.getUser(field,value).catch((err)=>{throw err});
+        return await this.model.getUser(field,value).catch((err)=>{console.log(err)});
 
     }
     async inviteNewUser(firstname,lastname,email,projectPermissions){
@@ -26,7 +26,7 @@ class UserController{
         return this.model.updateUser('id',user.id,{$unset:{authCode:''}})
             .then(this.model.updateUser('id',user.id,{$set:{password:hashPass,phone:phone}}))
             .then(()=>{return this.model.getUser('id',user.id)})
-            .catch((err)=>{throw err});
+            .catch((err)=>{console.log(err)});
     }
     async getAllUsers() {
         return await this.model.getAllUsers();
