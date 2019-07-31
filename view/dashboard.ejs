@@ -1,4 +1,4 @@
-<%- include('./include/head.ejs',{title:'File System Home',scripts:false})%>
+<%- include('./include/head.ejs',{title:'Novitious Dashboard'})%>
 <%if(user.admin){%>
     <%- include('./include/adminNav.ejs') %>
 <%}else{%>
@@ -6,102 +6,52 @@
     <% var projects = user.projectPermissions %>
 <%}%>
 <body>
-<div id="welcomeHeader" style="padding:35px 50px; width:100%;">
+<div id="pageHeader" style="padding:35px 50px; width:100%;">
     <h1> <i class="fa fa-user-circle-o " ></i> Welcome <%= user.firstname %> <%if(user.admin){%>(Admin)<%}%></h1>
 </div>
-<% var totalCells = projects.length%>
-<% var fullRows = Math.floor(projects.length/3)%>
-<% var partialRowCount = projects.length % 3 %>
-<% var rows = fullRows+1%>
-<% var cellCount1 = 0%>
-<% var cellCount2 = 0%>
-<% var cellCount3 = 0%>
-<div class="container">
-    <%for(var i = 0; i < rows; i++){%>
-        <%var cellsInRow = 3%>
-        <%if(i === fullRows){
-            cellsInRow = partialRowCount;
-        }%>
-        <div style="text-align:center;" class="row">
-            <%for(var k = 0; k < cellsInRow; k++){
-                var id;
-            %>
+<div style="padding-top:50px;" class="center">
+    <div style="text-align:center; padding-top:20px;padding-bottom:20px " class="row">
+    <%for(var i = 0; i < projects.length; i++){
+        var id;
+        var name;
+    %>
             <%if(user.admin){
-                id = projects[cellCount1].id;
-                console.log(id);
-            }else{
-                id = projects[cellCount1].projectId;
-
-            }%>
-                <div class="col">
-                    <div class="dropdown">
-                        <button style = "background-color:transparent; font-size:16px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
-                            <i class="fa fa-cog"></i> Options
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="projSettings">
-                            <form action="/projects/project/<%= id%>" method="get">
-                                <button class="dropdown-item" type="submit"><i class="fa fa-eye"></i> View</button>
-                            </form>
-                            <% if(user.admin){
-                                var renameJson = JSON.stringify({projectId: id,name:projects[cellCount1].name,type:'Project'});
-                            %>
-                                <button type="button" onclick="modal.display('rename',<%=renameJson%>)" class="dropdown-item"><i class="fa fa-pencil"></i> Rename</button>
-                                <form action="/projects/project/<%= id%>/delete%>" method="post">
-                                    <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i> Delete</button>
-                                </form>
-                                <div class="dropdown-divider"></div>
-                                <% var obj = projects[cellCount1]
-                                    var jsonProject = JSON.stringify(obj);
-                                %>
-                                <button type="button" onclick="modal.perform('edit project perm',<%=jsonProject%>)" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
-                            <%}%>
-                        </div>
-                    </div>
-                </div>
-                <%cellCount1++%>
-            <%}%>
-        </div>
-        <div style="text-align:center;" class="row">
-            <%for(let l = 0; l < cellsInRow; l++){
-                var id1;
+                id = projects[i].id;
+                name = projects[i].name;
+                var renameJson = JSON.stringify({projectId: id,name:projects[i].name,type:'Project'});
             %>
-
-                <%if(user.admin){
-                    id1 = projects[cellCount2].id;
-                }else{
-
-                    id1 = projects[cellCount2].projectId;
-
-                }%>
-                <div class="col">
-                    <a style = ";text-decoration: none; color:#343a40;" href="/projects/project/<%= id1 %>">
-                        <i class="fa fa-archive fa-3x"></i>
-                    </a>
+        <div style="text-align:left;" class="col">
+            <div style="text-align:center" class="dropdown">
+                <button style = "background-color:transparent; font-size:16px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
+                    <i class="fa fa-cog"></i> Options
+                </button>
+                <div class="dropdown-menu" aria-labelledby="projSettings">
+                    <button type="button" onclick="modal.display('rename',<%=renameJson%>)" class="dropdown-item"><i class="fa fa-pencil"></i> Rename</button>
+                    <form action="/projects/project/<%= id%>/delete%>" method="post">
+                        <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i> Delete</button>
+                    </form>
+                    <div class="dropdown-divider"></div>
+                    <% var obj = projects[i]
+                        var jsonProject = JSON.stringify(obj);
+                    %>
+                    <button type="button" onclick="modal.perform('edit project perm',<%=jsonProject%>)" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
                 </div>
-                <%cellCount2++%>
-            <%}%>
-        </div>
-        <div style="text-align:center;" class="row">
-            <%for(let m = 0; m < cellsInRow; m++){
-                var id2;
-                var name;
-            %>
-                <%if(user.admin){
-                    id2 = projects[cellCount3].id;
-                    name = projects[cellCount3].name;
-                }else{
+            </div>
 
-                    id2 = projects[cellCount3].projectId;
-                    name = projects[cellCount3].projectName;
-                    console.log(id2);
-                }%>
-                <div class="col">
-                    Project <%= name%>
-                </div>
-                <%cellCount3++%>
+            <%}else{%>
+                id = projects[i].projectId;
+                name = projects[i].projectName;
             <%}%>
+            <a style = "text-decoration: none; color:#343a40;" href="/projects/project/<%= id %>">
+                <div style="text-align:center;">
+                    <i class="fa fa-archive fa-3x"></i>
+                    <br>
+                    <b>Project <%= name%></b>
+                </div>
+            </a>
+
         </div>
     <%}%>
-
+    </div>
 </div>
 <%- include('./include/foot.ejs')%>

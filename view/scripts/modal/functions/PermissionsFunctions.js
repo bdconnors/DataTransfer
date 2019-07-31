@@ -55,12 +55,8 @@ class PermissionsFunctions{
         }
     }
     folderClick(element){
-        console.log(element);
         let labelId = element.id+'Label';
         let label = document.getElementById(labelId);
-        console.log(labelId);
-        console.log(label);
-
         if(element.checked){
             label.style.color = 'green';
         }

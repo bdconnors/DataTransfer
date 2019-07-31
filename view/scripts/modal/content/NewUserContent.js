@@ -49,6 +49,7 @@ class NewUserContent extends ModalContent{
             </div>
             <div class="form-group">
                 <p id="emailErr" style="color:red; display:none">*Please Enter a Valid E-mail Address</p>
+                <p id="userExistsErr" style="color:red; display:none">*An Account Associated with this E-mail Already Exists</p>
                 <label for="email"><i class="fa fa-envelope"></i> E-mail:</label>
                 <input type="text" onchange="modal.perform('check email',this)" class="form-control"  name="email" id="newUserEmail" placeholder="ex: user@domain.net">
             </div>`;

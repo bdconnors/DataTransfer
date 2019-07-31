@@ -28,8 +28,9 @@ class UploadFileContent extends ModalContent{
              <div class="text-left">
                     <label for="name"><i class="fa fa-pencil"></i> <b>Select a File:</b></label>
                  </div>
+                <p id="fileExistsErr" style="color:red; display:none">*A File With This Name Already Exists In The Folder</p>
                  <div class="text-center">
-                     <input type="file" class="form-control" name="fileName" accept="image/jpg, image/gif" id="fileInput" placeholder="Project Name">
+                     <input type="file" onchange="modal.perform('check file input')" class="form-control" name="fileName" id="fileInput" placeholder="Project Name">
                  </div>`;
     }
     getFooter(){

@@ -1,4 +1,15 @@
-<%- include('../include/head.ejs',{title:'Project',scripts:false})%>
+<%  var folders;
+    var projectName
+
+    if(user.admin){
+        folders = project.folders;
+        projectName = project.name;
+    }else{
+        folders = project.folderPermissions;
+        projectName = project.projectName;
+    }
+%>
+<%- include('../include/head.ejs',{title:'Project '+projectName})%>
 <body>
 <%if(user.admin){%>
     <%- include('../include/adminNav.ejs') %>
@@ -6,117 +17,43 @@
     <%- include('../include/menu.ejs') %>
 <%}%>
 <%- include('../include/projectNav.ejs') %>
-<% var folders;
-    var projectName
-    if(user.admin){
-        folders = project.folders;
-        projectName = project.name;
-    }else{
-        console.log(project)
-        folders = project.folderPermissions;
-        projectName = project.projectName;
-    }
-%>
-<div class="bg-dark" id = "header"  style="padding:35px 50px;">
-    <h4 class="bg-dark" ><i class="fa fa-archive fa-lg" ></i>  Project <%= projectName%></h4>
+<div class="bg-dark" id="pageHeader"  style="padding:35px 50px;">
+    <h1 class="bg-dark" ><i class="fa fa-archive" ></i>  Project <%= projectName%></h1>
 </div>
 <br>
 <% if(user.admin){%>
     <%- include('../include/modal.ejs')%>
 <%}%>
-<% var totalCells = folders.length%>
-<% var fullRows = Math.floor(folders.length/3)%>
-<% var partialRowCount = folders.length % 3 %>
-<% var rows = fullRows+1%>
-<% var cellCount1 = 0%>
-<% var cellCount2 = 0%>
-<% var cellCount3 = 0%>
-<div class="container">
-
-            <%for(var i = 0; i < rows; i++){%>
-                <%var cellsInRow = 3%>
-                <%if(i === fullRows){
-                    cellsInRow = partialRowCount;
+<div style="padding-top:20px;" class="center">
+    <div style="text-align:center; padding-top:20px;padding-bottom:20px " class="row">
+    <%for(var i = 0; i <folders.length; i++){%>
+        <%var id;var projectId;%>
+            <div style="text-align:left;padding-left:30px" class="col">
+                <%if(user.admin){id = folders[i].id;projectId = project.id;%>
+                <div style="text-align:center;" class="dropdown">
+                    <button style = "background-color:transparent; font-size:12px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
+                        <i class="fa fa-cog"></i> Options
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="projSettings">
+                        <form action="/projects/project/<%=projectId%>/folders/folder/<%=id%>/delete" method="post">
+                            <button type="submit" class="dropdown-item"><i class="fa fa-minus"></i> Delete</button>
+                        </form>
+                    </div>
+                </div>
+                <%}else{
+                    id = folders[i].folderId;
+                    projectId = project.id;
                 }%>
+                <a style = "text-decoration: none; color:#343a40;" href="./<%= projectId%>/folders/folder/<%= id%>">
+                    <div style="text-align:center;">
+                        <i class="fa fa-folder-open fa-3x"></i>
+                        <br>
+                        <b><%= folders[i].name%></b>
+                    </div>
+                </a>
+            </div>
+    <%}%>
 
-                        <div style="text-align:center;" class="row">
-                            <%for(var k = 0; k < cellsInRow; k++){
-                                var id;
-                                var projectId;
-
-                                if(user.admin){
-                                    id = folders[cellCount1].id;
-                                    projectId = project.id;
-                                }else{
-                                    id = folders[cellCount1].folderId;
-                                    projectId = project.id;
-                                }
-                            %>
-                                <div class="col">
-                                    <% if(user.admin){ %>
-                                    <div class="dropdown">
-                                        <button style = "background-color:transparent; font-size:12px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
-                                        <i class="fa fa-cog"></i> Options
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="projSettings">
-                                                <form action="/projects/project/<%=projectId%>/folders/folder/<%=id%>/delete" method="post">
-                                                    <button type="submit" class="dropdown-item"><i class="fa fa-minus"></i> Delete</button>
-                                                </form>
-                                        </div>
-                                    </div>
-                                    <%}%>
-                                </div>
-                                <%cellCount1++%>
-                            <%}%>
-                        </div>
-                        <div style="text-align:center;" class="row">
-                            <%for(let l = 0; l < cellsInRow; l++){
-                                var projectId1;
-                                var id1;
-
-                                if(user.admin){
-                                    projectId1 = project.id;
-                                    id1 = folders[cellCount2].id;
-                                }else{
-
-                                    projectId1 = project.projectId;
-                                    id1 = folders[cellCount2].folderId;
-
-
-                                }
-                            %>
-                                <div class="col">
-                                    <a style = "text-decoration: none; color:#343a40;" href="./<%= projectId1%>/folders/folder/<%= id1%>">
-                                        <i class="fa fa-folder-open fa-3x"></i>
-                                    </a>
-                                </div>
-                                 <%cellCount2++%>
-                            <%}%>
-
-                        </div>
-                        <div style="text-align:center;" class="row">
-                            <%for(let m = 0; m < cellsInRow; m++){
-                                var projectId2;
-                                var id2;
-                                var name;
-                                if(user.admin){
-                                    projectId2 = project.id;
-                                    id2 = folders[cellCount3].id;
-                                    name = folders[cellCount3].name;
-                                }else{
-
-                                    projectId2 = project.projectId;
-                                    id2 = folders[cellCount3].folderId;
-                                    name = folders[cellCount3].folderName;
-
-                                }
-                            %>
-                                <div class="col">
-                                    <%= name%>
-                                </div>
-                                <%cellCount3++%>
-                            <%}%>
-                        </div>
-            <%}%>
+</div>
 </div>
 <%- include('../include/foot.ejs')%>

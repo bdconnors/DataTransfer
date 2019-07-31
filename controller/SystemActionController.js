@@ -8,6 +8,7 @@ class SystemActionController{
         this.projectControl = projectControl;
         this.observers = [];
     }
+
     async inviteNewUser(authResponse){
         let userObj = authResponse.request.body;
         let firstName = userObj.firstname;
@@ -37,7 +38,6 @@ class SystemActionController{
         authResponse.variables.email = {action:'PROJECT ADD',user:user,permission:permission,lastEmail:true};
         this.notifyAll(authResponse);
     }
-
     async updateNewUser(authResponse){
         let authCode = authResponse.request.query.authCode;
         let phone = authResponse.request.body.phone;
@@ -49,14 +49,11 @@ class SystemActionController{
                 authResponse.display = '/users/authSuccess';
                 authResponse.command = 'DISPLAY';
                 authResponse.variables.user = user;
-            })
-            .catch((err)=>{throw err});
+            }).catch((err)=>{throw err});
     }
-
     async getAllUsers(authResponse){
         let users = await this.userControl.getAllUsers();
         authResponse.response.send(users);
-
     }
     async getProjectUsers(authResponse){
         if(authResponse.request.query.id){
@@ -77,9 +74,7 @@ class SystemActionController{
         let allProjects = await this.projectControl.getAllProjects();
         let exists = false;
         allProjects.forEach(project=>{
-            if(project.name === name){
-                exists = true;
-            }
+            if(project.name === name){exists = true;}
         });
         if(exists){
             authResponse.response.send({error:'PROJECT EXISTS'});
@@ -95,9 +90,7 @@ class SystemActionController{
         let project = await this.projectControl.getProject(projectId);
         let exists = false;
         project.folders.forEach(folder=>{
-            if(folder.name === folderName){
-                exists = true;
-            }
+            if(folder.name === folderName){exists = true;}
         });
         if(exists){
             authResponse.response.send({error:'FOLDER EXISTS'});
@@ -108,7 +101,6 @@ class SystemActionController{
             let folder = await this.projectControl.createNewFolder(project,folderName,authResponse.request.session.user);
             authResponse.response.send(folder);
         }
-
     }
     async removeUserProjectPermission(authResponse){
         let projectId = authResponse.request.body.projectId;
@@ -140,13 +132,9 @@ class SystemActionController{
     }
     async streamFile(authResponse){
         let projectId = authResponse.request.params.id;
-        console.log(projectId);
         let folderId = authResponse.request.params.folderid;
-        console.log(folderId);
         let fileName = authResponse.request.params.filename;
-        console.log(fileName);
         let folder = await this.projectControl.getFolder(projectId,folderId);
-        console.log(folder);
         authResponse.variables.storage.action = 'STREAM FILE';
         authResponse.variables.storage.file = fileName;
         authResponse.variables.storage.path = folder.projectName+'/'+folder.name+'/'+fileName;
@@ -167,12 +155,8 @@ class SystemActionController{
     async deleteProject(authResponse){
         let projectId = authResponse.request.params.id;
         this.projectControl.getProject(projectId).then(project=>{
-            console.log('inside delete project action');
-            console.log(project);
             this.projectControl.deleteProject(projectId).then(()=>{
-                console.log('inside delete project db ref');
                 this.userControl.deleteProject(projectId).then(()=>{
-                    console.log('inside delete project permissions');
                     authResponse.variables.storage = {};
                     authResponse.variables.storage.project = project;
                     authResponse.variables.storage.action = 'DELETE PROJECT';
@@ -233,11 +217,8 @@ class SystemActionController{
         let filepath = folder.projectName+'/'+folder.name+'/'+fileName;
         let ext = path.extname(fileName);
         let mime = mimeType.lookup(ext);
-        console.log(authResponse.variables);
         authResponse.variables.storage = {};
-        console.log(authResponse.variables.storage);
         authResponse.variables.storage.action ='WRITE FILE';
-        console.log(authResponse.variables.storage.action);
         authResponse.variables.storage.path = filepath;
         authResponse.variables.storage.data = data;
         this.notifyAll(authResponse);
@@ -255,8 +236,17 @@ class SystemActionController{
         this.notifyAll(authResponse);
         authResponse.response.send(response);
     }
+    async userExists(authResponse){
+        authResponse.response.send(this.userControl.getUser('email',authResponse.request.params.email));
+    }
+    async fileExists(authResponse){
+        let projectId = authResponse.request.params.id;
+        let folderId = authResponse.request.params.folderid;
+        let fileName = authResponse.request.params.filename;
+        let exists = await this.projectControl.fileExists(projectId,folderId,fileName);
+        authResponse.response.send(exists);
+    }
     performAction(authResponse){
-
         if(authResponse.display === '/users/invite'){
             this.inviteNewUser(authResponse).catch((err)=>{throw err});
         }else if(authResponse.display === '/users/authenticate'){
@@ -293,8 +283,11 @@ class SystemActionController{
             this.deleteFile(authResponse).catch((err)=>{throw err});
         }else if(authResponse.display === '/projects/project/:id/rename'){
             this.renameProject(authResponse).catch(err=>{throw err});
+        }else if(authResponse.display === '/users/:email/exists'){
+            this.userExists(authResponse).catch(err=>{throw err});
+        }else if(authResponse.display === '/projects/project/:id/folders/folder/:folderid/file/:filename/exists'){
+            this.fileExists(authResponse).catch((err)=>{throw err});
         }
-
     }
     notify(authResponse){
         if(authResponse.command === 'ACTION'){
@@ -304,12 +297,8 @@ class SystemActionController{
     subscribe(obs){
         this.observers.push(obs);
     }
-
     notifyAll(authResponse){
-
         this.observers.map(observer => observer.notify(authResponse));
-
     }
-
 }
 module.exports={SystemActionController:SystemActionController};

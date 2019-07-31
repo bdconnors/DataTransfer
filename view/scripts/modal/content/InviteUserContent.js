@@ -16,7 +16,6 @@ class InviteUserContent extends ModalContent {
                 <h5><i class="fa fa-user-circle"></i> Users Added To Project</h5>
                 <div class="center text-center">`;
         if (modal.functionControl.invitedUsers.length === 0) {
-            console.log(modal.functionControl.invitedUsers.length === 0);
             template += `<p style="font-style:italic">No Users Added</p>`
         } else {
 

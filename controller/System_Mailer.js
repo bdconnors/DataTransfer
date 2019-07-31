@@ -27,7 +27,7 @@ class System_Mailer{
 
         let email = this.getEmail(authResponse.variables.email,authResponse.variables.email.action);
         await this.transporter.sendMail(email).then(()=>{
-            if(authResponse.variables.email.action === 'INVITED'){
+            if(authResponse.variables.email.action === 'INVITED'||authResponse.variables.email.action ==='PROJECT ADD'){
                 authResponse.response.send(authResponse.variables.email.user);
             }else if(authResponse.variables.email.action === 'AUTHENTICATED'){
                 authResponse.display = '/users/authSuccess';

@@ -1,20 +1,21 @@
 class NewUserFunctions{
     constructor(){}
     async sendInvite(project,folderPermissions){
-        let $loading = $('#loadingSpinner');
-        $loading.modal({backdrop: 'static', keyboard: false});
         let userObject = await this.createUserObject(project,folderPermissions);
-        console.log(userObject);
-        let response = await server.send(server.make('/users/invite','POST',userObject));
-        $loading.modal('hide');
-        return response;
+        if(userObject) {
+            let $loading = $('#loadingSpinner');
+            $loading.modal({backdrop: 'static', keyboard: false});
+            let response = await server.send(server.make('/users/invite', 'POST', userObject));
+            $loading.modal('hide');
+            return response;
+        }
     }
     async createUserObject(project,folderPermissions){
         let firstNameInp = document.getElementById('newUserFirstname');
         let lastNameInp = document.getElementById('newUserLastname');
         let emailInp =  document.getElementById('newUserEmail');
-
-        if(this.validated(firstNameInp,lastNameInp,emailInp)){
+        let valid = await this.validated(firstNameInp,lastNameInp,emailInp);
+        if(valid){
             return {
                 firstname:firstNameInp.value,
                 lastname:lastNameInp.value,
@@ -25,10 +26,12 @@ class NewUserFunctions{
                     folderPermissions: folderPermissions
                 }]
             }
+        }else{
+            return false;
         }
     }
 
-    validated(firstNameInp,lastNameInp,emailInp){
+    async validated(firstNameInp,lastNameInp,emailInp){
         let valid = false;
         let firstname = firstNameInp.value;
 
@@ -53,7 +56,15 @@ class NewUserFunctions{
             let err = document.getElementById('emailErr');
             err.style.display = 'block';
         }else{
-            valid = true;
+            let userExists = await server.send(server.make('/users/'+email+'/exists','GET'));
+            if(userExists){
+                valid = false;
+                let err = document.getElementById('userExistsErr');
+                emailInp.style.backgroundColor = 'pink';
+                err.style.display = 'block';
+            }else{
+                valid = true;
+            }
         }
 
         return valid;

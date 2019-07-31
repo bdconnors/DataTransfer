@@ -3,7 +3,6 @@ class RenameFunctions{
 
     async rename(){
         let newName = document.getElementById('renameInput').value;
-        console.log(newName);
         let url;
 
         let type = document.getElementById('renameType').value;

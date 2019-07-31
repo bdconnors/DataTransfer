@@ -10,9 +10,6 @@ class ProjectController{
         return await this.model.getProject(id);
     }
     async getFolder(projectid,folderid){
-        console.log('inside controller get folder');
-        console.log(projectid);
-        console.log(folderid);
         return await this.model.getFolder(projectid,folderid);
     }
     async createNewFolder(project,name,author){
@@ -20,6 +17,9 @@ class ProjectController{
     }
     async getAllProjects(){
         return await this.model.getAllProjects();
+    }
+    async fileExists(projectid,folderid,filename){
+        return await this.model.fileExists(projectid,folderid,filename);
     }
     async addFile(folder,file){
         return await this.model.addFile(folder,file);
@@ -42,10 +42,8 @@ class ProjectController{
     async existingUserFolder(user,permission){
         return await this.model.existingUserFolder(user,permission);
     }
-    async renameFolder(projectid,folderid,newname){
+    /**async renameFolder(projectid,folderid,newname){
         return await this.model.renameFolder(projectid,folderid,newname);
-    }
-
-
+    }**/
 }
 module.exports={ProjectController:ProjectController};

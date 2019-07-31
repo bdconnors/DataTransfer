@@ -1,7 +1,6 @@
 class ExistingUsersFunctions{
     constructor(){}
     async sendInvite(userId,project,folderPermissions){
-        console.log('inside invite existing');
         delete folderPermissions.display;
         let projectPermission = {projectId:project.id,projectName:project.name,folderPermissions:folderPermissions};
         let $loading = $('#loadingSpinner');

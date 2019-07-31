@@ -27,7 +27,8 @@ class ProjectContent extends ModalContent{
                     <label for="name"><i class="fa fa-pencil"></i> <b>Project Name:</b></label>
                  </div>
                  <div class="text-center">
-                     <input type="text" class="form-control" name="name" id="createProjectName" placeholder="Project Name">
+                     <p id="projExistsErr" style="color:red; display:none">*A Project With This Name Already Exists</p>
+                     <input  onchange="modal.perform('check project input',this)" type="text" class="form-control" name="name" id="createProjectName" placeholder="Project Name">
                  </div>`;
     }
     getFooter(){
@@ -43,9 +44,10 @@ class ProjectContent extends ModalContent{
     getSuccessBody(){
 
         let template = `<div style="font-size:16px;" class="text-left center">
-                        <b>Project Name:</b>`;
+                        <b>Project Name:</b><br><br>`;
+
             template+= modal.functionControl.project.name;
-            template+=`<br>
+            template+=`<br><br>
                         <b>Folders Created:</b>
                         <br>`;
         modal.functionControl.project.folders.forEach(folder=>{

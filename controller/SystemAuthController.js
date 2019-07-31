@@ -8,11 +8,22 @@ class SystemAuthController{
         this.observers=[];
     }
 
-    getLogin(req,res){
+    displayLogin(req,res){
         let authResponse = this.make(req,res);
         this.notifyAll(authResponse);
     }
-    async postLogin(req,res){
+    displayUnauthorized(req,res){
+        let authResponse = this.make(req,res);
+        this.notifyAll(authResponse);
+    }
+    logout(req,res){
+        let authResponse = this.make(req,res);
+        req.session.destroy();
+        authResponse.command = 'REDIRECT';
+        authResponse.display='/login';
+        this.notifyAll(authResponse,);
+    }
+    async authorizeLogin(req,res){
         let authResponse = this.make(req,res);
         let verified = await this.userControl.verifyCredentials(req.body.email,req.body.password).catch((err)=>{throw err});
 
@@ -29,58 +40,77 @@ class SystemAuthController{
         }
         this.notifyAll(authResponse);
     }
-     getLogout(req,res){
+    async authorizeSession(req,res){
         let authResponse = this.make(req,res);
-        req.session.destroy();
-        authResponse.command = 'REDIRECT';
-        authResponse.display='/login';
-        this.notifyAll(authResponse,);
+        authResponse = await this.sessionAuth(authResponse,req);
+        if(authResponse.session) {
+            this.notifyAll(authResponse);
+        }
     }
-    getUnauthorized(req,res){
-        let authResponse = this.make(req,res);
-        this.notifyAll(authResponse);
-    }
-    async getDashboard(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.sessionAuth(authResponse,req).catch((err)=>{throw err});
-        this.notifyAll(authResponse);
-    }
-    async getInvite(req,res){
+    async authorizeAdmin(req,res){
         let authResponse = this.make(req,res);
         authResponse = await this.checkAdmin(authResponse,req);
         this.notifyAll(authResponse);
     }
-    async postInvite(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        this.notifyAll(authResponse);
-    }
-    async postRemoveProjectPermission(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        this.notifyAll(authResponse);
-    }
-    async postAddProjectPermission(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        this.notifyAll(authResponse);
-    }
-    async getAuthForm(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAuthCode(authResponse);
-        this.notifyAll(authResponse);
-    };
-    async postAuthForm(req,res){
+    async authorizeNewUser(req,res){
         let authResponse = this.make(req,res);
         authResponse = await this.checkAuthCode(authResponse);
         this.notifyAll(authResponse);
     }
-    async postRenameProject(req,res){
+    async authorizeFolderView(req,res){
         let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
+        authResponse = await this.sessionAuth(authResponse,req);
+        if(authResponse.session) {
+            authResponse = await this.folderAuth(authResponse, req);
+            this.notifyAll(authResponse);
+        }
+    }
+    async authorizeProjectView(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.sessionAuth(authResponse,req);
+        if(authResponse.session) {
+            authResponse = await this.projectAuth(authResponse, req);
+            this.notifyAll(authResponse);
+        }
+    }
+    async authorizeUpload(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.sessionAuth(authResponse,req);
+        if(authResponse.session) {
+            authResponse = await this.uploadAuth(authResponse, req);
+        }
         this.notifyAll(authResponse);
     }
-    async postDeleteUser(req,res){
+    async authorizeFileView(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.sessionAuth(authResponse,req);
+        if(authResponse.session) {
+            authResponse = await this.fileAuth(authResponse, req, 'view');
+            authResponse.variables.storage = {};
+            authResponse.variables.storage.disposition = 'inline';
+            this.notifyAll(authResponse);
+        }
+    }
+    async authorizeFileDownload(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.sessionAuth(authResponse,req);
+        if(authResponse.session) {
+            authResponse = await this.fileAuth(authResponse, req, 'download');
+            authResponse.variables.storage = {};
+            authResponse.variables.storage.disposition = 'attachment';
+            this.notifyAll(authResponse);
+        }
+    }
+    async authorizeProfileView(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.checkAdmin(authResponse,req);
+        if(authResponse.admin){
+            authResponse.variables.user = await this.userControl.getUser('id',req.params.id);
+            authResponse.display ='/users/userProfile';
+        }
+        this.notifyAll(authResponse);
+    }
+    async authorizeDeleteAccount(req,res){
         let authResponse = this.make(req,res);
         authResponse = await this.checkAdmin(authResponse,req);
         if(authResponse.admin){
@@ -93,215 +123,96 @@ class SystemAuthController{
             this.notifyAll(authResponse);
         }
     }
-    async postRenameFolder(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        this.notifyAll(authResponse);
-    }
-    async postCreateProject(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        this.notifyAll(authResponse);
-    }
-    async getUser(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        authResponse.command = 'ACTION';
-        this.notifyAll(authResponse);
-    }
-    async getAllUsers(req,res){
+    async authorizeAJAX(req,res){
         let authResponse = this.make(req,res);
         authResponse = await this.checkAdmin(authResponse,req);
         if(authResponse.admin){
             authResponse.command = 'ACTION';
         }
-        this.notifyAll(authResponse);
-    }
-    async getProjectUsers(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        if(authResponse.admin){
-            authResponse.command = 'ACTION';
-        }
-        this.notifyAll(authResponse);
-    }
-    async getProjectPage(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.sessionAuth(authResponse,req);
-        authResponse = await this.projectAuth(authResponse,req);
-        console.log('back in project auth page before notify');
-        this.notifyAll(authResponse);
-    }
-    async getFolderPage(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.sessionAuth(authResponse,req);
-        authResponse = await this.folderAuth(authResponse,req);
-        this.notifyAll(authResponse);
-    }
-    async postNewFolder(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        this.notifyAll(authResponse);
-    }
-    async postAddFolderPermission(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        this.notifyAll(authResponse);
-    }
-    async getFolderUsers(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        if(authResponse.admin) {
-            authResponse.command = 'ACTION';
-        }
-        this.notifyAll(authResponse)
-    }
-    async postRemoveFolderPermission(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        this.notifyAll(authResponse);
-    }
-    async postDeleteFolder(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        this.notifyAll(authResponse);
-    }
-    async postDeleteProject(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        this.notifyAll(authResponse);
-    }
-    async postDeleteFile(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        this.notifyAll(authResponse);
-    }
-    async postUploadFile(req,res){
-        let authResponse = this.make(req,res);
-        console.log('inside post upload file');
-        console.log(req.body.folderId);
-        console.log(req.body.projectId);
-        authResponse = await this.sessionAuth(authResponse,req);
-        authResponse = await this.uploadAuth(authResponse,req);
-        this.notifyAll(authResponse);
-
-    }
-    async getUserProfile(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.checkAdmin(authResponse,req);
-        if(authResponse.admin){
-            let userProfile = await this.userControl.getUser('id',req.params.id);
-            console.log('this is the profile user');
-            console.log(userProfile);
-            console.log('auth control');
-            console.log(req.params.id);
-            console.log(req.session.user.id);
-            authResponse.variables.user = userProfile;
-            authResponse.display ='/users/userProfile';
-        }
-        this.notifyAll(authResponse);
-    }
-    async getViewFile(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.sessionAuth(authResponse,req);
-        authResponse = await this.fileAuth(authResponse,req,'view');
-        authResponse.variables.storage = {};
-        authResponse.variables.storage.disposition = 'inline';
-        this.notifyAll(authResponse);
-    }
-    async getDownloadFile(req,res){
-        let authResponse = this.make(req,res);
-        authResponse = await this.sessionAuth(authResponse,req);
-        authResponse = await this.fileAuth(authResponse,req,'download');
-        authResponse.variables.storage = {};
-        authResponse.variables.storage.disposition = 'attachment';
         this.notifyAll(authResponse);
     }
     async fileAuth(authResponse,req,disposition){
         let user = req.session.user;
         let folderId = req.params.folderid;
         let projectId = req.params.id;
-        let authorized = false;
+        authResponse.authorized = false;
         if(user.admin){
-            authorized = true;
+            authResponse.authorized = true;
         }else {
             let permission = await this.userControl.getProjectPermission(user.id, projectId);
             permission.folderPermissions.forEach(perm => {
                 if (perm.folderId === folderId) {
                     if (perm[disposition]) {
-                        authorized = true;
+                        authResponse.authorized = true;
                     }
                 }
             });
         }
-        if(!authorized){
+        if(!authResponse.authorized){
             authResponse.display = '/unauthorized';
         }else{
             authResponse.display = '/projects/project/:id/folders/folder/:folderid/file/:filename';
             authResponse.command = 'ACTION';
         }
         return authResponse;
-
     }
     async uploadAuth(authResponse,req){
+        authResponse.authorized = false;
         let user = req.session.user;
         let folderId = req.body.folderId;
         let projectId = req.body.projectId;
-        console.log('inside upload auth');
-        console.log(folderId);
-        console.log(projectId);
         let folder = await this.projectControl.getFolder(projectId,folderId);
         if(user.admin || folder.metadata.userFolder === user.id){
+            authResponse.authorized = true;
             authResponse.variables.folder = folder;
         }else{
+            authResponse.authorized = false;
             authResponse.display = '/unauthorized';
         }
         return authResponse;
-
     }
     async folderAuth(authResponse,req){
-
         let user = req.session.user;
-        let authorized = false;
+        authResponse.authorized = false;
         let projectId = req.params.id;
         let folderId = req.params.folderid;
-        if(user.admin){
-            authorized = true;
-        }else{
-            let projectPermission = await this.userControl.getProjectPermission(user.id,projectId);
-            projectPermission.folderPermissions.forEach(perm=>{
-                if(perm.folderId === folderId){
-                    authorized = true;
-                    authResponse.variables.permission = perm;
-                }
-            });
-
-        }
-        if(authorized){
-            authResponse.variables.folder = await this.projectControl.getFolder(projectId,folderId);
-            authResponse.display = "/projects/folders/folder";
-        }
-        else{
-            authResponse.display ='/unauthorized';
+        if(user) {
+            if (user.admin) {
+                authResponse.authorized = true;
+            } else {
+                let projectPermission = await this.userControl.getProjectPermission(user.id, projectId);
+                projectPermission.folderPermissions.forEach(perm => {
+                    if (perm.folderId === folderId) {
+                        authResponse.authorized = true;
+                        authResponse.variables.permission = perm;
+                    }
+                });
+            }
+            if (authResponse.authorized) {
+                authResponse.variables.folder = await this.projectControl.getFolder(projectId, folderId);
+                authResponse.display = "/projects/folders/folder";
+            } else {
+                authResponse.display = '/unauthorized';
+            }
         }
         return authResponse
     }
     async projectAuth(authResponse,req){
         let projectId = req.params.id;
-        let authorized = false;
+        authResponse.authorized = false;
         if(req.session.user.admin){
             authResponse.variables.project = await this.projectControl.getProject(projectId);
             authResponse.display = '/projects/project';
-            authorized = true;
+            authResponse.authorized = true;
         }else{
             let permission = await this.userControl.getProjectPermission(req.session.user.id,projectId);
             authResponse.variables.project = permission;
             if(permission){
                 authResponse.display = '/projects/project';
-                authorized = true;
+                authResponse.authorized = true;
             }
         }
-        if(!authorized){
+        if(!authResponse.authorized){
             authResponse.display = '/unauthorized';
         }
         return authResponse;
@@ -313,21 +224,26 @@ class SystemAuthController{
                 if (req.session.user.id === dbUser.id) {
                     req.session.user = dbUser;
                     authResponse.variables.user = req.session.user;
+                    authResponse.session = true;
                     if(req.session.user.admin){
                         authResponse.admin = true;
+                        authResponse.session = true;
                         authResponse.variables.users = await this.userControl.getAllUsers();
                         authResponse.variables.projects = await this.projectControl.getAllProjects();
                     }
                 } else {
                     req.session.destroy();
+                    authResponse.session = false;
                     authResponse = this.badSession(authResponse);
                     this.notifyAll(authResponse);
                 }
             }else{
+                authResponse.session = false;
                 authResponse = this.badSession(authResponse);
                 this.notifyAll(authResponse);
             }
         }else{
+            authResponse.session = false;
             authResponse = this.badSession(authResponse);
             this.notifyAll(authResponse);
         }
@@ -335,11 +251,13 @@ class SystemAuthController{
     }
     async checkAdmin(authResponse,req){
         authResponse = await this.sessionAuth(authResponse,req);
-        if(authResponse.admin){
-            return authResponse;
-        }else{
-            authResponse.command = '/redirect';
-            authResponse.display = '/unauthorized';
+        if(authResponse.session) {
+            if (authResponse.admin) {
+                return authResponse;
+            } else {
+                authResponse.command = '/redirect';
+                authResponse.display = '/unauthorized';
+            }
         }
     }
     async checkAuthCode(authResponse) {
@@ -373,16 +291,13 @@ class SystemAuthController{
         authResponse.display = '/login';
         return authResponse;
     }
-
     subscribe(obs){
         this.observers.push(obs);
     }
-
     notifyAll(authResponse){
 
         this.observers.map(observer => observer.notify(authResponse));
 
     }
-
 }
 module.exports={SystemAuthController:SystemAuthController};

@@ -11,7 +11,8 @@ class UsersRepo {
         return newUser;
     }
     async getUser(field,value){
-        let results = await this.Users.find(this.makeQuery(field,value),{_id:0});
+        let downcase =value.toLocaleLowerCase();
+        let results = await this.Users.find(this.makeQuery(field,downcase),{_id:0});
         if(results[0]){
             return results[0];
         }else{
@@ -30,7 +31,6 @@ class UsersRepo {
         return await this.Users.deleteOne(this.makeQuery(field,value));
     }
     async addFolderPermission(userid,folder,perms){
-        console.log(perms);
         let view = perms.view;
         let download = perms.download;
         let folderPermission = {folderId:folder.id,folderName:folder.name,view:view,download:download};

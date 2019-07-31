@@ -50,7 +50,6 @@ class FolderAddUsersContent extends ModalContent{
             template +=`<option value="none" style="font-style:italic">No Users Found</option>`;
         }else {
             modal.functionControl.existingUsers.forEach(user => {
-                console.log(user);
                 template += `<option id="${user.id}" value="${user.id}">${user.firstname} ${user.lastname}</option>`;
             });
         }
@@ -96,7 +95,6 @@ class FolderAddUsersContent extends ModalContent{
                 <h5><i class="fa fa-user-circle"></i> Users Added To Project</h5>
                 <div class="center text-center">`;
         if (modal.functionControl.newFolderUsers.length === 0) {
-            console.log(modal.functionControl.newFolderUsers.length === 0);
             template += `<p style="font-style:italic">No Users Added</p>`
         } else {
 

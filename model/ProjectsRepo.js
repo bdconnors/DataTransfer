@@ -15,9 +15,7 @@ class ProjectsRepo {
 
     }
     async getFolder(projectid,folderid) {
-        console.log(projectid,folderid);
         let results = await this.Projects.findOne({id: projectid}, {folders: {$elemMatch: {id: folderid}}}, {_id: 0});
-        console.log(results);
         return results.folders[0];
 
     }
@@ -43,6 +41,10 @@ class ProjectsRepo {
         }
         return results;
     }
+    async fileExists(projectid,folderid,filename){
+        let results = await this.Projects.find({id:projectid,folders: { "$elemMatch": {id:folderid,files: {"$elemMatch": {"name": filename}}}}});
+        return results.length !== 0;
+    }
     async existingUserFolder(user,permission){
 
         let project = await this.getProject(permission.projectId);
@@ -65,11 +67,11 @@ class ProjectsRepo {
         }
         return update;
     }
-    async renameFolder(projectid,folderid,newname){
+    /**async renameFolder(projectid,folderid,newname){
         let folder = await this.getFolder(projectid,folderid);
         let update = await this.Projects.updateOne({'folders.id':folderid},{$set:{'folders.$.name':newname}});
         return folder;
-    }
+    }**/
     async deleteFolder(projectid,folderid){
         return await this.Projects.updateOne({id:projectid},{$pull:{folders:{id:folderid}}});
     }

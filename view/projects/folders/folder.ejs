@@ -1,4 +1,4 @@
-<%- include('../../include/head.ejs',{title:'Folder',scripts:false})%>
+<%- include('../../include/head.ejs',{title:folder.name})%>
 <body>
 <%if(user.admin){%>
     <%- include('../../include/adminNav.ejs') %>
@@ -6,113 +6,69 @@
     <%- include('../../include/menu.ejs') %>
 <%}%>
 <%- include('../../include/folderNav.ejs')%>
-<div class="bg-dark" id = "header"  style="padding:35px 50px;">
-    <h4 class="bg-dark" ><i class="fa fa-folder fa-lg" ></i>  <%= folder.name%></h4>
+<div class="bg-dark" id = "pageHeader"  style="padding:35px 50px;">
+    <h1 class="bg-dark" ><i class="fa fa-folder" ></i>  <%= folder.name%></h1>
 </div>
 <br>
 <% if(user.admin){%>
     <%- include('../../include/modal.ejs')%>
 <%}%>
 <% var files = folder.files%>
-<% var totalCells = files.length%>
-<% var fullRows = Math.floor(files.length/3)%>
-<% var partialRowCount = files.length % 3 %>
-<% var rows = fullRows+1%>
-<% var cellCount1 = 0%>
-<% var cellCount2 = 0%>
-<% var cellCount3 = 0%>
 <%if(folder.metadata.userFolder === user.id){%>
     <%- include('../../include/modal.ejs')%>
 <%}%>
-<div class="container">
-
-    <%for(var i = 0; i < rows; i++){%>
-        <%var cellsInRow = 3%>
-        <%if(i === fullRows){
-            cellsInRow = partialRowCount;
-        }%>
-
-        <div style="text-align:center;" class="row">
-            <%for(var k = 0; k < cellsInRow; k++){%>
-                <div class="col">
-                    <div class="dropdown">
+<div style="padding-top:50px;" class="center">
+    <div style="text-align:center; padding-top:20px;padding-bottom:20px " class="row">
+        <%for(var i = 0; i < files.length; i++){%>
+            <div style="text-align:left;padding-left:30px" class="col">
+                <%if(user.admin || folder.metadata.userFolder === user.id||permission.download){ %>
+                    <div style="text-align:center;" class="dropdown">
                         <button style = "background-color:transparent; font-size:12px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
                             <i class="fa fa-cog"></i> Options
                         </button>
                         <div class="dropdown-menu" aria-labelledby="projSettings">
-                            <form action = "" method="get">
+                            <form action = "./<%=folder.id%>/file/<%=files[i].name%>" method="get">
                                 <button class="dropdown-item" type="submit"><i class="fa fa-eye"></i> View</button>
                             </form>
-                            <% if(user.admin){ %>
-                                <form action = "./<%=folder.id%>/file/<%=files[cellCount1].name%>/attachment" method="get">
-                                    <button class="dropdown-item" type="submit"><i class="fa fa-download"></i> Download</button>
-                                </form>
-                            <%}else{%>
-                                <%if(permission.download){%>
-                                    <form action = "" method="get">
-                                        <button class="dropdown-item" type="submit"><i class="fa fa-download"></i> Download</button>
-                                    </form>
-                                <%}%>
-                            <%}%>
-                            <%if(user.admin){
-                                var obj = {projectId:folder.projectId,folderId:folder.id,name:files[cellCount1].name,type:'File'}
-                                var json = JSON.stringify(obj);
-                            %>
-
-                                <form action="/projects/project/<%= folder.projectId%>/folders/folder/<%= folder.id%>/file/<%= files[cellCount1].name%>/delete" method="post">
+                            <form action = "./<%=folder.id%>/file/<%=files[i].name%>/attachment" method="get">
+                                <button class="dropdown-item" type="submit"><i class="fa fa-download"></i> Download</button>
+                            </form>
+                                <%if(user.admin){%>
+                                <form action="/projects/project/<%= folder.projectId%>/folders/folder/<%= folder.id%>/file/<%= files[i].name%>/delete" method="post">
                                     <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i>  Delete</button>
-                                </form>
+                                 </form>
+                                <%}%>
                             <%}%>
                         </div>
                     </div>
-                </div>
-                <%cellCount1++%>
-            <%}%>
-        </div>
-        <div style="text-align:center;" class="row">
-            <%for(let l = 0; l < cellsInRow; l++){
-                var file = files[cellCount2]
-                var ext = files[cellCount2].metadata.ext;
-            %>
-            <div class="col">
-
-
-                <a style = "text-decoration: none; color:#343a40;" href="./<%=folder.id%>/file/<%=files[cellCount2].name%>">
-                    <%if(ext === '.pdf'){%>
-                        <i class="fa fa-file-pdf-o fa-3x"></i>
-                    <%}else if(ext  === '.docx'|| ext === '.doc'){%>
-                        <i class="fa fa-file-word-o fa-3x"></i>
-                    <%}else if(ext === '.jpg'||ext ==='.jpeg'||ext === '.png'||ext === '.bmp'||ext==='.gif'){%>
-                        <i class="fa fa-file-image-o fa-3x"></i>
-                    <%}else if(ext === '.ppt' || ext === '.pptx'){%>
-                        <i class="fa fa-file-powerpoint-o fa-3x"></i>
-                    <%}else if(ext === '.xlsx'){%>
-                        <i class="fa fa-file-excel-o fa-3x"></i>
-                    <%}else if(ext ==='.txt'){%>
-                        <i class="fa fa-file-text-o fa-3x"></i>
-                    <%}else if( ext === '.zip'||ext==='.rar'||ext ==='.7z'){%>
-                        <i class="fa fa-file-zip-o fa-3x"></i>
-                    <%}else if(ext === '.java'||ext ==='.js'||ext==='.py'||ext==='.cs'||ext==='.php'||ext==='.html'||ext==='.css'){%>
-                        <i class="fa fa-file-code-o fa-3x"></i>
-                    <%}else{%>
-                        <i class="fa fa-file-file-o fa-3x"></i>
-                    <%}%>
-                </a>
-            </div>
-                    <%cellCount2++%>
-                <%}%>
-
-        </div>
-        <div style="text-align:center;" class="row">
-            <%for(let m = 0; m < cellsInRow; m++){%>
-                <div class="col">
-                    <a style = "text-decoration: none; color:#343a40;" href="./<%=folder.id%>/file/<%=files[cellCount3].name%>">
-                        <%= files[cellCount3].name%>
+                    <a style = "text-decoration: none; color:#343a40;" href="./<%=folder.id%>/file/<%=files[i].name%>">
+                        <div style="text-align:center;">
+                            <%var ext = files[i].metadata.ext%>
+                            <%if(ext === '.pdf'){%>
+                                <i class="fa fa-file-pdf-o fa-3x"></i>
+                            <%}else if(ext  === '.docx'|| ext === '.doc'){%>
+                                <i class="fa fa-file-word-o fa-3x"></i>
+                            <%}else if(ext === '.jpg'||ext ==='.jpeg'||ext === '.png'||ext === '.bmp'||ext==='.gif'){%>
+                                <i class="fa fa-file-image-o fa-3x"></i>
+                            <%}else if(ext === '.ppt' || ext === '.pptx'){%>
+                                <i class="fa fa-file-powerpoint-o fa-3x"></i>
+                            <%}else if(ext === '.xlsx'){%>
+                                <i class="fa fa-file-excel-o fa-3x"></i>
+                            <%}else if(ext ==='.txt'){%>
+                                <i class="fa fa-file-text-o fa-3x"></i>
+                            <%}else if( ext === '.zip'||ext==='.rar'||ext ==='.7z'){%>
+                                <i class="fa fa-file-zip-o fa-3x"></i>
+                            <%}else if(ext === '.java'||ext ==='.js'||ext==='.py'||ext==='.cs'||ext==='.php'||ext==='.html'||ext==='.css'){%>
+                                <i class="fa fa-file-code-o fa-3x"></i>
+                            <%}else{%>
+                                <i class="fa fa-file fa-3x"></i>
+                            <%}%>
+                            <br>
+                            <b><%= files[i].name%></b>
+                        </div>
                     </a>
                 </div>
-                <%cellCount3++%>
             <%}%>
-        </div>
-    <%}%>
+    </div>
 </div>
 <%- include('../../include/foot.ejs')%>

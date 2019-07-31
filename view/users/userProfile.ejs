@@ -1,17 +1,20 @@
-<%- include('../include/head.ejs',{title:'User Profile',scripts:false})%>
+<%var profileName = user.firstname+' '+user.lastname%>
+<%- include('../include/head.ejs',{title: profileName+' Profile'})%>
 <body>
 <%- include('../include/adminNav.ejs') %>
-<div class="bg-dark" id="header" style="padding:35px 50px; width:100%;">
-    <h1 class="bg-dark" ><i class="fa fa-user-circle-o fa-2x"></i> <%= user.firstname%> <%=user.lastname%></h1>
+<div class="bg-dark"  id = "pageHeader"  style="padding:35px 50px; width:100%;">
+    <h1 class="bg-dark" ><i class="fa fa-user-circle-o"></i> <%= user.firstname%> <%=user.lastname%></h1>
 </div>
 <% var projects = user.projectPermissions%>
 <br>
 <div class="container">
     <div class="row">
     <div class="col">
-        <form action="/users/<%=user.id%>/delete" method="post">
-            <button type="submit"  id="new" class="btn btn-danger "><i class="fa fa-minus"></i> Delete User Account</button>
-        </form>
+        <% if(!user.admin){ %>
+            <form action="/users/<%=user.id%>/delete" method="post">
+                <button type="submit"  id="new" class="btn btn-danger "><i class="fa fa-minus"></i> Delete User Account</button>
+            </form>
+        <%}%>
         <br>
     <div class="card">
         <h5 class="card-header"><i class="fa fa-info"></i> User Information</h5>

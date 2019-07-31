@@ -1,5 +1,4 @@
 <%var user = user%>
-<% var scripts = scripts %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,16 +13,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"  ></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="/scripts/Server.js"></script>
+
     <% if(user){ %>
          <% if(user.admin){ %>
                 <%- include('./adminScripts.ejs')%>
             <% } else{%>
                 <%- include('./fileScripts.ejs')%>
             <%}%>
-    <% } %>
-    <% if(scripts){ %>
-        <script src="/scripts/<%= scripts %>"></script>
+    <%}else{%>
+        <script src="/scripts/login.js"></script>
+        <script src="/scripts/auth.js"></script>
     <%}%>
+
 </head>
 
 

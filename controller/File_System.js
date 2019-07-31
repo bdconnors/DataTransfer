@@ -75,8 +75,6 @@ class File_System{
         let file =  authResponse.variables.storage.file;
         let disposition = authResponse.variables.storage.disposition;
         let stream = fs.createReadStream(process.env.STORAGE_PATH+path);
-        console.log(path);
-        console.log(file);
         stream.on('open',()=>{
             authResponse.response.setHeader('Content-Disposition',disposition+'; filename='+file);
             stream.pipe(authResponse.response);
