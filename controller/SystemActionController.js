@@ -237,7 +237,8 @@ class SystemActionController{
         authResponse.response.send(response);
     }
     async userExists(authResponse){
-        authResponse.response.send(this.userControl.getUser('email',authResponse.request.params.email));
+        let exists = await this.userControl.getUser('email',authResponse.request.params.email);
+        authResponse.response.send(exists);
     }
     async fileExists(authResponse){
         let projectId = authResponse.request.params.id;

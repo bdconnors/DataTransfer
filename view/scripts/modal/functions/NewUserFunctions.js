@@ -57,6 +57,7 @@ class NewUserFunctions{
             err.style.display = 'block';
         }else{
             let userExists = await server.send(server.make('/users/'+email+'/exists','GET'));
+            console.log(userExists);
             if(userExists){
                 valid = false;
                 let err = document.getElementById('userExistsErr');

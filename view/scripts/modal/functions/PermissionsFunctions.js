@@ -27,9 +27,6 @@ class PermissionsFunctions{
         });
         return dataPerm;
     }
-    async getProject(projectid){
-        return await server.send(server.make())
-    }
     async getExistingUsers(){
         return await server.send(server.make('/users','GET'))
     }
@@ -64,5 +61,18 @@ class PermissionsFunctions{
             label.style.color = 'red';
         }
     }
+    confirmPermissions(element) {
+        let $confirmPermsModal = $('#confirmPermsModal');
+        let $confirmPermsFooter = $('#confirmPermsFooter');
+        $confirmPermsFooter.append(`<button type="button"  onclick="modal.perform('cancel permissions')" class="btn btn-outline-dark btn-block button"><i class="fa fa-user"></i> Cancel</button>`);
+        $confirmPermsFooter.append(`<button type="button" id="${element.id}" onclick="modal.perform('set permissions',this)" class="btn btn-outline-dark btn-block button"><i class="fa fa-user"></i> Confirm</button>`);
+        $confirmPermsModal.modal({backdrop: 'static', keyboard: false});
+    }
+    hideConfirm(){
+        let $confirmPermsModal = $('#confirmPermsModal');
+        $confirmPermsModal.modal('hide');
+    }
+
+
 
 }

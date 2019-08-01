@@ -18,6 +18,7 @@ class ContentControl{
         }else if(content === 'invite new user'){
             template = newUserDisplay.get('invite');
         }else if(content === 'new user success'){
+            console.log('in new user success');
             template = newUserDisplay.get('success');
         }else if(content === 'set permissions'){
             template = permissionsDisplay.get(element.id);

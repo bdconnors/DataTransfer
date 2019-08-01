@@ -12,6 +12,7 @@ class NewUserContent extends ModalContent{
             body = this.getBody();
             footer = this.getFooter();
         }else if(type === 'success'){
+            console.log('inside get success');
             header = this.getSuccessHeader();
             body = this.getSuccessBody();
             footer = this.getSuccessFooter();

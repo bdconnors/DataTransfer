@@ -5,13 +5,16 @@ class Modal{
     }
 
     display(content,element){
+        console.log('display'+content);
         this.contentControl.show(content,element);
     }
     async perform(action,element){
         this.processResponse(await this.functionControl.perform(action,element));
     }
     processResponse(response){
-
+        console.log('inside process response');
+        console.log('response');
+        console.log(response);
         if(response.display) {
             this.display(response.display);
         }

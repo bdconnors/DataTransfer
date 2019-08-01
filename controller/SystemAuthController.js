@@ -123,10 +123,18 @@ class SystemAuthController{
             this.notifyAll(authResponse);
         }
     }
-    async authorizeAJAX(req,res){
+    async authorizeAdminAJAX(req,res){
         let authResponse = this.make(req,res);
         authResponse = await this.checkAdmin(authResponse,req);
         if(authResponse.admin){
+            authResponse.command = 'ACTION';
+        }
+        this.notifyAll(authResponse);
+    }
+    async authorizeAJAX(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.sessionAuth(authResponse,req);
+        if(authResponse.session){
             authResponse.command = 'ACTION';
         }
         this.notifyAll(authResponse);

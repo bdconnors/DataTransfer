@@ -27,9 +27,10 @@ class FunctionControl{
                 response.display = 'invite existing user';
             }
         }else if(action === 'invite new user'){
-            this.user = await newUserFunc.sendInvite(this.project,this.folderPermissions);
+            this.user =  await newUserFunc.sendInvite(this.project,this.folderPermissions);
             response = this.user;
             response.display = 'new user success';
+
         }else if(action === 'check first name'){
             newUserFunc.checkFnInput(element);
         }else if(action === 'check last name'){
@@ -82,6 +83,10 @@ class FunctionControl{
             projectFunc.checkProjInput(element);
         }else if(action === 'check file input'){
             uploadFileFunc.checkFileInp();
+        }else if(action === 'cancel permissions'){
+            permissionsFunc.hideConfirm();
+        }else if(action === 'confirm permissions'){
+            permissionsFunc.confirmPermissions(element);
         }
         return response;
     }
