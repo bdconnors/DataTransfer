@@ -6,4 +6,32 @@
         </div>
     </div>
 </div>
+<div id="confirmModal" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div  class="center modal-header">
+                <h6 id="confirmModalHeaderText"></h6>
+            </div>
+            <div id="confirmModalBody" class="modal-body center text-center">
+            </div>
+            <div id="confirmModalFooter"  class="modal-footer">
+                <button type="button"  onclick="modal.hideConfirmModal()" class="btn btn-outline-dark btn-block button"><i class="fa fa-user"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="loadingSpinner" class="modal fade bd-example-modal-sm">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div style="padding:35px 50px;" class="center modal-header">
+                <h6 id="loadingSpinnerText">Sending Invite</h6>
+            </div>
+            <div style="padding:40px 50px;" class="modal-body center text-center">
+                <span id="loadingSrSpan" class="sr-only">Sending Invite</span>
+                <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+            </div>
+            <div style="padding:35px 50px;" class="modal-footer"></div>
+        </div>
+    </div>
+</div>
 

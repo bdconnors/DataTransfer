@@ -27,5 +27,41 @@ class Modal{
         $('.modal-backdrop').remove();
         location.reload();
     }
+    showConfirmModal(text,body,confirmFunction,confirmElement){
+        console.log('inside confirm modal show');
+        let $confirmModal = $('#confirmModal');
+        let $confirmModalText = $('#confirmModalHeaderText');
+        let $confirmModalBody = $('#confirmModalBody');
+        let $confirmFooter = $('#confirmModalFooter');
+        $confirmModalText.append(text);
+        $confirmModalBody.append(body);
+        if(confirmElement.id){
+            let name = "";
+            if(confirmElement.name){
+                name = confirmElement.name;
+            }
+            $confirmFooter.append(`<button type="button" name="${name}" id="${confirmElement.id}" onclick="modal.perform('${confirmFunction}',this)" class="btn btn-outline-dark btn-block button confirmModalButton"><i class="fa fa-user"></i> Confirm</button>`);
+        }else{
+            $confirmFooter.append(`<button type="button"  onclick="modal.perform('${confirmFunction}','${confirmElement}')" class="btn btn-outline-dark btn-block button confirmModalButton"><i class="fa fa-user"></i> Confirm</button>`);
+        }
+        $confirmModal.modal({backdrop: 'static', keyboard: false});
+    }
+    hideConfirmModal(){
+        let $confirmModal = $('#confirmModal');
+        let $confirmModalText = $('#confirmModalHeaderText');
+        let $confirmModalBody = $('#confirmModalBody');
+        $confirmModalText.empty();
+        $confirmModalBody.empty();
+        $('.confirmModalButton').remove();
+        $confirmModal.modal('hide');
+    }
+    showLoadingSpinner(){
+        let $loading = $('#loadingSpinner');
+        $loading.modal({backdrop: 'static', keyboard: false});
+    }
+    hideLoadingSpinner(){
+        let $loading = $('#loadingSpinner');
+        $loading.modal('hide');
+    }
 
 }

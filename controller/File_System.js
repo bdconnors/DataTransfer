@@ -49,17 +49,14 @@ class File_System{
         let fileName = authResponse.variables.storage.file;
         let path = folder.projectName+'/'+folder.name+'/'+fileName;
         fs.unlinkSync(process.env.STORAGE_PATH+path);
-        authResponse.command = 'REDIRECT';
-        authResponse.display='/projects/project/'+folder.projectId+'/folders/folder/'+folder.id;
-        this.notifyAll(authResponse);
+        authResponse.response.send('/projects/project/'+folder.projectId+'/folders/folder/'+folder.id);
+
     }
     deleteProject(authResponse){
         let project = authResponse.variables.storage.project;
         let path = project.name;
         rimraf.sync(process.env.STORAGE_PATH+path);
-        authResponse.command ='REDIRECT';
-        authResponse.display='/dashboard';
-        this.notifyAll(authResponse);
+        authResponse.response.send('/dashboard');
     }
     deleteFolder(authResponse){
         let folder = authResponse.variables.storage.folder;
@@ -83,32 +80,42 @@ class File_System{
     writeFile(authResponse){
         let path = authResponse.variables.storage.path;
         let data = authResponse.variables.storage.data;
-        fs.writeFileSync(process.env.STORAGE_PATH+path,data,{encoding:'base64'});
+        if(!fs.existsSync(process.env.STORAGE_PATH + path)) {
+            fs.writeFileSync(process.env.STORAGE_PATH + path, data, {encoding: 'base64'});
+        }
     }
     createNewProject(authResponse) {
         let project = authResponse.variables.storage.project;
         let projectPath = process.env.STORAGE_PATH+project.name;
-        fs.mkdirSync(projectPath);
-        project.folders.forEach(folder=>{
-            fs.mkdirSync(projectPath+'/'+folder.name);
-        });
+        if(!fs.existsSync(projectPath)) {
+            fs.mkdirSync(projectPath);
+            project.folders.forEach(folder => {
+                fs.mkdirSync(projectPath + '/' + folder.name);
+            });
+        }
         authResponse.response.send(project);
     }
     createNewUserFolder(authResponse){
 
         let folder = authResponse.variables.storage.folder;
-        fs.mkdirSync(process.env.STORAGE_PATH+'/'+folder.projectName+'/'+folder.name);
+        if(!fs.existsSync(process.env.STORAGE_PATH + folder.projectName+'/'+folder.name)) {
+            fs.mkdirSync(process.env.STORAGE_PATH + folder.projectName + '/' + folder.name);
+        }
     }
     createExistingUserFolder(authResponse){
         let permission = authResponse.variables.storage.permissions;
         let user = authResponse.variables.storage.user;
         let folderName = user.firstname+" "+user.lastname+"'s Uploads";
-        fs.mkdirSync(process.env.STORAGE_PATH+permission.projectName+'/'+folderName);
+        if(!fs.existsSync(process.env.STORAGE_PATH + permission.projectName + '/' + folderName)) {
+            fs.mkdirSync(process.env.STORAGE_PATH + permission.projectName + '/' + folderName);
+        }
     }
     createNewProjectFolder(authResponse){
         let project = authResponse.variables.storage.project;
         let newFolderPath = process.env.STORAGE_PATH+project.name+'/'+authResponse.variables.storage.foldername;
-        fs.mkdirSync(newFolderPath);
+        if(!fs.existsSync(process.env.STORAGE_PATH+project.name+'/'+authResponse.variables.storage.foldername)) {
+            fs.mkdirSync(newFolderPath);
+        }
     }
     notify(authResponse){
         if(authResponse.variables.storage){

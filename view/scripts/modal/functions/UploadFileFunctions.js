@@ -47,6 +47,18 @@ class UploadFileFunctions{
         }
 
     }
+    confirmDelete(element){
+        let text = 'Confirm Delete File';
+        let body = `<p>Delete File ${element.id}?</p>`;
+        let confirmFunction = 'delete file';
+        modal.showConfirmModal(text,body,confirmFunction,element);
+    }
+    async deleteFile(element){
+        let projectId=this.getProjectId();
+        let folderId = this.getFolderId();
+        let fileName = element.id;
+        return await server.send(server.make('/projects/project/'+projectId+'/folders/folder/'+folderId+'/file/'+fileName+'/delete','POST'));
+    }
     getProjectId(){
         let url = window.location.href.split('/');
         return url[5];

@@ -17,13 +17,15 @@ class SystemActionController{
         let projPermissions = userObj.projectPermissions;
         let user = await this.userControl.inviteNewUser(firstName,lastName,email,projPermissions);
         let newUserFolder = await this.projectControl.newUserFolder(user);
-        let perms = {view:true,download:true};
-        user = await this.userControl.addFolderPermission(user.id,newUserFolder,perms);
-        authResponse.variables.storage = {folder:newUserFolder, action: 'NEW USER FOLDER'};
-        this.notifyAll(authResponse);
-        delete authResponse.variables.storage;
-        authResponse.variables.email = {action:'INVITED',user:user};
-        this.notifyAll(authResponse);
+        if(newUserFolder) {
+            let perms = {view: true, download: true};
+            user = await this.userControl.addFolderPermission(user.id, newUserFolder, perms);
+            authResponse.variables.storage = {folder: newUserFolder, action: 'NEW USER FOLDER'};
+            this.notifyAll(authResponse);
+            delete authResponse.variables.storage;
+            authResponse.variables.email = {action: 'INVITED', user: user};
+            this.notifyAll(authResponse);
+        }
     }
     async inviteExistingUser(authResponse){
         let userId = authResponse.request.body.userId;
@@ -33,6 +35,7 @@ class SystemActionController{
         this.notifyAll(authResponse);
         delete authResponse.variables.storage;
         permission = await this.projectControl.existingUserFolder(user,permission);
+        console.log(permission);
         user.projectPermissions.push(permission);
         user = await this.userControl.updateUser('id',user.id,{$set:{projectPermissions:user.projectPermissions}});
         authResponse.variables.email = {action:'PROJECT ADD',user:user,permission:permission,lastEmail:true};

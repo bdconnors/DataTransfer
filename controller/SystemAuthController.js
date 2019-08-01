@@ -50,6 +50,7 @@ class SystemAuthController{
     async authorizeAdmin(req,res){
         let authResponse = this.make(req,res);
         authResponse = await this.checkAdmin(authResponse,req);
+        console.log(req.path);
         this.notifyAll(authResponse);
     }
     async authorizeNewUser(req,res){
@@ -105,7 +106,8 @@ class SystemAuthController{
         let authResponse = this.make(req,res);
         authResponse = await this.checkAdmin(authResponse,req);
         if(authResponse.admin){
-            authResponse.variables.user = await this.userControl.getUser('id',req.params.id);
+
+            authResponse.variables.profileUser = await this.userControl.getUser('id',req.params.id);
             authResponse.display ='/users/userProfile';
         }
         this.notifyAll(authResponse);
@@ -115,9 +117,7 @@ class SystemAuthController{
         authResponse = await this.checkAdmin(authResponse,req);
         if(authResponse.admin){
             this.userControl.deleteUser(req.params.id).then(()=>{
-                authResponse.command = 'REDIRECT';
-                authResponse.display = '/dashboard';
-                this.notifyAll(authResponse);
+                authResponse.response.send('/dashboard');
             }).catch(err=>{console.log(err)});
         }else{
             this.notifyAll(authResponse);

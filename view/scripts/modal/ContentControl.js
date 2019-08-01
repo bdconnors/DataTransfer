@@ -42,6 +42,7 @@ class ContentControl{
             template = renameDisplay.get(element);
         }
         $modalContent.append(template);
+        modal.hideConfirmModal();
         $('#modal').modal({backdrop: 'static', keyboard: false});
     }
 

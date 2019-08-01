@@ -10,26 +10,12 @@ class PermissionsContent extends ModalContent{
         return super.make(header,body,footer);
     }
     getHeader() {
-        return `<i class="fa fa-eye"></i> Set User Invitation Permissions`;
+        return `<i class="fa fa-eye"></i> Project ${modal.functionControl.project.name} Permissions`;
     }
 
     getBody() {
         let folders = modal.functionControl.project.folders;
-        let template = `
-
-                    <br><div class="row">
-                            <div id="confirmPermsModal" class="modal fade bd-example-modal-sm">
-                            <div class="modal-dialog modal-sm modal-dialog-centered">
-                            <div class="modal-content">
-                            <div style="padding:35px 50px;" class="center modal-header">
-                                <h6>Set User Permissions</h6>
-                            </div>
-                            <div id="confirmPermsBody" style="padding:40px 50px;" class="modal-body center text-center">
-                            </div>
-                            <div id="confirmPermsFooter" style="padding:35px 50px;" class="modal-footer"></div>
-                            </div>
-                         </div>
-                    </div>
+        let template = `<br><div class="row">
                     <div id="userPermsDiv" class="col center">
                     <h5><b><i class = "fa fa-file"></i> Data Access Level:</b></h5>
                     <label for="view"><span style="color:green; font-size:20px;" id="viewLabel" ><i class = "fa fa-eye"></i></span> <b>View Data Only</b></label>

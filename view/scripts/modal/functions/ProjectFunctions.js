@@ -18,4 +18,15 @@ class ProjectFunctions{
         document.getElementById('projExistsErr').style.display = 'none';
         element.style.backgroundColor = "";
     }
+    confirmDelete(element){
+        console.log('inside proj func confirm delete');
+        let text = 'Confirm Delete Project';
+        let body = `<p>Delete Project ${element.name}?</p>`;
+        let confirmFunction = 'delete project';
+        modal.showConfirmModal(text,body,confirmFunction,element);
+    }
+    async deleteProject(element){
+        let projectId=element.id;
+        return await server.send(server.make('/projects/project/'+projectId+'/delete','POST'));
+    }
 }

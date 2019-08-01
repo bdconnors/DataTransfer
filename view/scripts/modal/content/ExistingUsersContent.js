@@ -23,28 +23,13 @@ class ExistingUsersContent extends ModalContent{
         return`<i class="fa fa-user"></i> Invite Existing User`;
     }
     getBody(){
-        let template =`<div id="loadingSpinner" class="modal fade bd-example-modal-sm">
-                <div class="modal-dialog modal-sm modal-dialog-centered">
-                    <div class="modal-content">
-                    <div style="padding:35px 50px;" class="center modal-header">
-                        <h6>Sending Invite</h6>
-                    </div>
-                    <div style="padding:40px 50px;" class="modal-body center text-center">
-                        <span class="sr-only">Sending Invite</span>
-                        <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
-                    </div>
-                    <div style="padding:35px 50px;" class="modal-footer"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="center text-center" id="usersAddedStatus">
+        let template =`<div class="center text-center" id="usersAddedStatus">
                 <h5><i class="fa fa-user-circle"></i> Existing Users</h5>
                 <div class="center text-center">
                     <select class="form-control" name="existingUserSelect" id="existingUserSelectInput">`;
-                    if(modal.functionControl.existingUsers.length === 0){
-                        template +=`<option value="none" style="font-style:italic">No Users Found</option>`;
-                    }else {
+
                         let displayCount = 0;
+                        template +=`<option value="none" style="font-style:italic">None</option>`;
                         modal.functionControl.existingUsers.forEach(user => {
                             let alreadyAMember = false;
                             user.projectPermissions.forEach(perm=>{
@@ -52,21 +37,21 @@ class ExistingUsersContent extends ModalContent{
 
                                 });
                             if(!alreadyAMember){
-                                template += `<option id="${user.id}" value="${user.id}">${user.firstname} ${user.lastname}</option>`;
+                                template += `<option id="${user.firstname} ${user.lastname}"  value="${user.id}">${user.firstname} ${user.lastname}</option>`;
                                 displayCount++;
                             }
                         });
                         if(displayCount === 0){
                             template +=`<option value="none" style="font-style:italic">No Users Found</option>`;
                         }
-                    }
+
                 template +=`</select></div></div>`;
                     return template;
     }
     getFooter(){
 
         let template =  `<button type="button" id="existing" onclick="modal.display('set permissions',this)" class="btn btn-outline-dark btn-block button "><i class="fa fa-arrow-left"></i> Back</button>
-                <br><button type="button"  onclick="modal.perform('invite existing user','existingUserSelectInput')" class="btn btn-outline-dark btn-block button "><i class="fa fa-user-plus"></i> Invite</button>`;
+                <br><button type="button"  onclick="modal.perform('confirm existing','existingUserSelectInput')" class="btn btn-outline-dark btn-block button "><i class="fa fa-user-plus"></i> Invite</button>`;
                 return template;
     }
 

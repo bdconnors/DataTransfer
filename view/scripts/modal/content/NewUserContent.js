@@ -21,24 +21,10 @@ class NewUserContent extends ModalContent{
 
     }
     getHeader(){
-        return`<i class="fa fa-envelope"></i> Invite New User`;
+        return`<i class="fa fa-envelope"></i> Invite to Project ${modal.functionControl.project.name}`;
     }
     getBody(){
-        return`<div id="loadingSpinner" class="modal fade bd-example-modal-sm">
-                <div class="modal-dialog modal-sm modal-dialog-centered">
-                    <div class="modal-content">
-                        <div style="padding:35px 50px;" class="center modal-header">
-                            <h6>Sending Invite</h6>
-                        </div>
-                        <div style="padding:40px 50px;" class="modal-body center text-center">
-                            <span class="sr-only">Sending Invite</span>
-                            <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
-                        </div>
-                         <div style="padding:35px 50px;" class="modal-footer"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
+        return`<div class="form-group">
                 <p id="fnErr" style="color:red; display:none">*Please Enter a First Name</p>
                 <label for="firstname"><i class="fa fa-user"></i> First Name:</label>
                 <input type="text" onchange="modal.perform('check first name',this)" class="form-control"  name="firstname" id="newUserFirstname" placeholder="ex: John">

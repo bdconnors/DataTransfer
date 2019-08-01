@@ -1,19 +1,17 @@
-<%var profileName = user.firstname+' '+user.lastname%>
+<%var profileName = profileUser.firstname+' '+profileUser.lastname%>
 <%- include('../include/head.ejs',{title: profileName+' Profile'})%>
 <body>
 <%- include('../include/adminNav.ejs') %>
 <div class="bg-dark"  id = "pageHeader"  style="padding:35px 50px; width:100%;">
-    <h1 class="bg-dark" ><i class="fa fa-user-circle-o"></i> <%= user.firstname%> <%=user.lastname%></h1>
+    <h1 class="bg-dark" ><i class="fa fa-profileUser-circle-o"></i> <%= profileUser.firstname%> <%=profileUser.lastname%></h1>
 </div>
-<% var projects = user.projectPermissions%>
+<% var projects = profileUser.projectPermissions%>
 <br>
 <div class="container">
     <div class="row">
     <div class="col">
-        <% if(!user.admin){ %>
-            <form action="/users/<%=user.id%>/delete" method="post">
-                <button type="submit"  id="new" class="btn btn-danger "><i class="fa fa-minus"></i> Delete User Account</button>
-            </form>
+        <% if(!profileUser.admin){ %>
+            <button type="submit" name="<%= profileUser.firstname%> <%=profileUser.lastname%> " id="<%= profileUser.id%>" onclick="modal.perform('confirm delete user',this)" class="btn btn-danger "><i class="fa fa-minus"></i> Delete User Account</button>
         <%}%>
         <br>
     <div class="card">
@@ -21,19 +19,19 @@
         <div class="card-body">
             <div class="row">
                 <div class="col">
-                    <b><i class="fa fa-user"></i> First Name:</b> <%= user.firstname%>
+                    <b><i class="fa fa-user"></i> First Name:</b> <%= profileUser.firstname%>
                 </div>
                 <div class="col">
 
-                    <b><i class="fa fa-envelope"></i> E-mail:</b> <%= user.email%>
+                    <b><i class="fa fa-envelope"></i> E-mail:</b> <%= profileUser.email%>
                 </div>
             </div>
             <div class="row">
                 <div class ="col">
-                    <b><i class="fa fa-user"></i> Last Name:</b> <%= user.lastname%>
+                    <b><i class="fa fa-user"></i> Last Name:</b> <%= profileUser.lastname%>
                 </div>
                 <div class ="col">
-                    <b><i class="fa fa-phone"></i> Phone:</b> <%= user.phone%>
+                    <b><i class="fa fa-phone"></i> Phone:</b> <%= profileUser.phone%>
                 </div>
             </div>
         </div>
@@ -42,8 +40,8 @@
             <div class="card">
                 <h5 class="card-header"><i class="fa fa-eye"></i> Activity</h5>
                 <div class="card-body">
-                    <%for(var l = 0; l < user.activity.length; l++){
-                        var curActivity = user.activity[l];
+                    <%for(var l = 0; l < profileUser.activity.length; l++){
+                        var curActivity = profileUser.activity[l];
                     %>
                         <div class="row">
                             <p><b><%= curActivity.date%>:</b> <%= curActivity.action%> <%= curActivity.targetType%> <%= curActivity.target%></p>

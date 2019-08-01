@@ -83,10 +83,23 @@ class FunctionControl{
             projectFunc.checkProjInput(element);
         }else if(action === 'check file input'){
             uploadFileFunc.checkFileInp();
-        }else if(action === 'cancel permissions'){
-            permissionsFunc.hideConfirm();
         }else if(action === 'confirm permissions'){
             permissionsFunc.confirmPermissions(element);
+        }else if(action === 'confirm existing'){
+            existingUsersFunc.confirmSelection(element);
+        }else if(action === 'confirm project delete'){
+            console.log('inside confirm delete');
+            projectFunc.confirmDelete(element);
+        }else if(action === 'delete project'){
+            window.location = await projectFunc.deleteProject(element);
+        }else if(action === 'confirm file delete'){
+            uploadFileFunc.confirmDelete(element);
+        }else if(action === 'delete file'){
+            window.location = await uploadFileFunc.deleteFile(element);
+        }else if(action ==='confirm delete user'){
+            existingUsersFunc.confirmDelete(element);
+        }else if(action ==='delete user'){
+            window.location = await existingUsersFunc.deleteUser(element);
         }
         return response;
     }

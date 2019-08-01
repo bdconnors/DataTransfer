@@ -16,7 +16,20 @@ class ProjectsRepo {
     }
     async getFolder(projectid,folderid) {
         let results = await this.Projects.findOne({id: projectid}, {folders: {$elemMatch: {id: folderid}}}, {_id: 0});
-        return results.folders[0];
+        let response =  false;
+        if(results.folders[0]){
+            response = results.folders[0];
+        }
+        return response;
+
+    }
+    async folderExists(projectid,foldername) {
+        let results = await this.Projects.findOne({id: projectid}, {folders: {$elemMatch: {name: foldername}}}, {_id: 0});
+        let response =  false;
+        if(results.folders[0]){
+            response = results.folders[0];
+        }
+        return response;
 
     }
     async createNewFolder(project,foldername,author){
@@ -35,9 +48,13 @@ class ProjectsRepo {
         let project = user.projectPermissions[0];
         let folderName = user.firstname+" "+user.lastname+"'s Uploads";
         let userFolder = this.makeFolder(project.projectId,project.projectName,folderName,'System',user.id);
-        let results = await this.Projects.updateOne({id:project.projectId},{$push:{folders:userFolder}});
-        if(results.nModified === 1){
-            results = userFolder;
+        let exist = await this.folderExists(project.projectId,folderName);
+        let results = false;
+        if(!exist) {
+            results = await this.Projects.updateOne({id: project.projectId}, {$push: {folders: userFolder}});
+            if (results.nModified === 1) {
+                results = userFolder;
+            }
         }
         return results;
     }
@@ -50,9 +67,18 @@ class ProjectsRepo {
         let project = await this.getProject(permission.projectId);
         let userFolderName = user.firstname+" "+user.lastname+"'s Uploads";
         let userFolder = this.makeFolder(project.id,project.name,userFolderName,'System',user.id);
-        permission.folderPermissions.push({folderId:userFolder.id,folderName:userFolder.name,view:true,download:true});
-        project.folders.push(userFolder);
-        await this.Projects.updateOne({id:project.id},{$set:{folders:project.folders}});
+        let exist = await this.folderExists(project.id,userFolderName);
+        console.log(exist);
+        if(!exist) {
+            permission.folderPermissions.push({
+                folderId: userFolder.id,
+                folderName: userFolder.name,
+                view: true,
+                download: true
+            });
+            project.folders.push(userFolder);
+            await this.Projects.updateOne({id: project.id}, {$set: {folders: project.folders}});
+        }
         return permission;
     }
     async addFile(folder,file){

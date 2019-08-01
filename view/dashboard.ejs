@@ -27,9 +27,7 @@
                 </button>
                 <div class="dropdown-menu" aria-labelledby="projSettings">
                     <button type="button" onclick="modal.display('rename',<%=renameJson%>)" class="dropdown-item"><i class="fa fa-pencil"></i> Rename</button>
-                    <form action="/projects/project/<%= id%>/delete%>" method="post">
-                        <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i> Delete</button>
-                    </form>
+                    <button type="button" name="<%=name%>" id="<%=id%>" onclick="modal.perform('confirm project delete',this);" class="dropdown-item"><i class="fa fa-minus-square-o"></i> Delete</button>
                     <div class="dropdown-divider"></div>
                     <% var obj = projects[i]
                         var jsonProject = JSON.stringify(obj);

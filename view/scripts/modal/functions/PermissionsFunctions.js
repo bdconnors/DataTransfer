@@ -62,16 +62,28 @@ class PermissionsFunctions{
         }
     }
     confirmPermissions(element) {
-        let $confirmPermsModal = $('#confirmPermsModal');
-        let $confirmPermsFooter = $('#confirmPermsFooter');
-        $confirmPermsFooter.append(`<button type="button"  onclick="modal.perform('cancel permissions')" class="btn btn-outline-dark btn-block button"><i class="fa fa-user"></i> Cancel</button>`);
-        $confirmPermsFooter.append(`<button type="button" id="${element.id}" onclick="modal.perform('set permissions',this)" class="btn btn-outline-dark btn-block button"><i class="fa fa-user"></i> Confirm</button>`);
-        $confirmPermsModal.modal({backdrop: 'static', keyboard: false});
+        let folderPerms = this.getFolderPermissions();
+        let accessLevel;
+        if(folderPerms[0].download){
+           accessLevel = `<i style="color:green" class = "fa fa-eye"></i> <i style="color:green" class = "fa fa-download"></i> View and Download`;
+        }else{
+            accessLevel = `<i style="color:green" class = "fa fa-eye"></i> View Data Only`;
+        }
+        let headerText = `Proceed with Permissions?`;
+        let body =`<div style="text-align:left">
+        <b>Data Access Level:</b>
+        <br>${accessLevel}
+        </div>
+        <div style="text-align:left">
+        <br><b>Folder Access:</b>`;
+        folderPerms.forEach(perm=>{
+            body+=`<br><i style="color:green" class = "fa fa-folder-open"></i> ${perm.folderName}`;
+        });
+        body+=`</div>`;
+        let confirmFunction = 'set permissions';
+        modal.showConfirmModal(headerText,body,confirmFunction,element);
     }
-    hideConfirm(){
-        let $confirmPermsModal = $('#confirmPermsModal');
-        $confirmPermsModal.modal('hide');
-    }
+
 
 
 

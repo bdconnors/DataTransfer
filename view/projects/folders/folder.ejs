@@ -34,9 +34,7 @@
                                 <button class="dropdown-item" type="submit"><i class="fa fa-download"></i> Download</button>
                             </form>
                                 <%if(user.admin){%>
-                                <form action="/projects/project/<%= folder.projectId%>/folders/folder/<%= folder.id%>/file/<%= files[i].name%>/delete" method="post">
-                                    <button type="submit" class="dropdown-item"><i class="fa fa-minus-square-o"></i>  Delete</button>
-                                 </form>
+                                    <button type="submit" id="<%=files[i].name%>" onclick="modal.perform('confirm file delete',this)" class="dropdown-item"><i class="fa fa-minus-square-o"></i>  Delete</button>
                                 <%}%>
                             <%}%>
                         </div>
