@@ -27,8 +27,6 @@ class ExistingUsersContent extends ModalContent{
                 <h5><i class="fa fa-user-circle"></i> Existing Users</h5>
                 <div class="center text-center">
                     <select class="form-control" name="existingUserSelect" id="existingUserSelectInput">`;
-
-                        let displayCount = 0;
                         template +=`<option value="none" style="font-style:italic">None</option>`;
                         modal.functionControl.existingUsers.forEach(user => {
                             let alreadyAMember = false;
@@ -38,13 +36,8 @@ class ExistingUsersContent extends ModalContent{
                                 });
                             if(!alreadyAMember){
                                 template += `<option id="${user.firstname} ${user.lastname}"  value="${user.id}">${user.firstname} ${user.lastname}</option>`;
-                                displayCount++;
                             }
                         });
-                        if(displayCount === 0){
-                            template +=`<option value="none" style="font-style:italic">No Users Found</option>`;
-                        }
-
                 template +=`</select></div></div>`;
                     return template;
     }

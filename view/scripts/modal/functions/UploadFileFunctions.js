@@ -61,11 +61,15 @@ class UploadFileFunctions{
     }
     getProjectId(){
         let url = window.location.href.split('/');
-        return url[5];
+        if(url[5]) {
+            return url[5];
+        }
     }
     getFolderId(){
         let url = window.location.href.split('/');
-        return url[8].replace('#','');
+        if(url[8]) {
+            return url[8].replace('#','');
+        }
     }
     checkFileInp(){
         document.getElementById('fileExistsErr').style.display = 'none';

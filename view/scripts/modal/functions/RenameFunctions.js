@@ -3,23 +3,22 @@ class RenameFunctions{
 
     async rename(){
         let newName = document.getElementById('renameInput').value;
-        let url;
+        let projectId = document.getElementById('projectIdHidden').value;
+        let url = "/projects/project/"+projectId+"/rename";
 
-        let type = document.getElementById('renameType').value;
-        let name = document.getElementById('oldName').value;
-        if(type === 'Project'){
-            let projectId = document.getElementById('projectIdHidden').value;
-            url = "/projects/project/"+projectId+"/rename";
-        }else if(type ==='Folder'){
-            let projectId = document.getElementById('projectIdHidden').value;
-            let folderId = document.getElementById('folderIdHidden').value;
-            url = "/projects/project/"+projectId+"/folders/folder/"+folderId+"/rename";
-        }else if(type ==='File'){
-            let projectId = document.getElementById('projectIdHidden').value;
-            let folderId = document.getElementById('folderIdHidden').value;
-            url = "/projects/project/"+projectId+"/folders/folder/"+folderId+"/file/"+name+"/rename";
+        let doesNotExist = await server.send(server.make(url,'POST',"newname="+newName));
+
+        if(doesNotExist){
+            return doesNotExist
+        }else{
+            document.getElementById('projExistsErr').style.display = 'block';
+            document.getElementById('renameInput').style.backgroundColor = 'pink';
         }
-        return await server.send(server.make(url,'POST',"newname="+newName));
+    }
+    confirmRename(){
+        let name = document.getElementById('oldName').value;
+        let newName = document.getElementById('renameInput').value;
+        modal.showConfirmModal('Confirm Project Rename',`<p>Rename Project ${name} to Project ${newName}?</p>`,'rename');
     }
 
 }

@@ -27,7 +27,7 @@ class NewUserContent extends ModalContent{
         return`<div class="form-group">
                 <p id="fnErr" style="color:red; display:none">*Please Enter a First Name</p>
                 <label for="firstname"><i class="fa fa-user"></i> First Name:</label>
-                <input type="text" onchange="modal.perform('check first name',this)" class="form-control"  name="firstname" id="newUserFirstname" placeholder="ex: John">
+                <input type="text" onchange="modal.perform('check first name',this)" class="form-control"  name="firstname" id="newUserFirstname" placeholder="ex: Jane">
             </div>
             <div class="form-group">
                 <p id="lnErr" style="color:red; display:none">*Please Enter a Last Name</p>
@@ -45,7 +45,7 @@ class NewUserContent extends ModalContent{
 
         return `<button type="button" id="new" onclick="modal.display('set permissions',this)" class="btn btn-outline-dark btn-block button "><i class="fa fa-arrow-left"></i> Back</button>
                 <br>
-                <button type="button"  onclick="modal.perform('invite new user')" class="btn btn-outline-dark btn-block button "><i class="fa fa-envelope"></i> Invite</button>`;
+                <button type="button"  onclick="modal.perform('confirm new user invite')" class="btn btn-outline-dark btn-block button "><i class="fa fa-envelope"></i> Invite</button>`;
     }
 
     getSuccessHeader(){

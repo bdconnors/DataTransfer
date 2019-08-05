@@ -32,7 +32,7 @@ class ProjectContent extends ModalContent{
                  </div>`;
     }
     getFooter(){
-        return `<button type="button" onclick="modal.perform('create project')" class="btn btn-outline-dark btn-block button "><i class="fa fa-power-off"></i> Create</button>`;
+        return `<button type="button" onclick="modal.perform('confirm create project')" class="btn btn-outline-dark btn-block button "><i class="fa fa-power-off"></i> Create</button>`;
     }
     getSuccessFooter(){
         return `<button type="button" onclick="modal.perform('invite users')" class="btn btn-outline-dark btn-block button "><i class="fa fa-user-plus"></i> Invite Users</button>
@@ -44,9 +44,7 @@ class ProjectContent extends ModalContent{
     getSuccessBody(){
 
         let template = `<div style="font-size:16px;" class="text-left center">
-                        <b>Project Name:</b><br><br>`;
-
-            template+= modal.functionControl.project.name;
+                        <b>Project Name:</b> ${modal.functionControl.project.name}`;
             template+=`<br><br>
                         <b>Folders Created:</b>
                         <br>`;

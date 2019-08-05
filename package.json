@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "install-windows-service": "winser -i",
+    "uninstall-windows-service": "winser -r"
   },
   "author": "",
   "license": "ISC",
@@ -27,6 +28,7 @@
     "path": "^0.12.7",
     "popper.js": "^1.15.0",
     "rimraf": "^2.6.3",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "winser": "^1.0.3"
   }
 }

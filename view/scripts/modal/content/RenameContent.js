@@ -17,11 +17,11 @@ class RenameContent extends ModalContent{
     }
     getProjectBody(type,name){
         let template = `<div class="text-left">
-                        <label><i class="fa fa-pencil"></i> <b>Current ${type} Name:</b></label>
-                        <br>
-                        ${name}
+                        <label><i class="fa fa-pencil"></i> <b>Current ${type} Name:</b></label> ${name}
                     </div>
+                    <br>
                     <div class="text-left">
+                        <p id="projExistsErr" style="color:red; display:none">*A Project With This Name Already Exists</p>
                         <label for="name"><i class="fa fa-pencil"></i> <b>New ${type} Name:</b></label>
                     </div>`;
                     if(this.jsonObj.projectId){
@@ -39,6 +39,6 @@ class RenameContent extends ModalContent{
                     return template;
     }
     getProjectFooter(){
-        return `<button type="button" onclick="modal.perform('rename')" class="btn btn-outline-dark btn-block button "><i class="fa fa-pencil"></i> Rename</button>`;
+        return `<button type="button" onclick="modal.perform('confirm rename project')" class="btn btn-outline-dark btn-block button "><i class="fa fa-pencil"></i> Rename</button>`;
     }
 }

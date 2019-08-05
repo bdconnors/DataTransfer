@@ -32,6 +32,14 @@ class ProjectsRepo {
         return response;
 
     }
+    async projectExists(projectName){
+        let results =  await this.Projects.find({name:projectName},{_id:0});
+        if(results.length !== 0){
+            return results;
+        }else{
+            return false;
+        }
+    }
     async createNewFolder(project,foldername,author){
         let authorName = author.firstname+' '+author.lastname;
         let folder = this.makeFolder(project.id,project.name,foldername,authorName);

@@ -47,7 +47,7 @@ class SystemAuthController{
             this.notifyAll(authResponse);
         }
     }
-    async authorizeAdmin(req,res){
+    async authorizeAdminAction(req,res){
         let authResponse = this.make(req,res);
         authResponse = await this.checkAdmin(authResponse,req);
         console.log(req.path);
@@ -184,6 +184,8 @@ class SystemAuthController{
         authResponse.authorized = false;
         let projectId = req.params.id;
         let folderId = req.params.folderid;
+        console.log(projectId);
+        console.log(folderId);
         if(user) {
             if (user.admin) {
                 authResponse.authorized = true;

@@ -28,18 +28,16 @@ class ContentControl{
             template = existingUsersDisplay.get('success');
         }else if(content === 'new folder'){
             template = newFolderDisplay.get('create');
-        }else if(content === 'new folder success'){
-            template = newFolderDisplay.get('success');
-        }else if(content === 'folder add user'){
-            template = folderAddUsersDisplay.get('add');
-        }else if(content === 'folder select user'){
-            template = folderAddUsersDisplay.get('select');
-        }else if(content === 'folder add user success'){
-            template = folderAddUsersDisplay.get('success');
         }else if(content === 'upload file'){
             template = uploadFileDisplay.get();
         }else if(content === 'rename'){
             template = renameDisplay.get(element);
+        }else if(content === 'new folder success'){
+            template = newFolderDisplay.get('success');
+        }else if(content === 'new folder invite'){
+            template = newFolderDisplay.get('invite');
+        }else if(content ==='new folder invite success'){
+            template = newFolderDisplay.get('invite success');
         }
         $modalContent.append(template);
         modal.hideConfirmModal();

@@ -21,6 +21,12 @@ class ProjectController{
     async fileExists(projectid,folderid,filename){
         return await this.model.fileExists(projectid,folderid,filename);
     }
+    async projectExists(projectName){
+        return await this.model.projectExists(projectName);
+    }
+    async folderExists(projectId,folderName){
+        return await this.model.folderExists(projectId,folderName);
+    }
     async addFile(folder,file){
         return await this.model.addFile(folder,file);
     }

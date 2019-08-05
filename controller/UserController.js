@@ -18,6 +18,9 @@ class UserController{
         return await this.model.updateUser(field,value,updateQuery);
     }
     async addFolderPermission(userid,folder,perms){
+        console.log(userid);
+        console.log(folder);
+        console.log(perms);
         return await this.model.addFolderPermission(userid,folder,perms);
     }
     async updateNewUser(authCode,phone,password){
@@ -80,7 +83,7 @@ class UserController{
 
     notify(authResponse){
         if(authResponse.variables.activity){
-            this.logActivity(authResponse);
+            this.logActivity(authResponse).catch(err=>{console.log(err)});
         }
     }
 }

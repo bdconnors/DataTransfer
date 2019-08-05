@@ -23,9 +23,9 @@ class SystemActionController{
             authResponse.variables.storage = {folder: newUserFolder, action: 'NEW USER FOLDER'};
             this.notifyAll(authResponse);
             delete authResponse.variables.storage;
-            authResponse.variables.email = {action: 'INVITED', user: user};
-            this.notifyAll(authResponse);
         }
+        authResponse.variables.email = {action: 'INVITED', user: user};
+        this.notifyAll(authResponse);
     }
     async inviteExistingUser(authResponse){
         let userId = authResponse.request.body.userId;
@@ -38,7 +38,7 @@ class SystemActionController{
         console.log(permission);
         user.projectPermissions.push(permission);
         user = await this.userControl.updateUser('id',user.id,{$set:{projectPermissions:user.projectPermissions}});
-        authResponse.variables.email = {action:'PROJECT ADD',user:user,permission:permission,lastEmail:true};
+        authResponse.variables.email = {action:'PROJECT ADD',user:user,permission:permission};
         this.notifyAll(authResponse);
     }
     async updateNewUser(authResponse){
@@ -90,14 +90,11 @@ class SystemActionController{
     async createNewProjectFolder(authResponse){
         let projectId = authResponse.request.params.id;
         let folderName = authResponse.request.body.name;
-        let project = await this.projectControl.getProject(projectId);
-        let exists = false;
-        project.folders.forEach(folder=>{
-            if(folder.name === folderName){exists = true;}
-        });
+        let exists = await this.projectControl.folderExists(projectId,folderName);
         if(exists){
             authResponse.response.send({error:'FOLDER EXISTS'});
         }else{
+            let project = await this.projectControl.getProject(projectId);
             authResponse.variables.storage = {project:project,foldername:folderName, action: 'NEW PROJECT FOLDER'};
             this.notifyAll(authResponse);
             delete authResponse.variables.storage;
@@ -113,11 +110,20 @@ class SystemActionController{
         }).catch((err)=>{console.log(err)});
     }
     async addUserFolderPermission(authResponse){
-        let folder = authResponse.request.body.folder;
+        let folderId = authResponse.request.body.folderId;
+        console.log(folderId);
+        let projectId = authResponse.request.body.projectId;
+        console.log(projectId);
         let userId = authResponse.request.body.userId;
-        let perms = authResponse.request.body.perms;
-        let user = await this.userControl.addFolderPermission(userId,folder,perms);
-        authResponse.response.send(user);
+        let folder = await this.projectControl.getFolder(projectId,folderId);
+        console.log(folder);
+        let userProjectPerm = await this.userControl.getProjectPermission(userId,projectId);
+        let folderPerm = userProjectPerm.folderPermissions[0];
+        console.log(userProjectPerm);
+        let perms = {view:folderPerm.view,download:folderPerm.download};
+        let result = await this.userControl.addFolderPermission(userId,folder,perms);
+        console.log(result);
+        authResponse.response.send(result);
 
     }
     async getFolderUsers(authResponse){
@@ -171,15 +177,24 @@ class SystemActionController{
     async renameProject(authResponse){
         let projectId = authResponse.request.params.id;
         let newName = authResponse.request.body.newname;
-        this.projectControl.renameProject(projectId,newName).then((project)=>{
-            this.userControl.renameProject(projectId,newName).then(()=>{
-                authResponse.variables.storage ={};
-                authResponse.variables.storage.project = project;
-                authResponse.variables.storage.newName = newName;
-                authResponse.variables.storage.action = 'RENAME PROJECT';
-                this.notifyAll(authResponse);
-            })
-        }).catch(err=>{console.log(err)});
+        let exists = await this.projectControl.projectExists(newName);
+        console.log(exists);
+        if(!exists) {
+            this.projectControl.renameProject(projectId, newName).then((project) => {
+                this.userControl.renameProject(projectId, newName).then(() => {
+                    authResponse.variables.storage = {};
+                    authResponse.variables.storage.project = project;
+                    authResponse.variables.storage.newName = newName;
+                    authResponse.variables.storage.action = 'RENAME PROJECT';
+                    console.log(authResponse);
+                    this.notifyAll(authResponse);
+                })
+            }).catch(err => {
+                console.log(err)
+            });
+        }else{
+            authResponse.response.send(false);
+        }
     }
     async deleteFolder(authResponse){
         let folderId = authResponse.request.params.folderid;

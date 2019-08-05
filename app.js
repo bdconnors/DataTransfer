@@ -472,7 +472,7 @@ app.post('/users/:id/delete',(req,res)=>{
  *     projectId: project's id number
  */
 app.post('/users/project/permissions/remove',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
+    sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
 });
 /**
  * Handles requests for granting a user permission to a project.
@@ -491,7 +491,7 @@ app.post('/users/project/permissions/remove',(req,res)=>{
  *     projectId: project's id number
  */
 app.post('/users/project/permissions/add',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
+    sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
 });
 /**
  * Handles requests for granting project folder permission to a user.
@@ -510,7 +510,7 @@ app.post('/users/project/permissions/add',(req,res)=>{
  *     projectId: project's id number
  */
 app.post('/users/folders/permissions/add',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
+    sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
 });
 /**
  * Handles requests for revoking a user's project folder permission.
@@ -529,7 +529,7 @@ app.post('/users/folders/permissions/add',(req,res)=>{
  *     projectId: project's id number
  */
 app.post('/users/folders/permissions/remove',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
+    sysAuth.authorizeAdminAction(req,res).catch(err=>{console.log(err)});
 });
 /**
  * Handles requests for revoking a user's project folder permission.
@@ -548,7 +548,7 @@ app.post('/users/folders/permissions/remove',(req,res)=>{
  *     projectId: project's id number
  */
 app.get('/users/invite',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
+    sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
 });
 /**
  * @param {req} req
@@ -557,7 +557,7 @@ app.get('/users/invite',(req,res)=>{
  *     res: express http response object
  */
 app.post('/users/invite',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
+    sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
 });
 /**
  * @param {req} req
@@ -568,7 +568,31 @@ app.post('/users/invite',(req,res)=>{
  *     id: Project ID
  */
 app.post('/projects/project/:id/rename',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
+    sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
+});
+/**
+ * @param {req} req
+ * @param {res} res
+ *
+ */
+app.post('/projects/project/:id/folders/new',(req,res)=>{
+    sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
+});
+/**
+ * @param {req} req
+ * @param {res} res
+ *
+ */
+app.get('/users/folders',(req,res)=>{
+    sysAuth.authorizeAdminAction(req,res).catch(err=>{console.log(err)});
+});
+/**
+ * @param {req} req
+ * @param {res} res
+ *
+ */
+app.post('/users/folders/permissions/add',(req,res)=>{
+    sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
 });
 /**
  * @param {req} req
@@ -583,7 +607,7 @@ app.post('/projects/project/:id/rename',(req,res)=>{
  *     filename: File Name
  */
 app.post('/projects/project/:id/folders/folder/:folderid/file/:filename/delete',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
+    sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
 });
 /**
  * @param {req} req
@@ -596,7 +620,7 @@ app.post('/projects/project/:id/folders/folder/:folderid/file/:filename/delete',
  *     folderid: Folder ID
  */
 app.post('/projects/project/:id/folders/folder/:folderid/delete',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
+    sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
 });
 /**
  * @param {req} req
@@ -607,12 +631,12 @@ app.post('/projects/project/:id/folders/folder/:folderid/delete',(req,res)=>{
  *     id: Project ID
  */
 app.post('/projects/project/:id/delete',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
+    sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
 });
 /**
  * @param {req} req
  * @param {res} res
  */
 app.post('/projects/create',(req,res)=>{
-    sysAuth.authorizeAdmin(req,res).catch(err=>{console.log(err)});
+    sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
 });

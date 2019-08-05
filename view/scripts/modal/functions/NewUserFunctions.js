@@ -26,6 +26,7 @@ class NewUserFunctions{
                 }]
             }
         }else{
+            modal.hideConfirmModal();
             return false;
         }
     }
@@ -80,5 +81,9 @@ class NewUserFunctions{
     checkEmailInput(element){
         document.getElementById('emailErr').style.display = 'none';
         element.style.backgroundColor = "";
+    }
+    confirmSendInvite(){
+        let email = document.getElementById('newUserEmail').value;
+        modal.showConfirmModal('Confirm Invitation',`<p>Send Project Invitation to ${email}?</p>`,'invite new user');
     }
 }

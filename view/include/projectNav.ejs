@@ -11,8 +11,16 @@ var name;
 
 <nav style="border: 1px solid #343a40;" id="projNav" class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="/projects/project/<%= id%>"><i class="fa fa-archive "></i> Project <%= name %></a>
-    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
-        <ul class="navbar-nav">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#projectDropDown" aria-controls="projectDropDown" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fa fa-chevron-circle-down"></i>
+    </button>
+    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2" id="projectDropDown">
+        <ul class="navbar-nav ml-auto">
+            <%if(user.admin){%>
+                <li class="nav-item active">
+                    <a  class="nav-link" href="#" onclick="modal.display('new folder')"><i class="fa fa-folder-open"></i> New Folder</a>
+                </li>
+            <%}%>
         </ul>
     </div>
 </nav>

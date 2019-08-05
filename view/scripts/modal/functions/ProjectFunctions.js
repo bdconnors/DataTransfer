@@ -18,6 +18,10 @@ class ProjectFunctions{
         document.getElementById('projExistsErr').style.display = 'none';
         element.style.backgroundColor = "";
     }
+    confirmProjectName(){
+        let name = $('#createProjectName').val();
+        modal.showConfirmModal('Confirm Project Name',`<p>Create Project ${name}?</p>`,'create project');
+    }
     confirmDelete(element){
         console.log('inside proj func confirm delete');
         let text = 'Confirm Delete Project';

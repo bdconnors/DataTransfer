@@ -1,3 +1,6 @@
+html{
+    font-family:"Helvetica Neue",'serif';
+}
 #header, h4{
     background-color: #787778;
     color:white !important;
@@ -16,6 +19,8 @@
     color:white !important;
     text-align: center;
     font-size: 24px;
+}
+.nov-font {
 }
 #primaryH4{
     background-color: #343a40;

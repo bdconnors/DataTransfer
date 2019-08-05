@@ -27,9 +27,9 @@
 <div style="padding-top:20px;" class="center">
     <div style="text-align:center; padding-top:20px;padding-bottom:20px " class="row">
     <%for(var i = 0; i <folders.length; i++){%>
-        <%var id;var projectId;%>
+        <%var id;var folderName;var projectId;%>
             <div style="text-align:left;padding-left:30px" class="col">
-                <%if(user.admin){id = folders[i].id;projectId = project.id;%>
+                <%if(user.admin){id = folders[i].id;projectId = project.id; folderName = folders[i].name%>
                 <div style="text-align:center;" class="dropdown">
                     <button style = "background-color:transparent; font-size:12px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
                         <i class="fa fa-cog"></i> Options
@@ -42,17 +42,18 @@
                 </div>
                 <%}else{
                     id = folders[i].folderId;
-                    projectId = project.id;
+                    projectId = project.projectId;
+                    folderName = folders[i].folderName;
                 }%>
-                <a style = "text-decoration: none; color:#343a40;" href="./<%= projectId%>/folders/folder/<%= id%>">
+                <a style = "text-decoration: none; color:#343a40;" href="/projects/project/<%= projectId%>/folders/folder/<%= id%>">
                     <div style="text-align:center;">
                             <% if(i <= 5){%>
-                            <i style="color:#17a2b8;" class="fa fa-folder-open fa-3x "></i>
+                                <i style="color:#17a2b8;" class="fa fa-folder-open fa-3x "></i>
                             <%}else{%>
                                 <i class="fa fa-folder-open fa-3x"></i>
                             <%}%>
                         <br>
-                        <b><%= folders[i].name%></b>
+                        <b><%= folderName%></b>
                     </div>
                 </a>
             </div>

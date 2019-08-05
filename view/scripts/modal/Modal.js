@@ -2,6 +2,7 @@ class Modal{
     constructor(contentControl,functionControl){
         this.contentControl = contentControl;
         this.functionControl = functionControl;
+
     }
 
     display(content,element){
@@ -35,14 +36,19 @@ class Modal{
         let $confirmFooter = $('#confirmModalFooter');
         $confirmModalText.append(text);
         $confirmModalBody.append(body);
-        if(confirmElement.id){
-            let name = "";
-            if(confirmElement.name){
-                name = confirmElement.name;
+
+        if(confirmElement) {
+            if (confirmElement.id) {
+                let name = "";
+                if (confirmElement.name) {
+                    name = confirmElement.name;
+                }
+                $confirmFooter.append(`<button type="button" name="${name}" id="${confirmElement.id}" onclick="modal.perform('${confirmFunction}',this)" class="btn btn-outline-dark btn-block button confirmModalButton"><i class="fa fa-check-square-o"></i> Confirm</button>`);
+            } else {
+                $confirmFooter.append(`<button type="button"  onclick="modal.perform('${confirmFunction}','${confirmElement}')" class="btn btn-outline-dark btn-block button confirmModalButton"><i class="fa fa-check-square-o"></i> Confirm</button>`);
             }
-            $confirmFooter.append(`<button type="button" name="${name}" id="${confirmElement.id}" onclick="modal.perform('${confirmFunction}',this)" class="btn btn-outline-dark btn-block button confirmModalButton"><i class="fa fa-user"></i> Confirm</button>`);
         }else{
-            $confirmFooter.append(`<button type="button"  onclick="modal.perform('${confirmFunction}','${confirmElement}')" class="btn btn-outline-dark btn-block button confirmModalButton"><i class="fa fa-user"></i> Confirm</button>`);
+            $confirmFooter.append(`<button type="button" name="" id="" onclick="modal.perform('${confirmFunction}')" class="btn btn-outline-dark btn-block button confirmModalButton"><i class="fa fa-check-square-o"></i> Confirm</button>`);
         }
         $confirmModal.modal({backdrop: 'static', keyboard: false});
     }
@@ -56,12 +62,12 @@ class Modal{
         $confirmModal.modal('hide');
     }
     showLoadingSpinner(){
-        let $loading = $('#loadingSpinner');
-        $loading.modal({backdrop: 'static', keyboard: false});
+        let spinner = $('#loadingSpinner');
+        spinner.modal({backdrop: 'static', keyboard: false});
     }
     hideLoadingSpinner(){
-        let $loading = $('#loadingSpinner');
-        $loading.modal('hide');
+        let spinner = $('#loadingSpinner');
+        spinner.modal('hide');
     }
 
 }
