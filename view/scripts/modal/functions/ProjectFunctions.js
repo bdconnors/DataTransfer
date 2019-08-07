@@ -33,4 +33,9 @@ class ProjectFunctions{
         let projectId=element.id;
         return await server.send(server.make('/projects/project/'+projectId+'/delete','POST'));
     }
+    async deleteFolder(){
+        let projectId = functionControl.project.id;
+        let folderId = functionControl.folder.id;
+        return await server.send(server.make('/projects/project/'+projectId+'/folders/folder/'+folderId+'/delete','POST'));
+    }
 }

@@ -124,6 +124,7 @@ class SystemAuthController{
         }
     }
     async authorizeAdminAJAX(req,res){
+        console.log('inside authorize admin ajax');
         let authResponse = this.make(req,res);
         authResponse = await this.checkAdmin(authResponse,req);
         if(authResponse.admin){
@@ -263,8 +264,10 @@ class SystemAuthController{
         authResponse = await this.sessionAuth(authResponse,req);
         if(authResponse.session) {
             if (authResponse.admin) {
+                console.log('inside is admin');
                 return authResponse;
             } else {
+                console.log('inside unauthorized');
                 authResponse.command = '/redirect';
                 authResponse.display = '/unauthorized';
             }

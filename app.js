@@ -282,6 +282,12 @@ app.get('/projects/project/:id/folders/folder/:folderid/file/:filename/attachmen
  *     email: email, sent with request object and accessed by req.query.email
  *
  */
+app.get('/projects/project/:id/folders/folder/:foldername/exists',(req,res)=>{
+    console.log('inside app folder exists');
+    sysAuth.authorizeAdminAJAX(req,res).catch((err)=>{console.log(err)});
+});
+
+
 app.get('/projects/project/:id/folders/folder/:folderid/file/:filename/exists',(req,res)=>{
     sysAuth.authorizeAJAX(req,res).catch((err)=>{console.log(err)});
 });
@@ -569,6 +575,10 @@ app.post('/users/invite',(req,res)=>{
  */
 app.post('/projects/project/:id/rename',(req,res)=>{
     sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
+});
+app.post('/projects/project/:id/folders/folder/:folderid/rename',(req,res)=>{
+    console.log('inside folder rename app');
+    sysAuth.authorizeAdminAction(req,res).catch(err=>{console.log(err)});
 });
 /**
  * @param {req} req

@@ -62,6 +62,7 @@ class SystemActionController{
         if(authResponse.request.query.id){
             let id = authResponse.request.query.id;
             let projectUsers = await this.userControl.getProjectUsers(id);
+            console.log(projectUsers);
             authResponse.response.send(projectUsers);
         }
     }
@@ -130,14 +131,17 @@ class SystemActionController{
         let projectId = authResponse.request.query.projectId;
         let folderId = authResponse.request.query.folderId;
         let folderUsers = await this.userControl.getFolderUsers(projectId,folderId);
+        console.log(folderUsers);
         authResponse.response.send(folderUsers);
     }
     async removeFolderPermission(authResponse){
         let userid = authResponse.request.body.userid;
         let projectid = authResponse.request.body.projectid;
         let folderid = authResponse.request.body.folderid;
-        let response = await this.userControl.removeFolderPermission(userid,projectid,folderid);
-        authResponse.response.send(response);
+        this.userControl.removeFolderPermission(userid,projectid,folderid).then(result=>{
+            authResponse.response.send(result);
+        });
+
     }
     async streamFile(authResponse){
         let projectId = authResponse.request.params.id;
@@ -195,6 +199,23 @@ class SystemActionController{
         }else{
             authResponse.response.send(false);
         }
+    }
+    async renameFolder(authResponse){
+        let projectId = authResponse.request.params.id;
+        let folderId = authResponse.request.params.folderid;
+        let newName = authResponse.request.body.newname;
+        console.log(projectId);
+        console.log(folderId);
+        console.log(newName);
+        this.projectControl.renameFolder(projectId,folderId,newName).then(folder=>{
+            this.userControl.renameFolder(projectId,folderId,newName).then(()=>{
+                authResponse.variables.storage = {};
+                authResponse.variables.storage.folder = folder;
+                authResponse.variables.storage.newName = newName;
+                authResponse.variables.storage.action = 'RENAME FOLDER';
+                this.notifyAll(authResponse);
+            })
+        }).catch(err=>{console.log(err)});
     }
     async deleteFolder(authResponse){
         let folderId = authResponse.request.params.folderid;
@@ -265,7 +286,19 @@ class SystemActionController{
         let exists = await this.projectControl.fileExists(projectId,folderId,fileName);
         authResponse.response.send(exists);
     }
+    async folderExists(authResponse){
+        console.log('inside folder exists func sys action');
+        let projectId = authResponse.request.params.id;
+        let folderName = authResponse.request.params.foldername;
+        console.log(projectId);
+        console.log(folderName);
+        let exists = await this.projectControl.folderExists(projectId,folderName);
+        console.log(exists);
+        authResponse.response.send(exists);
+    }
+
     performAction(authResponse){
+        console.log(authResponse.display);
         if(authResponse.display === '/users/invite'){
             this.inviteNewUser(authResponse).catch((err)=>{console.log(err)});
         }else if(authResponse.display === '/users/authenticate'){
@@ -306,6 +339,12 @@ class SystemActionController{
             this.userExists(authResponse).catch(err=>{console.log(err)});
         }else if(authResponse.display === '/projects/project/:id/folders/folder/:folderid/file/:filename/exists'){
             this.fileExists(authResponse).catch((err)=>{console.log(err)});
+        }else if(authResponse.display ==='/projects/project/:id/folders/folder/:foldername/exists'){
+            console.log('inside observer sys action exists');
+            this.folderExists(authResponse).catch((err)=>{console.log(err)});
+        }else if(authResponse.display ==='/projects/project/:id/folders/folder/:folderid/rename'){
+            console.log('inside observer sys action');
+            this.renameFolder(authResponse).catch(err=>{console.log(err)});
         }
     }
     notify(authResponse){

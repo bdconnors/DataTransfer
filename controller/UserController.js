@@ -59,6 +59,9 @@ class UserController{
     async renameProject(projectId,newname){
         return await this.model.renameProject(projectId,newname);
     }
+    async renameFolder(projectId,folderId,newname){
+        return await this.model.renameFolder(projectId,folderId,newname);
+    }
     async deleteProject(projectId){
         return await this.model.deleteProject(projectId);
     }

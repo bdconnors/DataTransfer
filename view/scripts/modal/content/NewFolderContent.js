@@ -22,8 +22,7 @@ class NewFolderContent extends ModalContent{
             header = this.getInviteSuccessHeader();
             body = this.getInviteSuccessBody();
             footer = this.getInviteSuccessFooter();
-        }
-        return super.make(header,body,footer);
+        }        return super.make(header,body,footer);
     }
     getHeader() {
         return `<i class="fa fa-folder"></i> Create New Folder`;
@@ -38,16 +37,27 @@ class NewFolderContent extends ModalContent{
             </div>`
 
     }
-
     getFooter() {
         return `<button type="button" onclick="modal.perform('create new folder')" class="btn btn-outline-dark btn-block button "><i class="fa fa-power-off"></i> Create</button>`;
     }
     getInviteHeader(){
-        return`<i class="fa fa-user"></i> Invite Existing User`;
+        return`<i class="fa fa-user"></i> Folder Permissions`;
     }
     getInviteBody(){
         let template =`<div class="center text-center" id="usersAddedStatus">
-                <h5><i class="fa fa-user-circle"></i> Existing Users</h5>
+                <h5><i class="fa fa-user-circle"></i> Current Folder Permissions</h5>
+                <div class="center text-center">`;
+        if (modal.functionControl.invitedUsers.length === 0) {
+            template += `<p style="font-style:italic">No Users Added</p>`
+        } else {
+            modal.functionControl.invitedUsers.forEach((user) => {
+                template += `<b>${user.firstname} ${user.lastname}</b>
+                        <input type="button" value ="Remove" onclick="modal.perform('remove folder permission',this)" id="${user.id}" style="font-size:14px;" class="btn btn-danger button"></button><br>`;
+            });
+        }
+        template += `</div></div>
+<div class="center text-center" id="usersAddedStatus">
+                <h5><i class="fa fa-user-circle"></i> Select A User To Add</h5>
                 <div class="center text-center">
                     <p id="selectUserErr" style="color:red; visibility:hidden; font-size:12px;">*Please select a user</p>
                     <select class="form-control" name="existingUserSelect" id="existingUserSelectInput">`;
@@ -57,11 +67,12 @@ class NewFolderContent extends ModalContent{
             user.projectPermissions.forEach(perm=>{
                 perm.folderPermissions.forEach(folder=>{
                         console.log(folder);
-                        if(folder.folderId === functionControl.newFolder.id){
+                        if(folder.folderId === functionControl.folder.id){
                             console.log('alreadyAMember');
                             alreadyAMember = true;
                         }
                     });
+                console.log(alreadyAMember);
                     if(!alreadyAMember){
                         template += `<option id="${user.firstname} ${user.lastname}"  value="${user.id}">${user.firstname} ${user.lastname}</option>`;
                     }
@@ -73,8 +84,9 @@ class NewFolderContent extends ModalContent{
     }
     getInviteFooter(){
 
-        return `<br><button type="button" id="existing" onclick="modal.display('new folder success')" class="btn btn-outline-dark btn-block button "><i class="fa fa-arrow-left"></i> Back</button>
-                <button type="button"  onclick="modal.perform('new folder invite user')" class="btn btn-outline-dark btn-block button "><i class="fa fa-user-plus"></i> Invite</button>`;
+        return `<br>
+                <button type="button"  onclick="modal.perform('new folder invite user')" class="btn btn-outline-dark btn-block button "><i class="fa fa-user-plus"></i> Invite Selected</button>
+                <button type="button" id="existing" onclick="modal.hide()" class="btn btn-outline-dark btn-block button "><i class="fa fa-power-off"></i> Done</button>`;
 
     }
     getInviteSuccessHeader(){
@@ -96,13 +108,12 @@ class NewFolderContent extends ModalContent{
     getSuccessBody(){
 
         return `<div style="font-size:16px;" class="text-left center">
-                        <b>Folder Created:</b>&nbsp;<i class="fa fa-folder-open"></i> ${functionControl.newFolder.name}<br>
+                        <b>Folder Created:</b>&nbsp;<i class="fa fa-folder-open"></i> ${functionControl.folder.name}<br>
                         </div>`;
     }
     getSuccessFooter(){
-        return `<button type="button" onclick="modal.perform('new folder invite')" class="btn btn-outline-dark btn-block" ><i class="fa fa-user-plus"></i>Add Users</button>
+        return `<button type="button" onclick="modal.perform('new folder invite')" class="btn btn-outline-dark btn-block" ><i class="fa fa-eye"></i> Add/Remove Permissions</button>
                 <button type="button" onclick="modal.hide()" class="btn btn-outline-dark btn-block" ><i class="fa fa-power-off"></i>Done</button>`;
     }
-
 
 }

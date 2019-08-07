@@ -36,6 +36,12 @@ class PermissionsFunctions{
         return await server.send(server.make('/users/project/permissions/remove','POST',{id:userId,projectId:projectId}));
 
     }
+    async removeFolderPermission(element){
+        let userId = element.id;
+        let projectId = functionControl.project.id;
+        let folderId = functionControl.folder.id;
+        return await server.send(server.make('/users/folders/permissions/remove','POST',{userid:userId,projectid:projectId,folderid:folderId}));
+    }
     permissionClick(){
         let view = document.getElementById('view').checked;
         let download = document.getElementById('download').checked;

@@ -41,6 +41,7 @@ class UsersRepo {
         return update;
     }
     async getFolderUsers(projectId,folderId){
+
         return await this.Users.find({"projectPermissions": { "$elemMatch": {"projectId": projectId,"folderPermissions": {"$elemMatch": {"folderId": folderId}}}}});
     }
     async getProjectPermission(userid,projectid){
@@ -51,7 +52,7 @@ class UsersRepo {
         return await this.Users.updateOne({id:userid},{$pull:{'projectPermissions':{projectId:projectid}}});
     }
     async removeFolderPermission(userid,projectid,folderid){
-        return await this.Users.update({"id":userid,"projectPermissions.projectId":projectid},{"$pull":{"projectPermissions.$.folderPermissions":{folderId:folderid}}});
+        return await this.Users.updateOne({"id":userid,"projectPermissions.projectId":projectid},{"$pull":{"projectPermissions.$.folderPermissions":{folderId:folderid}}});
     }
     async getAllUsers(){
         return await this.Users.find({admin:false});
@@ -64,7 +65,27 @@ class UsersRepo {
         return await this.Users.updateMany({"projectPermissions.projectId":projectid},{$pull:{projectPermissions:{id:projectid}}});
     }
     async renameProject(projectid,newname){
-        return await this.Users.updateMany({'projectPermissions.projectId':projectid},{$set:{projectName:newname}});
+        return await this.Users.updateMany({'projectPermissions.projectId':projectid},{$set:{'projectPermissions.$.projectName':newname}});
+    }
+    async renameFolder(projectid,folderid,newname){
+        let folderUsers = await this.getFolderUsers(projectid,folderid);
+        folderUsers.forEach(user=>{
+            user.projectPermissions.forEach(projPerm=>{
+                if(projPerm.projectId === projectid){
+                    projPerm.folderPermissions.forEach(folderPerm=>{
+                        folderPerm.folderName = newname;
+                    });
+                }
+            });
+        });
+        let update = {nModified:0};
+        for(let i = 0; i < folderUsers.length; i++) {
+            let userUpdate = await this.Users.update({id: folderUsers[i].id}, {$set: {projectPermissions: folderUsers[i].projectPermissions}});
+            if(userUpdate.nModified === 1){
+                update.nModified += 1;
+            }
+        }
+        return update;
     }
     async getProjectUsers(id){
         return await this.Users.find({"projectPermissions.projectId":id},{_id:0});

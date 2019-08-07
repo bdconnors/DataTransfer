@@ -9,10 +9,23 @@
     </div>
     <div class="navbar-collapse collapse w-100 order-3 dual-collapse2" id="projectDropDown">
         <ul class="navbar-nav ml-auto">
-            <%if(user.admin || folder.metadata.userFolder === user.id){%>
+            <%if(user.admin || folder.metadata.userFolder === user.id){
+                var renameJson = JSON.stringify({name:folder.name,type:'Folder'});
+            %>
                 <li class="nav-item active">
                     <a  class="nav-link" href="#" onclick="modal.display('upload file')"><i class="fa fa-upload"></i> Upload File</a>
                 </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="folderSettings" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-cog"></i> Folder Settings
+                </a>
+                <div class="dropdown-menu" aria-labelledby="folderSettings">
+                    <button type="button" onclick="modal.display('rename',<%=renameJson%>)" class="dropdown-item"><i class="fa fa-pencil"></i> Rename</button>
+                    <button type="button" id="" onclick="modal.perform('delete folder')" class="dropdown-item"><i class="fa fa-minus-square-o"></i> Delete</button>
+                    <div class="dropdown-divider"></div>
+                    <button type="button" onclick="modal.perform('new folder invite')" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
+                </div>
+            </li>
             <%}%>
         </ul>
     </div>

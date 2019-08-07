@@ -2,6 +2,7 @@ class InviteUserFunctions{
     constructor(){}
 
     async getInvitedUsers(projectId){
+        console.log(projectId);
         let url ='/users/project';
         let data ='id='+projectId;
         let req = server.make(url,'GET',data);

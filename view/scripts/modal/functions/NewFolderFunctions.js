@@ -24,8 +24,8 @@ class NewFolderFunctions{
         let input = document.getElementById('existingUserSelectInput');
         let userId = input.options[input.selectedIndex].value;
         if (userId !== 'none') {
-            let projectId = functionControl.project;
-            let folderId = functionControl.newFolder.id;
+            let projectId = functionControl.project.id;
+            let folderId = functionControl.folder.id;
             response = await server.send(server.make('/users/folders/permissions/add', 'POST', {
                 projectId: projectId,
                 folderId: folderId,
@@ -34,7 +34,11 @@ class NewFolderFunctions{
             return response;
         }
     }
-    async getUsers(projectId,folderId){
+    async getUsers(){
+        let projectId = functionControl.project.id;
+        let folderId = functionControl.folder.id;
+        console.log(projectId);
+        console.log(folderId);
         return await server.send(server.make('/users/folders','GET',{projectId:projectId,folderId:folderId}));
     }
 }

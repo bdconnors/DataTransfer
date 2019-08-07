@@ -1,7 +1,7 @@
-const fs = require('fs');
 const rimraf = require('rimraf');
 const fileTypes = require('mime-types');
 const uuid = require('uuid');
+const fs = require('fs');
 
 class File_System{
 
@@ -32,9 +32,9 @@ class File_System{
             this.deleteFile(authResponse);
         }else if(vars.action ==='RENAME PROJECT'){
             this.renameProject(authResponse);
+        }else if(vars.action ==='RENAME FOLDER'){
+            this.renameFolder(authResponse)
         }
-
-
 
     }
     renameProject(authResponse){
@@ -43,6 +43,13 @@ class File_System{
         let newpath = process.env.STORAGE_PATH+authResponse.variables.storage.newName;
         fs.renameSync(oldpath,newpath);
         authResponse.response.send('/dashboard');
+    }
+    renameFolder(authResponse){
+        let folder = authResponse.variables.storage.folder;
+        let oldpath = process.env.STORAGE_PATH+folder.projectName+'/'+folder.name;
+        let newpath = process.env.STORAGE_PATH+folder.projectName+'/'+authResponse.variables.storage.newName;
+        fs.renameSync(oldpath,newpath);
+        authResponse.response.send('/projects/project/'+folder.projectId);
     }
     deleteFile(authResponse){
         let folder = authResponse.variables.storage.folder;
@@ -62,9 +69,7 @@ class File_System{
         let folder = authResponse.variables.storage.folder;
         let path = folder.projectName+'/'+folder.name;
         rimraf.sync(process.env.STORAGE_PATH+path);
-        authResponse.command='REDIRECT';
-        authResponse.display='/projects/project/'+folder.projectId;
-        this.notifyAll(authResponse);
+        authResponse.response.send('/projects/project/'+folder.projectId);
 
     }
     streamFile(authResponse){
@@ -78,13 +83,14 @@ class File_System{
         });
     }
     writeFile(authResponse){
+
         let path = authResponse.variables.storage.path;
         let data = authResponse.variables.storage.data;
         if(!fs.existsSync(process.env.STORAGE_PATH + path)) {
             fs.writeFileSync(process.env.STORAGE_PATH + path, data, {encoding: 'base64'});
         }
     }
-    createNewProject(authResponse) {
+    createNewProject(authResponse){
         let project = authResponse.variables.storage.project;
         let projectPath = process.env.STORAGE_PATH+project.name;
         if(!fs.existsSync(projectPath)) {

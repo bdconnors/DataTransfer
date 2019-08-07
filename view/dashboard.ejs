@@ -18,24 +18,7 @@
             <%if(user.admin){
                 id = projects[i].id;
                 name = projects[i].name;
-                var renameJson = JSON.stringify({projectId: id,name:projects[i].name,type:'Project'});
             %>
-        <div style="text-align:left;" class="col">
-            <div style="text-align:center" class="dropdown">
-                <button style = "background-color:transparent; font-size:16px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
-                    <i class="fa fa-cog"></i> Options
-                </button>
-                <div class="dropdown-menu" aria-labelledby="projSettings">
-                    <button type="button" onclick="modal.display('rename',<%=renameJson%>)" class="dropdown-item"><i class="fa fa-pencil"></i> Rename</button>
-                    <button type="button" name="<%=name%>" id="<%=id%>" onclick="modal.perform('confirm project delete',this);" class="dropdown-item"><i class="fa fa-minus-square-o"></i> Delete</button>
-                    <div class="dropdown-divider"></div>
-                    <% var obj = projects[i]
-                        var jsonProject = JSON.stringify(obj);
-                    %>
-                    <button type="button" onclick="modal.perform('edit project perm',<%=jsonProject%>)" class="dropdown-item"><i class="fa fa-user"></i> Permissions</button>
-                </div>
-            </div>
-
             <%}else{
                 id = projects[i].projectId;
                 name = projects[i].projectName;

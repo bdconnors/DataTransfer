@@ -15,6 +15,8 @@ class ProjectsRepo {
 
     }
     async getFolder(projectid,folderid) {
+        console.log(projectid);
+        console.log(folderid);
         let results = await this.Projects.findOne({id: projectid}, {folders: {$elemMatch: {id: folderid}}}, {_id: 0});
         let response =  false;
         if(results.folders[0]){
@@ -24,7 +26,10 @@ class ProjectsRepo {
 
     }
     async folderExists(projectid,foldername) {
+        console.log('proj repo folder exists proj id '+projectid);
+        console.log('proj repo folder exists foldername '+foldername);
         let results = await this.Projects.findOne({id: projectid}, {folders: {$elemMatch: {name: foldername}}}, {_id: 0});
+        console.log(results);
         let response =  false;
         if(results.folders[0]){
             response = results.folders[0];
@@ -95,17 +100,25 @@ class ProjectsRepo {
     }
     async renameProject(projectid,newname){
         let project = await this.getProject(projectid);
-        let update = await this.Projects.updateOne({id:projectid},{$set:{name:newname}});
+        let folders = project.folders;
+        folders.forEach(folder=>{
+            folder.projectName = newname;
+        });
+        let update = await this.Projects.updateOne({id:projectid},{$set:{name:newname,folders:folders}});
+
         if(update.nModified === 1){
             update = project;
         }
         return update;
     }
-    /**async renameFolder(projectid,folderid,newname){
+    async renameFolder(projectid,folderid,newname){
         let folder = await this.getFolder(projectid,folderid);
         let update = await this.Projects.updateOne({'folders.id':folderid},{$set:{'folders.$.name':newname}});
-        return folder;
-    }**/
+        if(update.nModified === 1){
+            update = folder;
+        }
+        return update;
+    }
     async deleteFolder(projectid,folderid){
         return await this.Projects.updateOne({id:projectid},{$pull:{folders:{id:folderid}}});
     }

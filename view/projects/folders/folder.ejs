@@ -10,9 +10,6 @@
     <h1 class="bg-dark" ><i class="fa fa-folder" ></i>  <%= folder.name%></h1>
 </div>
 <br>
-<% if(user.admin){%>
-    <%- include('../../include/modal.ejs')%>
-<%}%>
 <% var files = folder.files%>
 <%if(folder.metadata.userFolder === user.id){%>
     <%- include('../../include/modal.ejs')%>
@@ -41,22 +38,24 @@
                     </div>
                     <a style = "text-decoration: none; color:#343a40;" href="./<%=folder.id%>/file/<%=files[i].name%>">
                         <div style="text-align:center;">
-                            <%var ext = files[i].metadata.ext%>
+                            <% var fileExt = files[i].metadata.ext;
+                              var ext = fileExt.toUpperCase();
+                            %>
                             <%if(ext === '.pdf'){%>
                                 <i class="fa fa-file-pdf-o fa-3x"></i>
-                            <%}else if(ext  === '.docx'|| ext === '.doc'){%>
+                            <%}else if(ext  === '.DOCX'|| ext === '.DOC'){%>
                                 <i class="fa fa-file-word-o fa-3x"></i>
-                            <%}else if(ext === '.jpg'||ext ==='.jpeg'||ext === '.png'||ext === '.bmp'||ext==='.gif'){%>
+                            <%}else if(ext === '.JPG'||ext ==='.JPEG'||ext === '.PNG'||ext === '.BMP'||ext==='.GIF'){%>
                                 <i class="fa fa-file-image-o fa-3x"></i>
-                            <%}else if(ext === '.ppt' || ext === '.pptx'){%>
+                            <%}else if(ext === '.PPT' || ext === '.PPTX'){%>
                                 <i class="fa fa-file-powerpoint-o fa-3x"></i>
-                            <%}else if(ext === '.xlsx'){%>
+                            <%}else if(ext === '.XLSX'){%>
                                 <i class="fa fa-file-excel-o fa-3x"></i>
-                            <%}else if(ext ==='.txt'){%>
+                            <%}else if(ext ==='.TXT'){%>
                                 <i class="fa fa-file-text-o fa-3x"></i>
-                            <%}else if( ext === '.zip'||ext==='.rar'||ext ==='.7z'){%>
+                            <%}else if( ext === '.ZIP'||ext==='.RAR'||ext ==='.7Z'){%>
                                 <i class="fa fa-file-zip-o fa-3x"></i>
-                            <%}else if(ext === '.java'||ext ==='.js'||ext==='.py'||ext==='.cs'||ext==='.php'||ext==='.html'||ext==='.css'){%>
+                            <%}else if(ext === '.JAVA'||ext ==='.JS'||ext==='.PY'||ext==='.CS'||ext==='.PHP'||ext==='.HTML'||ext==='.CSS'||ext==='.TS'){%>
                                 <i class="fa fa-file-code-o fa-3x"></i>
                             <%}else{%>
                                 <i class="fa fa-file fa-3x"></i>

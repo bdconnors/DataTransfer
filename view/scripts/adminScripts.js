@@ -20,13 +20,16 @@ const renameDisplay = new RenameContent();
 const contentControl = new ContentControl();
 const modal = new Modal(contentControl,functionControl);
 
+
 $( document ).ready(()=>{
     if(uploadFileFunc.getProjectId()) {
-        functionControl.project = uploadFileFunc.getProjectId();
+        functionControl.project ={};
+        functionControl.project.id = uploadFileFunc.getProjectId();
         console.log(functionControl.project);
     }
     if(uploadFileFunc.getFolderId()) {
-        functionControl.folder = uploadFileFunc.getFolderId();
+        functionControl.folder = {};
+        functionControl.folder.id = uploadFileFunc.getFolderId();
         console.log(functionControl.folder);
     }
 });

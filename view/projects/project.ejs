@@ -29,17 +29,9 @@
     <%for(var i = 0; i <folders.length; i++){%>
         <%var id;var folderName;var projectId;%>
             <div style="text-align:left;padding-left:30px" class="col">
-                <%if(user.admin){id = folders[i].id;projectId = project.id; folderName = folders[i].name%>
-                <div style="text-align:center;" class="dropdown">
-                    <button style = "background-color:transparent; font-size:12px" class="btn btn-lg dropdown-toggle" type="button" id="projSettings" data-toggle="dropdown" aria-haspopup ="true" aria-expanded="false">
-                        <i class="fa fa-cog"></i> Options
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="projSettings">
-                        <form action="/projects/project/<%=projectId%>/folders/folder/<%=id%>/delete" method="post">
-                            <button type="submit" class="dropdown-item"><i class="fa fa-minus"></i> Delete</button>
-                        </form>
-                    </div>
-                </div>
+                <%if(user.admin){
+                    id = folders[i].id;projectId = project.id; folderName = folders[i].name
+                %>
                 <%}else{
                     id = folders[i].folderId;
                     projectId = project.projectId;

@@ -58,7 +58,15 @@ class FunctionControl{
         }else if(action === 'new folder'){
 
         }else if(action === 'rename'){
-            let success =  await renameFunc.rename();
+            let success;
+            console.log(element);
+            if(element === 'Project') {
+                success = await renameFunc.rename();
+            }else if(element ==='Folder'){
+                console.log('inside elemet is folder');
+                success = await renameFunc.renameFolder();
+            }
+            console.log(success);
             if(success){
                 window.location = success;
             }else{
@@ -73,6 +81,8 @@ class FunctionControl{
             projectFunc.checkProjInput(element);
         }else if(action === 'check file input'){
             uploadFileFunc.checkFileInp();
+        }else if(action ==='upload file'){
+            uploadFileFunc.upload();
         }else if(action === 'confirm permissions'){
             permissionsFunc.confirmPermissions(element);
         }else if(action === 'confirm existing'){
@@ -94,8 +104,8 @@ class FunctionControl{
             inviteFunc.confirmRemovePermissions(element);
         }else if(action === 'confirm new user invite'){
             newUserFunc.confirmSendInvite();
-        }else if(action === 'confirm rename project'){
-            renameFunc.confirmRename();
+        }else if(action === 'confirm rename'){
+            renameFunc.confirmRename(element);
         }else if(action === 'confirm create project'){
             projectFunc.confirmProjectName();
         }else if(action === 'create new folder'){
@@ -103,21 +113,33 @@ class FunctionControl{
             if(response.error){
                 document.getElementById('folderExistsErr').style.display='block';
             }else{
-                this.newFolder = response;
+                this.folder = response;
                 response.display = 'new folder success';
             }
         }else if(action ==='new folder invite'){
-            this.existingUsers = await inviteFunc.getInvitedUsers(this.project);
+            this.existingUsers = await inviteFunc.getInvitedUsers(this.project.id);
+            console.log(this.existingUsers);
+            this.invitedUsers = await newFolderFunc.getUsers();
+            console.log(this.invitedUsers);
             response.display = 'new folder invite';
         }else if(action === 'new folder invite user'){
             console.log('inside invite new user function control');
             response = await newFolderFunc.inviteUser();
             if(response) {
                 this.user = response;
+                this.invitedUsers = await newFolderFunc.getUsers();
                 response.display = 'new folder invite success';
             }else{
                 document.getElementById('selectUserErr').style.visibility = 'visible';
             }
+        }else if(action === 'remove folder permission'){
+            response = await permissionsFunc.removeFolderPermission(element);
+            this.existingUsers = await inviteFunc.getInvitedUsers(this.project.id);
+            this.invitedUsers = await newFolderFunc.getUsers();
+            response.display = 'new folder invite';
+
+        }else if(action === 'delete folder'){
+            window.location = await projectFunc.deleteFolder();
         }
         return response;
     }

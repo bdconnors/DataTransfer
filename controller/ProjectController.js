@@ -25,6 +25,8 @@ class ProjectController{
         return await this.model.projectExists(projectName);
     }
     async folderExists(projectId,folderName){
+        console.log('proj controller project id '+projectId);
+        console.log('proj controller folderName '+folderName);
         return await this.model.folderExists(projectId,folderName);
     }
     async addFile(folder,file){
@@ -41,6 +43,9 @@ class ProjectController{
     }
     async renameProject(projectId,newname){
         return await this.model.renameProject(projectId,newname);
+    }
+    async renameFolder(projectId,folderId,newname){
+        return await this.model.renameFolder(projectId,folderId,newname);
     }
     async newUserFolder(user){
         return await this.model.newUserFolder(user);
