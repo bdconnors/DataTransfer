@@ -87,17 +87,35 @@ sysAuth.subscribe(sysView);
 sysAuth.subscribe(sysAct);
 
 
-/** Routes **/
+/** Home Page Routes **/
 
-/**
- * Handles root path requests.
- *
- * Redirects To Login Page
- *
- */
+
 app.get('/',(req,res)=>{
-    res.redirect('/login');
+    res.render('index')
 });
+app.get('/about',(req,res)=>{
+    res.render('about')
+});
+app.get('/services',(req,res)=>{
+    res.render('services');
+});
+app.get('/compensation',(req,res)=>{
+    res.render('compensation');
+});
+app.get('/team',(req,res)=>{
+    res.render('team');
+});
+app.get('/contact',(req,res)=>{
+    res.render('contact');
+});
+app.get('/team/:name',(req,res)=>{
+    let name = req.params.name;
+    res.render(name);
+});
+
+
+/** Application Routes **/
+
 /**
  *
  * Handles login Page requests
@@ -564,6 +582,16 @@ app.get('/users/invite',(req,res)=>{
  */
 app.post('/users/invite',(req,res)=>{
     sysAuth.authorizeAdminAJAX(req,res).catch(err=>{console.log(err)});
+});
+app.post('/users/recovery',(req,res)=>{
+    sysAuth.authorizeRecovery(req,res).catch(err=>{console.log(err)});
+});
+app.get('/users/recovery/:authCode',(req,res)=>{
+    sysAuth.authorizePasswordReset(req,res).catch(err=>{console.log(err)});
+});
+app.post('/users/recovery/:authCode',(req,res)=>{
+    console.log('inside app');
+    sysAuth.authorizePasswordReset(req,res).catch(err=>{console.log(err)});
 });
 /**
  * @param {req} req

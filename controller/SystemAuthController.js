@@ -140,6 +140,15 @@ class SystemAuthController{
         }
         this.notifyAll(authResponse);
     }
+    async authorizeRecovery(req,res){
+        let authResponse = this.make(req,res);
+        this.notifyAll(authResponse);
+    }
+    async authorizePasswordReset(req,res){
+        let authResponse = this.make(req,res);
+        authResponse = await this.checkPasswordReset(authResponse);
+        this.notifyAll(authResponse);
+    }
     async fileAuth(authResponse,req,disposition){
         let user = req.session.user;
         let folderId = req.params.folderid;
@@ -257,6 +266,21 @@ class SystemAuthController{
             authResponse.session = false;
             authResponse = this.badSession(authResponse);
             this.notifyAll(authResponse);
+        }
+        return authResponse;
+    }
+    async checkPasswordReset(authResponse){
+        let authCode = authResponse.request.params.authCode;
+        let account = await this.userControl.getUser('authCode',authCode);
+        if(!account){
+            authResponse.display ='/error/passwordAuthError';
+            authResponse.command = 'REDIRECT';
+        }else{
+            if(authResponse.command === 'DISPLAY') {
+                authResponse.display = '/users/resetPassword';
+            }else if(authResponse.command ==='ACTION'){
+                authResponse.variables.account = account;
+            }
         }
         return authResponse;
     }

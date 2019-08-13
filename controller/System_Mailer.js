@@ -34,6 +34,8 @@ class System_Mailer{
                 authResponse.command = 'DISPLAY';
                 authResponse.variables.user = authResponse.variables.email.user;
                 this.notifyAll(authResponse)
+            }else if(authResponse.variables.email.action ==='RECOVER ACCOUNT'){
+                authResponse.response.send(true);
             }
         }).catch(err=>{
             console.log(err)
@@ -58,6 +60,10 @@ class System_Mailer{
         }else if(action === 'PROJECT ADD'){
             subject = this.sysEmails.projectAddSubject(variables.permission);
             body = this.sysEmails.projectAddBody(variables.user,variables.permission,this.company);
+        }else if(action === 'RECOVER ACCOUNT'){
+            url = this.sysEmails.resetPasswordUrl(variables.user.authCode);
+            subject = this.sysEmails.accountRecoverySubject();
+            body = this.sysEmails.accountRecoveryBody(variables.user,url,this.company);
         }
 
         return this.make(to,subject,body);

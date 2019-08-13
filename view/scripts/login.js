@@ -69,6 +69,38 @@ function validate(){
     }
     return valid;
 }
+function showForgotModal(){
+    $('#forgotResponseEmail').empty();
+    $('#forgotModal').modal();
+}
+function hideForgotModal(){
+    $('#forgotModal').modal('hide');
+    $('body').removeClass('modal-open');
+    $('.modal-backdrop').remove();
+}
+function showForgotResponseModal(){
+    $('#forgotResponseModal').modal();
+}
+function hideForgotResponseModal(){
+    $('#forgotResponseModal').modal('hide');
+    hideForgotModal();
+}
+function showForgotLoadingSpinner(){
+    $('#forgotLoadingSpinner').modal();
+}
+function hideForgotLoadingSpinner(){
+    $('#forgotLoadingSpinner').modal('hide');
+}
+async function passwordRecovery(){
+    showForgotLoadingSpinner();
+    let email = document.getElementById('forgotEmail').value;
+    let server = new Server();
+    $('#forgotResponseEmail').append(email);
+    await server.send(server.make('/users/recovery','POST','email='+email)).catch(err=>{console.log(err)});
+    hideForgotLoadingSpinner();
+    showForgotResponseModal();
+
+}
 function clearChildren(element){
 
     while (element.firstChild) {

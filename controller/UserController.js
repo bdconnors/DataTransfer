@@ -65,6 +65,13 @@ class UserController{
     async deleteProject(projectId){
         return await this.model.deleteProject(projectId);
     }
+    async resetPassword(email){
+        return await this.model.resetPassword(email);
+    }
+    async submitResetPassword(account){
+        account.password = bcrypt.hashSync(account.password,11);
+        return await this.model.submitResetPassword(account);
+    }
     async verifyCredentials(email,password){
         return await this.model.getUser('email',email)
             .then(user => {

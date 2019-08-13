@@ -59,6 +59,26 @@ function validate(){
     }
     return valid;
 }
+async function submitRecoveryPassword(){
+    if(validate()){
+        showForgotLoadingSpinner();
+        let server = new Server();
+        const newPassword = document.getElementById('password').value;
+        let curUrl = window.location.href.split('/');
+        let authCode = curUrl[5];
+        let url = '/users/recovery/'+authCode;
+        console.log(url);
+        await server.send(server.make(url,'POST',{password:newPassword}));
+        hideForgotLoadingSpinner();
+        showRecoveryModal();
+    }
+}
+function showRecoveryModal(){
+    $('#recoverySuccessModal').modal();
+}
+function exitRecovery(){
+    window.location = '/login';
+}
 function clearChildren(element){
     while (element.firstChild) {
         element.removeChild(element.firstChild);

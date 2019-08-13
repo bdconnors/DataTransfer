@@ -1,8 +1,8 @@
-<%- include('./include/head.ejs',{title:'Novitious Dashboard'})%>
+<%- include('../include/app/head.ejs',{title:'Novitious Dashboard'})%>
 <%if(user.admin){%>
-    <%- include('./include/adminNav.ejs') %>
+    <%- include('../include/app/adminNav.ejs') %>
 <%}else{%>
-    <%- include('./include/menu.ejs') %>
+    <%- include('../include/app/menu.ejs') %>
     <% var projects = user.projectPermissions %>
 <%}%>
 <body>
@@ -35,4 +35,4 @@
     <%}%>
     </div>
 </div>
-<%- include('./include/foot.ejs')%>
+<%- include('../include/app/foot.ejs')%>

@@ -3,7 +3,7 @@ class SystemViewController{
     constructor(){}
 
     load(authResponse){
-        authResponse.response.render('.'+authResponse.display,authResponse.variables);
+        authResponse.response.render('./app'+authResponse.display,authResponse.variables);
     }
     redirect(authResponse){
         authResponse.response.redirect(authResponse.display);

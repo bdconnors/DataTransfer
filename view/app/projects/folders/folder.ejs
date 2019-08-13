@@ -1,18 +1,18 @@
-<%- include('../../include/head.ejs',{title:folder.name})%>
+<%- include('../../../include/app/head.ejs',{title:folder.name})%>
 <body>
 <%if(user.admin){%>
-    <%- include('../../include/adminNav.ejs') %>
+    <%- include('../../../include/app/adminNav.ejs') %>
 <%}else{%>
-    <%- include('../../include/menu.ejs') %>
+    <%- include('../../../include/app/menu.ejs') %>
 <%}%>
-<%- include('../../include/folderNav.ejs')%>
+<%- include('../../../include/app/folderNav.ejs')%>
 <div class="bg-dark" id = "pageHeader"  style="padding:35px 50px;">
     <h1 class="bg-dark" ><i class="fa fa-folder" ></i>  <%= folder.name%></h1>
 </div>
 <br>
 <% var files = folder.files%>
 <%if(folder.metadata.userFolder === user.id){%>
-    <%- include('../../include/modal.ejs')%>
+    <%- include('../../../include/app/modal.ejs')%>
 <%}%>
 <div style="padding-top:50px;" class="center">
     <div style="text-align:center; padding-top:20px;padding-bottom:20px " class="row">
@@ -68,4 +68,4 @@
             <%}%>
     </div>
 </div>
-<%- include('../../include/foot.ejs')%>
+<%- include('../../../include/app/foot.ejs')%>

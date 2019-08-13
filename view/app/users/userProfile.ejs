@@ -1,7 +1,7 @@
 <%var profileName = profileUser.firstname+' '+profileUser.lastname%>
-<%- include('../include/head.ejs',{title: profileName+' Profile'})%>
+<%- include('../../include/app/head.ejs',{title: profileName+' Profile'})%>
 <body>
-<%- include('../include/adminNav.ejs') %>
+<%- include('../../include/app/adminNav.ejs') %>
 <div class="bg-dark"  id = "pageHeader"  style="padding:35px 50px; width:100%;">
     <h1 class="bg-dark" ><i class="fa fa-user-circle-o"></i> <%= profileUser.firstname%> <%=profileUser.lastname%></h1>
 </div>
@@ -53,4 +53,4 @@
     </div>
     </div>
 </div>
-<%- include('../include/foot.ejs')%>
+<%- include('../../include/app/foot.ejs')%>

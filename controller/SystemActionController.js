@@ -296,6 +296,25 @@ class SystemActionController{
         console.log(exists);
         authResponse.response.send(exists);
     }
+    async accountRecovery(authResponse){
+        let email = authResponse.request.body.email;
+        let recoveredAccount = await this.userControl.resetPassword(email);
+        if(recoveredAccount){
+            authResponse.variables.email = {action:'RECOVER ACCOUNT',user:recoveredAccount};
+            this.notifyAll(authResponse)
+        }else{
+            authResponse.response.send(false);
+        }
+
+    }
+    async accountRecoveryReset(authResponse){
+        let account = authResponse.variables.account;
+        let newPassword = authResponse.request.body.password;
+        delete account.authCode;
+        account.password = newPassword;
+        let response = await this.userControl.submitResetPassword(account);
+        authResponse.response.send(response);
+    }
 
     performAction(authResponse){
         console.log(authResponse.display);
@@ -345,6 +364,10 @@ class SystemActionController{
         }else if(authResponse.display ==='/projects/project/:id/folders/folder/:folderid/rename'){
             console.log('inside observer sys action');
             this.renameFolder(authResponse).catch(err=>{console.log(err)});
+        }else if(authResponse.display ==='/users/recovery'){
+            this.accountRecovery(authResponse).catch((err)=>{console.log(err)});
+        }else if(authResponse.display ==='/users/recovery/:authCode'){
+            this.accountRecoveryReset(authResponse).catch(err=>{console.log(err)});
         }
     }
     notify(authResponse){

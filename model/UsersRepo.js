@@ -87,6 +87,27 @@ class UsersRepo {
         }
         return update;
     }
+    async resetPassword(email){
+        let user = await this.getUser('email',email);
+        if(user){
+            user.password = '';
+            user.authCode = uuid();
+            await this.Users.updateOne({email:email},{$unset:{password:''}});
+            await this.Users.updateOne({email:email},{$set:{authCode:user.authCode}});
+        }
+        return user;
+    }
+    async submitResetPassword(account){
+        let update;
+        update = await this.Users.updateOne({id:account.id},{$unset:{authCode:''}});
+        update = await this.Users.updateOne({id:account.id},{$set:{password:account.password}});
+        if(update.nModified === 1){
+            update = account;
+        }else{
+            update = false;
+        }
+        return update;
+    }
     async getProjectUsers(id){
         return await this.Users.find({"projectPermissions.projectId":id},{_id:0});
     }

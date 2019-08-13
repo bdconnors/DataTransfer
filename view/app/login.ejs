@@ -1,0 +1,84 @@
+<%- include('../include/app/head.ejs',{title:'Novitious Login'})%>
+<div id="primaryHeader" class="row" style="padding:35px 50px;">
+    <div class="center">
+        <img src="/img/logo.png" class='img-fluid col-xs-12'>
+    </div>
+</div>
+<div class="container">
+    <div class="modal fade" id="forgotModal">
+        <div class=".modal-dialog-centered modal-dialog modal-lg">
+            <div id="forgotLoadingSpinnerContent" class="modal-content">
+                <div id="forgotLoadingSpinner" class="modal fade bd-example-modal-sm">
+                    <div class="modal-dialog modal-sm modal-dialog-centered">
+                        <div class="modal-content">
+                            <div style="padding:35px 50px;" class="center modal-header">
+                                <h6 id="loadingSpinnerText">Recovering Account</h6>
+                            </div>
+                            <div style="padding:40px 50px;" class="modal-body center text-center">
+                                <span id="loadingSrSpan" class="sr-only">Recovering Account</span>
+                                <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+                            </div>
+                            <div style="padding:35px 50px;" class="modal-footer"></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="background-color:#343a40;  padding:35px 50px;"  class="modal-header text-center">
+                    <div class="center">
+                        <h4  style="background-color:#343a40; color:#f8f9fa;" id="modalHeader"><i class="fa fa-eye"></i> Reset Account Password</h4>
+                    </div>
+                    <div class="text-right">
+                        <button type="button" class="close" onclick="hideForgotResponseModal()">&times;</button>
+                    </div>
+                </div>
+                    <div style="padding:40px 50px;"  class="modal-body">
+                        <div id="forgotResponseModal" class="modal fade bd-example-modal-sm">
+                            <div class="modal-dialog modal-sm modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div  class="center modal-header">
+                                        <h6 id="forgotResponseText">Reset Account Password</h6>
+                                    </div>
+                                    <div id="forgotResponseBody" class="modal-body center text-center">
+                                        <p id="forgotResponseMessage">If an associated account was found, instructions on how to reset your password were sent in an e-mail to <span id="forgotResponseEmail"></span>.</p>
+                                    </div>
+                                    <div id="forgotResponseFooter"  class="modal-footer">
+                                        <button type="button"  onclick="hideForgotResponseModal()" class="btn btn-outline-dark btn-block button"><i class="fa fa-power-off"></i> Ok</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="button-width center" id="modalBody">
+                            <div class="form-group">
+                                <label for="forgotEmail"><b><i class="fa fa-envelope"></i> Account Email:</b></label>
+                                <input type="text" class="form-control"  name="email" id="forgotEmail" placeholder="ex: user@domain.net">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="padding:35px 50px;" class="modal-footer">
+                        <div id="modalFooter" class="button-width center">
+                            <button type="button" onclick="passwordRecovery()" class="btn btn-outline-dark btn-block" ><i class="fa fa-power-off"></i>Submit</button>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content">
+    <div class="body" style="padding:40px 50px;">
+        <div class = "center form-width">
+            <p id="accountErr" style="color:red; visibility:hidden; font-size:12px;">*Password Incorrect or Account was not found</p>
+            <form role="form" method="post">
+                <label for="email"><i class="fa fa-envelope"></i> <b>E-mail</b></label>
+                <input type="text" class="form-control" name="email" id="email" placeholder="username@email.com">
+                <br>
+                <label for="password"><i class="fa fa-eye"></i> <b>Password</b></label>
+                <input type="password" class="form-control" name="password" id="password" placeholder="password">
+                <br>
+                <button type="submit" class="btn btn-dark btn-block" ><span class="glyphicon glyphicon-off"></span> Login</button>
+            </form>
+            <br>
+            <span style="float:right;" class="psw"><a onclick="showForgotModal()" href="#">Forgot password?</a></span>
+        </div>
+    </div>
+</div>
+
+<%- include('../include/app/foot.ejs')%>
